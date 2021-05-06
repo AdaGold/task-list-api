@@ -2,6 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import request, Blueprint, make_response, jsonify
 from sqlalchemy import asc, desc
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -69,3 +70,37 @@ def get_tasks():
     for task in tasks:
         response_body.append(task.to_dict())
     return jsonify(response_body), 200
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    """Marks Task complete"""
+    task = Task.query.get(task_id) 
+    if not task: # Why can't move it down?
+        return jsonify(None), 404
+    # Marks complete on incompleted task
+    if not task.is_complete(): 
+        task.completed_at = datetime.now()
+        db.session.add(task)
+        db.session.commit()
+        return jsonify({"task": task.to_dict()}), 200
+    # Marks complete on completed task 
+    if task.completed_at != None and task.completed_at != True:
+        db.session.add(task)
+        db.session.commit()
+        return jsonify({"task": task.to_dict()}), 200  
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    """Marks Task complete"""
+    # Marks incomplete on completed task
+    task = Task.query.get(task_id) 
+    if not task:
+        return jsonify(None), 404
+    if task.is_complete(): 
+        task.completed_at = None
+        db.session.add(task)
+        db.session.commit()
+        return jsonify({"task": task.to_dict()}), 200
+    # Marks incomplete on incompleted task 
+    if task.completed_at == None:
+        return jsonify({"task": task.to_dict()}), 200  
