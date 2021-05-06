@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import request, Blueprint, make_response, jsonify
+from sqlalchemy import asc, desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -23,22 +24,6 @@ def add_task():
         "description": task.description,
         "is_complete": task.is_complete()
         }}), 201
-
-@tasks_bp.route("", methods=["GET"])
-def get_all_tasks():
-    """Gets data of the existing tasks in Task table"""
-    tasks = Task.query.all() 
-    response_body = [] 
-    for task in tasks:
-        response_body.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.is_complete()
-            }), 200
-    if len(response_body) == 0:
-        return jsonify([]), 200
-    return jsonify(response_body), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"]) 
 def get_one_task(task_id):
@@ -80,3 +65,27 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return ({"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200)
+
+@tasks_bp.route("", methods=["GET"])
+def get_tasks():
+    """
+    Returns an array of tasks.
+    - No arg provided -> return all tasks
+    - Arg provided -> return tasks sorted by title
+    """
+    task_order = request.args.get("sort")
+    if task_order == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif task_order == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    response_body = [] 
+    for task in tasks:
+        response_body.append({
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete()
+            })
+    return jsonify(response_body), 200
