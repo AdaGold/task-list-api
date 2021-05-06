@@ -18,12 +18,7 @@ def add_task():
         )  
     db.session.add(task)
     db.session.commit()
-    return jsonify({"task":{
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": task.is_complete()
-        }}), 201
+    return jsonify({"task": task.to_dict()}), 201
 
 @tasks_bp.route("/<task_id>", methods=["GET"]) 
 def get_one_task(task_id):
@@ -31,12 +26,7 @@ def get_one_task(task_id):
     task = Task.query.get(task_id)
     if not task:
         return jsonify(None), 404
-    return jsonify({"task":{
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": task.is_complete()
-        }}), 200   
+    return jsonify({"task": task.to_dict()}), 200   
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -49,12 +39,7 @@ def update_task(task_id):
     task.description = request_body["description"]
     task.completed_at = request_body["completed_at"]
     db.session.commit()
-    return jsonify({"task":{
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": task.is_complete() 
-        }}), 200
+    return jsonify({"task": task.to_dict()}), 200
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -82,10 +67,5 @@ def get_tasks():
         tasks = Task.query.all()
     response_body = [] 
     for task in tasks:
-        response_body.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.is_complete()
-            })
+        response_body.append(task.to_dict())
     return jsonify(response_body), 200

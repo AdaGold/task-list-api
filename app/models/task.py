@@ -13,3 +13,11 @@ class Task(db.Model):
             return False
         else:
             return True
+
+    def to_dict(self):
+        return {
+            "id": self.task_id, 
+            "title": self.title,
+            "description": self.description,
+            "is_complete": self.is_complete()
+        }    
