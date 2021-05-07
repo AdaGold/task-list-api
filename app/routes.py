@@ -103,7 +103,7 @@ def send_slack_task_notification(task):
     SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
     notification = f"Someone just completed the task {task.title}"
     url = f"https://slack.com/api/chat.postMessage?channel=task-notifications&text={notification}"
-    headers = {Authorization': f'Bearer {SLACK_BOT_TOKEN}'}
+    headers = {"Authorization": f"Bearer {SLACK_BOT_TOKEN}"}
     return requests.request("POST", url, headers=headers)
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
