@@ -3,6 +3,9 @@ from app.models.task import Task
 from flask import request, Blueprint, make_response, jsonify
 from sqlalchemy import asc, desc
 from datetime import datetime
+import os
+import slack
+from slack import WebClient
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -77,22 +80,26 @@ def mark_complete(task_id):
     task = Task.query.get(task_id) 
     if not task: # Why can't move it down?
         return jsonify(None), 404
-    # Marks complete on incompleted task
     if not task.is_complete(): 
         task.completed_at = datetime.now()
         db.session.add(task)
         db.session.commit()
-        return jsonify({"task": task.to_dict()}), 200
-    # Marks complete on completed task 
-    if task.completed_at != None and task.completed_at != True:
-        db.session.add(task)
-        db.session.commit()
-        return jsonify({"task": task.to_dict()}), 200  
+        send_slack_task_notification(task)
+    return jsonify({"task": task.to_dict()}), 200
+
+def send_slack_task_notification(task):
+    """Posts message to a Slack channel"""
+    slack_token = os.environ.get("SLACK_BOT_TOKEN")
+    client = WebClient(token=slack_token)
+    channel_id = "C0215S41XGS"
+    client.chat_postMessage(
+        channel=channel_id,
+        text=(f"Someone just completed the task {task.title}")
+        )
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     """Marks Task complete"""
-    # Marks incomplete on completed task
     task = Task.query.get(task_id) 
     if not task:
         return jsonify(None), 404
@@ -100,7 +107,4 @@ def mark_incomplete(task_id):
         task.completed_at = None
         db.session.add(task)
         db.session.commit()
-        return jsonify({"task": task.to_dict()}), 200
-    # Marks incomplete on incompleted task 
-    if task.completed_at == None:
-        return jsonify({"task": task.to_dict()}), 200  
+    return jsonify({"task": task.to_dict()}), 200
