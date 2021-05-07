@@ -20,4 +20,4 @@ class Task(db.Model):
             "title": self.title,
             "description": self.description,
             "is_complete": self.is_complete()
-        }    
+            }    
