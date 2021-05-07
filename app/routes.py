@@ -5,7 +5,6 @@ from flask import request, Blueprint, jsonify # make_response,
 from sqlalchemy import asc, desc
 from datetime import datetime
 import os
-import slack
 from slack import WebClient
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
