@@ -5,7 +5,8 @@ from flask import request, Blueprint, jsonify # make_response,
 from sqlalchemy import asc, desc
 from datetime import datetime
 import os
-from slack import WebClient
+from slack_sdk import WebClient
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -90,6 +91,7 @@ def mark_task_complete(task_id):
 
 def send_slack_task_notification(task):
     """Posts message to a Slack channel"""
+    """
     slack_token = os.environ.get("SLACK_BOT_TOKEN")
     client = WebClient(token=slack_token)
     channel_id = "C0215S41XGS"
@@ -97,6 +99,12 @@ def send_slack_task_notification(task):
         channel=channel_id,
         text=(f"Someone just completed the task {task.title}")
         )
+    """
+    SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
+    notification = f"Someone just completed the task {task.title}"
+    url = f"https://slack.com/api/chat.postMessage?channel=task-notifications&text={notification}"
+    headers = {Authorization': f'Bearer {SLACK_BOT_TOKEN}'}
+    return requests.request("POST", url, headers=headers)
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
