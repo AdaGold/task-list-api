@@ -1,6 +1,6 @@
 from flask import current_app
 from app import db
-
+from flask import jsonify
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
@@ -16,9 +16,12 @@ class Task(db.Model):
             return True
 
     def to_dict(self):
-        return {
-            "id": self.task_id, 
+        task = {
+            "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.is_complete()
-            }    
+            }
+        if self.goal:
+            task["goal_id"] = self.goal_id
+        return task
