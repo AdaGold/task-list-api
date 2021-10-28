@@ -10,15 +10,18 @@ def handle_tasks():
         tasks = Task.query.all()
         tasks_response = []
         for task in tasks:
+            if not task.completed_at:
+                is_complete = False
+            else:
+                is_complete = True
             tasks_response.append({
                 "id" : task.id,
                 "title" : task.title,
                 "description" : task.description,
-                "completed_at" : task.completed_at
+                "is_complete" : is_complete
             })
+
         return jsonify(tasks_response)
-
-
 
     # elif request.method == "POST":
     #     request_body = request.get_json()
@@ -30,7 +33,6 @@ def handle_tasks():
 
     #     return jsonify()
 #GET /tasks
-    #no saved tasks
     #one saved task
 
 #POST /tasks
