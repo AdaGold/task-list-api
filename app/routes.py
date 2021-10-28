@@ -58,6 +58,15 @@ def handle_task(id):
         }
         return jsonify(response)
 
+    elif request.method == "DELETE":
+        db.session.delete(task)
+        db.session.commit()
+
+        response = {
+            'details' : f'Task {task.id} "{task.title}" successfully deleted'
+        }
+        return jsonify(response), 200
+
 
     # elif request.method == "POST":
     #     request_body = request.get_json()
