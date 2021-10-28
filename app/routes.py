@@ -38,9 +38,27 @@ def handle_task(id):
                 "description": task.description,
                 "is_complete": bool(task.completed_at)
             }
-    }
+        }   
 
-    
+    elif request.method == "PUT":
+        request_body = request.get_json()
+        
+        task.title = request_body["title"]
+        task.description = request_body["description"]
+
+        db.session.commit()
+
+        response = {
+            "task" : {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
+        }
+        return jsonify(response)
+
+
     # elif request.method == "POST":
     #     request_body = request.get_json()
     #     new_task = Task(title=request_body["title"], 
