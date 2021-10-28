@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, request
+from sqlalchemy import asc, desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -8,7 +9,15 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["GET", "POST"])
 def handle_tasks():
     if request.method == "GET":
-        tasks = Task.query.all()
+        sort_query = request.args.get("sort")
+        if sort_query:
+            if sort_query == "asc":
+                tasks = Task.query.order_by(asc(Task.title))
+            else:
+                tasks = Task.query.order_by(desc(Task.title))
+        else:
+            tasks = Task.query.all()
+
         tasks_response = []
         for task in tasks:
 
@@ -87,3 +96,14 @@ def handle_task(id):
             'details': f'Task {task.id} "{task.title}" successfully deleted'
         }
         return jsonify(response), 200
+
+#potential refactors:
+    # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
+    # potential fixture or helper function that formats :
+                    #{
+            #     "id": task.id,
+            #     "title": task.title,
+            #     "description": task.description,
+            #     "is_complete": bool(task.completed_at)
+            # }
+
