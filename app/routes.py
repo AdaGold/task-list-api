@@ -28,7 +28,7 @@ def handle_tasks():
 def handle_task(id):
     task = Task.query.get(id)
     if task is None:
-        return jsonify(""), 201
+        return jsonify(None), 404
     
     if request.method == "GET":
         return {
