@@ -24,6 +24,30 @@ def handle_tasks():
 
         return jsonify(tasks_response)
 
+    elif request.method == "POST":
+        request_body = request.get_json()
+        
+        try:
+            new_task = Task(title=request_body["title"], 
+            description=request_body["description"], completed_at=request_body["completed_at"])
+
+            db.session.add(new_task)
+            db.session.commit()
+            
+
+            response = {
+                "task": {
+                    "id": new_task.id,
+                    "title": new_task.title,
+                    "description": new_task.description,
+                    "is_complete": bool(new_task.completed_at)
+                }
+            }
+
+            return jsonify(response), 201
+        except KeyError:
+            return jsonify({"details": "Invalid data"}), 400
+
 @tasks_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
 def handle_task(id):
     task = Task.query.get(id)
@@ -67,21 +91,6 @@ def handle_task(id):
         }
         return jsonify(response), 200
 
-
-    # elif request.method == "POST":
-    #     request_body = request.get_json()
-    #     new_task = Task(title=request_body["title"], 
-    #     description=request_body["description"], completed_at=request_body["completed_at"])
-
-    #     db.session.add(new_task)
-    #     db.session.commit()
-        
-    #     if request_body["completed_at"]:
-    #         is_complete = True
-    #     else: 
-    #         is_complete = False
-        
-    #     return jsonify("succesfully added"), 201
 
 #POST /tasks
     #create a task where completed @ == None
