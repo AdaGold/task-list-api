@@ -2,15 +2,16 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, request
 from sqlalchemy import asc, desc
+from datetime import date
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
 
 @tasks_bp.route("", methods=["GET", "POST"])
 def handle_tasks():
     if request.method == "GET":
         sort_query = request.args.get("sort")
         if sort_query:
+            #potential refactor: order by default orders category by asc, so I could remove asc() and just say order_by(Task.title) ?
             if sort_query == "asc":
                 tasks = Task.query.order_by(asc(Task.title))
             else:
@@ -20,7 +21,6 @@ def handle_tasks():
 
         tasks_response = []
         for task in tasks:
-
             tasks_response.append({
                 "id": task.id,
                 "title": task.title,
@@ -97,13 +97,30 @@ def handle_task(id):
         }
         return jsonify(response), 200
 
-#potential refactors:
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def update_task(id):
+    task = Task.query.get(id)
+    task.completed_at = date.today()
+
+    db.session.commit()
+
+    response = {
+        "task": {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        }
+    }
+    return jsonify(response), 200
+    
+
+# potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
     # potential fixture or helper function that formats :
-                    #{
-            #     "id": task.id,
-            #     "title": task.title,
-            #     "description": task.description,
-            #     "is_complete": bool(task.completed_at)
-            # }
-
+        # {
+        #     "id": task.id,
+        #     "title": task.title,
+        #     "description": task.description,
+        #     "is_complete": bool(task.completed_at)
+        # }
