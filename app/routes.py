@@ -98,7 +98,7 @@ def handle_task(id):
         return jsonify(response), 200
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
-def update_task(id):
+def update_task_completed(id):
     task = Task.query.get(id)
     task.completed_at = date.today()
 
@@ -113,6 +113,24 @@ def update_task(id):
         }
     }
     return jsonify(response), 200
+
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def update_task_not_completed(id):
+    task = Task.query.get(id)
+    task.completed_at = None
+
+    db.session.commit()
+
+    response = {
+        "task": {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        }
+    }
+    return jsonify(response), 200
+
     
 
 # potential refactors:
