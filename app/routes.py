@@ -100,8 +100,10 @@ def handle_task(id):
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def update_task_completed(id):
     task = Task.query.get(id)
-    task.completed_at = date.today()
+    if task is None:
+        return jsonify(None), 404
 
+    task.completed_at = date.today()
     db.session.commit()
 
     response = {
@@ -114,11 +116,15 @@ def update_task_completed(id):
     }
     return jsonify(response), 200
 
+#refactor these two routes to be one /<id?/<mark completion> 
+
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def update_task_not_completed(id):
     task = Task.query.get(id)
-    task.completed_at = None
+    if task is None:
+        return jsonify(None), 404
 
+    task.completed_at = None
     db.session.commit()
 
     response = {
