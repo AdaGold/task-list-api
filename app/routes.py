@@ -37,16 +37,22 @@ def handle_tasks():
                 }}, 201)
 
     elif request.method=="GET":
-       tasks=Task.query.all()
-       tasks_response=[]
-       for task in tasks:
+        title_query = request.args.get('sort')
+        if title_query=='desc':
+            tasks = Task.query.order_by(Task.title.desc()).all()
+        elif title_query=='asc':
+            tasks = Task.query.order_by(Task.title).all()
+        else:
+            tasks=Task.query.all()
+        tasks_response=[]
+        for task in tasks:
             tasks_response.append({
                     "id": task.task_id,
                     "title": task.title,
                     "description": task.description,
                     "is_complete": False if task.completed_at is None else task.completed_at
                 })
-       return jsonify(tasks_response)
+        return jsonify(tasks_response)
 
     
 @tasks_bp.route("/<task_id>", methods=["GET", "PUT", "DELETE"])
