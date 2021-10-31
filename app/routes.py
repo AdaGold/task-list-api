@@ -4,6 +4,7 @@ from flask import Blueprint, request, make_response, jsonify
     #but we use a helper method, make_response?
 from app import db
 from app.models.task import Task
+from datetime import datetime
 #from app.models.goal import Goal
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -88,3 +89,34 @@ def handle_a_task(task_id):
         db.session.delete(task)
         db.session.commit()
         return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+
+    task = Task.query.get(task_id)
+    if not task is None:
+        task.completed_at = datetime.utcnow()
+        db.session.commit()
+
+        return make_response({"task": { "id": task.task_id,
+                                                "title": task.title,
+                                                "description": task.description,
+                                                "is_complete": bool(task.completed_at)
+                                                }}, 200)
+    else:
+        return make_response("",404)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = Task.query.get(task_id)
+    if not task is None:
+        task.completed_at = None
+        db.session.commit()
+
+        return make_response({"task": { "id": task.task_id,
+                                                "title": task.title,
+                                                "description": task.description,
+                                                "is_complete": bool(task.completed_at) #added bool
+                                                }}, 200)
+    else:
+        return make_response("",404)
