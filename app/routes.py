@@ -8,8 +8,8 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def tasks():
     if request.method == "GET":
         tasks = Task.query.all()
-        response = [task.to_dict() for task in tasks]
-        return jsonify(response), 200
+        response_body = [task.to_dict() for task in tasks]
+        return jsonify(response_body), 200
 
     elif request.method == "POST":
         request_body = request.get_json()
@@ -27,3 +27,38 @@ def tasks():
         }
 
         return jsonify(response_body), 201
+
+@tasks_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
+def tasks_id(id):
+    task = Task.query.get(id)
+    if not task:
+        return jsonify(None), 404
+
+    if request.method == "GET":
+        response_body = {
+            "task": task.to_dict()
+        }
+        return response_body
+
+    elif request.method == "PUT":
+        request_body = request.get_json()
+        task.title = request_body["title"]
+        task.description = request_body["description"]
+
+        db.session.commit()
+
+        response_body = {
+            "task": Task.query.get(id).to_dict()
+        }
+
+        return jsonify(response_body), 200
+
+    elif request.method == "DELETE":
+        db.session.delete(task)
+        db.session.commit()
+
+        response_body = {
+            "details": f"Task {task.id} \"{task.title}\" successfully deleted"
+        }
+
+        return jsonify(response_body), 200
