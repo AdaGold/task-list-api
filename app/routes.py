@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -13,7 +14,7 @@ def tasks():
         elif sort_query == "desc":
             tasks = Task.query.order_by(Task.title.desc())
         else:
-            task = Task.query.all()
+            tasks = Task.query.all()
         response_body = [task.to_dict() for task in tasks]
         return jsonify(response_body), 200
 
@@ -35,7 +36,8 @@ def tasks():
         return jsonify(response_body), 201
 
 @tasks_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
-def tasks_id(id):
+@tasks_bp.route("/<id>/<status>", methods=["PATCH"])
+def tasks_id(id, status=None):
     task = Task.query.get(id)
     if not task:
         return jsonify(None), 404
@@ -44,20 +46,30 @@ def tasks_id(id):
         response_body = {
             "task": task.to_dict()
         }
-        return response_body
 
     elif request.method == "PUT":
         request_body = request.get_json()
         task.title = request_body["title"]
         task.description = request_body["description"]
+        task.completed_at = request_body.get("completed_at")
 
         db.session.commit()
 
         response_body = {
-            "task": Task.query.get(id).to_dict()
+            "task": task.to_dict()
         }
 
-        return jsonify(response_body), 200
+    elif request.method == "PATCH":
+        if status == "mark_complete":
+            task.completed_at = datetime.now()
+        elif status == "mark_incomplete":
+            task.completed_at = None
+
+        db.session.commit()
+
+        response_body = {
+            "task": task.to_dict()
+        }
 
     elif request.method == "DELETE":
         db.session.delete(task)
@@ -67,4 +79,4 @@ def tasks_id(id):
             "details": f"Task {task.id} \"{task.title}\" successfully deleted"
         }
 
-        return jsonify(response_body), 200
+    return jsonify(response_body), 200
