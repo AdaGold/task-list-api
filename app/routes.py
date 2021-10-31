@@ -34,7 +34,7 @@ def handle_tasks():
                     "id": new_task.task_id,
                     "title": new_task.title,
                     "description": new_task.description,
-                    "is_complete": False if new_task.completed_at is None else new_task.completed_at
+                    "is_complete": False if new_task.completed_at is None else True
                 }}, 201)
 
     elif request.method=="GET":
@@ -82,7 +82,7 @@ def handle_a_task(task_id):
         return make_response({"task": { "id": task.task_id,
                                         "title": task.title,
                                         "description": task.description,
-                                        "is_complete": False if task.completed_at is None else task.completed_at  
+                                        "is_complete": False if task.completed_at is None else True  
                                         }})
 
     elif request.method == "DELETE":
@@ -97,7 +97,7 @@ def mark_task_complete(task_id):
     if not task is None:
         task.completed_at = datetime.utcnow()
         db.session.commit()
-
+        print(task)
         return make_response({"task": { "id": task.task_id,
                                                 "title": task.title,
                                                 "description": task.description,
