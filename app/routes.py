@@ -1,11 +1,13 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 import os
 import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["GET", "POST"])
 def tasks():
@@ -26,13 +28,13 @@ def tasks():
         if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
             return {"details": "Invalid data"}, 400
 
-        task = Task.from_dict(request_body)
+        new_task = Task.from_dict(request_body)
 
-        db.session.add(task)
+        db.session.add(new_task)
         db.session.commit()
 
         response_body={
-            "task": task.to_dict()
+            "task": new_task.to_dict()
         }
 
         return jsonify(response_body), 201
@@ -90,3 +92,27 @@ def tasks_id(id, status=None):
         }
 
     return jsonify(response_body), 200
+
+@goals_bp.route("", methods=["GET", "POST"])
+def goals():
+    if request.method == "GET":
+        goals = Goal.query.all()
+        response_body = [goal.to_dict() for goal in goals]
+        return jsonify(response_body), 200
+
+    elif request.method == "POST":
+        request_body = request.get_json()
+
+        if "title" not in request_body:
+            return jsonify({"details": "Invalid data"}), 400
+
+        new_goal = Goal.from_dict(request_body)
+
+        db.session.add(new_goal)
+        db.session.commit()
+
+        response_body = {
+            "goal": new_goal.to_dict()
+        }
+
+        return jsonify({response_body}), 201
