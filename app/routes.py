@@ -4,12 +4,11 @@ from flask import Blueprint, request, make_response, jsonify
     #but we use a helper method, make_response?
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 import slack 
 import os
 from dotenv import load_dotenv
-
-#from app.models.goal import Goal
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 #Our Blueprint instance. We'll use it to group routes that start with /tasks. 
@@ -17,9 +16,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
     #__name__ provides information the blueprint uses for certain aspects of routing.?
 
 @tasks_bp.route("", methods=["POST","GET"])
-#I still don't really get how decorators work
-#but anyway this one is for if you want to generally post 
-#or if you want to get all tasks
+#decorators
 def handle_tasks():
     if request.method=="POST":
         request_body = request.get_json()
@@ -133,3 +130,103 @@ def mark_task_incomplete(task_id):
                                                 }}, 200)
     else:
         return make_response("",404)
+
+
+##### goals ######
+
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+
+@goals_bp.route("", methods=["POST","GET"])
+def handle_goals():
+    if request.method=="POST":
+        request_body = request.get_json()
+        if "title" not in request_body.keys():
+            return make_response({"details": "Invalid data"}, 400) 
+        else:
+            new_goal = Goal(title=request_body["title"])
+            db.session.add(new_goal)
+            db.session.commit()
+            
+            return make_response({"goal": {
+                    "id": new_goal.goal_id,
+                    "title": new_goal.title
+                }}, 201)
+
+    elif request.method=="GET":
+        title_query = request.args.get('sort')
+        if title_query=='desc':
+            goals = Goal.query.order_by(Goal.title.desc()).all()
+        elif title_query=='asc':
+            goals = Goal.query.order_by(Goal.title).all()
+        else:
+            goals=Goal.query.all()
+        goals_response=[]
+        for goal in goals:
+            goals_response.append({
+                    "id": goal.goal_id,
+                    "title": goal.title
+                })
+        return jsonify(goals_response)
+
+    
+@goals_bp.route("/<goal_id>", methods=["GET", "PUT", "DELETE"])
+def handle_a_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal is None:
+        return make_response('',404)
+
+    elif request.method == "GET":
+        return {"goal": { "id": goal.goal_id,
+                        "title": goal.title
+                        }}
+                        
+    elif request.method == "PUT":
+        form_data = request.get_json()
+
+        goal.title = form_data["title"]
+
+        db.session.commit()
+
+        return make_response({"goal": { "id": goal.goal_id,
+                                        "title": goal.title
+                                        }})
+
+    elif request.method == "DELETE":
+        db.session.delete(goal)
+        db.session.commit()
+        return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
+
+# @goals_bp.route("/<goal_id>/mark_complete", methods=["PATCH"])
+# def mark_goal_complete(goal_id):
+
+#     goal = Goal.query.get(goal_id)
+#     if not goal is None:
+#         goal.completed_at = datetime.utcnow()
+#         db.session.commit()
+#         # if goal.title == "My Beautiful Goal":
+            
+#         #     client=slack.WebClient(token=os.getenv('SLACK_TOKEN'))
+#         #     client.chat_postMessage(
+#         #             channel="slack-api-test-channel", 
+#         #             text=f"Someone just completed the goal {goal.title}"
+#         #         )
+
+#         return make_response({"goal": { "id": goal.goal_id,
+#                                                 "title": goal.title
+#                                                 }}, 200)
+        
+#     else:
+#         return make_response("",404)
+
+
+# @goals_bp.route("/<goal_id>/mark_incomplete", methods=["PATCH"])
+# def mark_goal_incomplete(goal_id):
+#     goal = Goal.query.get(goal_id)
+#     if not goal is None:
+#         db.session.commit()
+
+#         return make_response({"goal": { "id": goal.goal_id,
+#                                                 "title": goal.title
+#                                                 }}, 200)
+#     else:
+#         return make_response("",404)
