@@ -72,7 +72,7 @@ def test_create_goal(client):
 def test_update_goal(client, one_goal):
     # Act
     updated_goal = {"title": "Updated Goal"}
-    response = client.put("/goals/1", updated_goal)
+    response = client.put("/goals/1", json=updated_goal)
     response_body = response.get_json()
 
     # Assert
@@ -89,7 +89,7 @@ def test_update_goal(client, one_goal):
 def test_update_goal_not_found(client):
     # Act
     updated_goal = {"title": "Updated Goal"}
-    response = client.put("/goals/1", updated_goal)
+    response = client.put("/goals/1", json=updated_goal)
     response_body = response.get_json()
 
     # Assert

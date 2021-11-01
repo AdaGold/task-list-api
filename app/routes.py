@@ -115,4 +115,39 @@ def goals():
             "goal": new_goal.to_dict()
         }
 
-        return jsonify({response_body}), 201
+        return jsonify(response_body), 201
+
+@goals_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
+def goal_id(id):
+    goal = Goal.query.get(id)
+
+    if not goal:
+        return jsonify(None), 404
+
+    if request.method == "GET":
+        response_body = {
+            "goal": goal.to_dict()
+        }
+        return jsonify(response_body), 200
+
+    elif request.method == "PUT":
+        request_body = request.get_json()
+        goal.title = request_body["title"]
+
+        db.session.commit()
+
+        response_body = {
+            "goal": goal.to_dict()
+        }
+
+        return jsonify(response_body), 200
+
+    elif request.method == "DELETE":
+        db.session.delete(goal)
+        db.session.commit()
+
+        response_body = {
+            "details": f"Goal {id} \"{goal.title}\" successfully deleted"
+        }
+
+        return jsonify(response_body), 200
