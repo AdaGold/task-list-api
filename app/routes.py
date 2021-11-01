@@ -2,6 +2,8 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, request, jsonify
 from datetime import datetime
+import os
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -62,6 +64,14 @@ def tasks_id(id, status=None):
     elif request.method == "PATCH":
         if status == "mark_complete":
             task.completed_at = datetime.now()
+
+            data = {
+                "token": os.environ.get("SLACK_BOT_TOKEN"),
+                "channel": "task-notifications",
+                "text": f"Someone just complete the task {task.title}"
+            }
+            requests.post("https://slack.com/api/chat.postMessage", data=data)
+
         elif status == "mark_incomplete":
             task.completed_at = None
 
