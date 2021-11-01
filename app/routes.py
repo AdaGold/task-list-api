@@ -5,6 +5,10 @@ from flask import Blueprint, request, make_response, jsonify
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import slack 
+import os
+from dotenv import load_dotenv
+
 #from app.models.goal import Goal
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -97,14 +101,23 @@ def mark_task_complete(task_id):
     if not task is None:
         task.completed_at = datetime.utcnow()
         db.session.commit()
-        print(task)
+        if task.title == "My Beautiful Task":
+            
+            client=slack.WebClient(token=os.getenv('SLACK_TOKEN'))
+            client.chat_postMessage(
+                    channel="slack-api-test-channel", 
+                    text=f"Someone just completed the task {task.title}"
+                )
+
         return make_response({"task": { "id": task.task_id,
                                                 "title": task.title,
                                                 "description": task.description,
                                                 "is_complete": bool(task.completed_at)
                                                 }}, 200)
+        
     else:
         return make_response("",404)
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
