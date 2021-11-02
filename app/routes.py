@@ -12,6 +12,7 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 auth_token = os.environ.get("AUTHORIZATION_TOKEN")
 
+
 @tasks_bp.route("", methods=["GET", "POST"])
 def handle_tasks():
     if request.method == "GET":
@@ -33,7 +34,6 @@ def handle_tasks():
                 "description": task.description,
                 "is_complete": bool(task.completed_at)
             })
-
         return jsonify(tasks_response)
 
     elif request.method == "POST":
@@ -54,8 +54,8 @@ def handle_tasks():
                     "is_complete": bool(new_task.completed_at)
                 }
             }
-
             return jsonify(response), 201
+
         except KeyError:
             return jsonify({"details": "Invalid data"}), 400
 
@@ -103,13 +103,16 @@ def handle_task(id):
         }
         return jsonify(response), 200
 
+
 def slack_chat_post_message(task):
     url = "https://slack.com/api/chat.postMessage"
     auth = f"Bearer {auth_token}"
     channel_id = "task-notifications"
     text = f"Someone just completed the task {task.title}"
 
-    result = requests.post(url, headers=dict(authorization=auth), data=dict(channel=channel_id, text=text))
+    result = requests.post(url, headers=dict(
+        authorization=auth), data=dict(channel=channel_id, text=text))
+
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def update_task_completed(id):
@@ -118,7 +121,6 @@ def update_task_completed(id):
         return jsonify(None), 404
 
     task.completed_at = date.today()
-
     db.session.commit()
 
     response = {
@@ -133,7 +135,6 @@ def update_task_completed(id):
     slack_chat_post_message(task)
     return jsonify(response), 200
 
-# refactor these two routes to be one /<id?/<mark completion>
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def update_task_not_completed(id):
@@ -154,10 +155,10 @@ def update_task_not_completed(id):
     }
     return jsonify(response), 200
 
+
 @goals_bp.route("", methods=["GET"])
 def read_goals():
     goals = Goal.query.all()
-
     goals_response = []
     for goal in goals:
         goals_response.append({
@@ -166,6 +167,7 @@ def read_goals():
         })
 
     return jsonify(goals_response), 200
+
 
 @goals_bp.route("", methods=["POST"])
 def add_goal():
@@ -183,11 +185,11 @@ def add_goal():
                 "title": new_goal.title,
             }
         }
-
         return jsonify(response), 201
 
     except KeyError:
         return jsonify({"details": "Invalid data"}), 400
+
 
 @goals_bp.route("/<id>", methods=["GET"])
 def read_one_goal(id):
@@ -202,12 +204,13 @@ def read_one_goal(id):
         }
     }
 
+
 @goals_bp.route("/<id>", methods=["DELETE"])
 def delete_one_goal(id):
     goal = Goal.query.get(id)
     if goal is None:
         return jsonify(None), 404
-    
+
     db.session.delete(goal)
     db.session.commit()
 
@@ -216,6 +219,7 @@ def delete_one_goal(id):
     }
     return jsonify(response), 200
 
+
 @goals_bp.route("/<id>", methods=["PUT"])
 def update_a_goal(id):
     goal = Goal.query.get(id)
@@ -223,7 +227,6 @@ def update_a_goal(id):
         return jsonify(None), 404
 
     request_body = request.get_json()
-
     goal.title = request_body["title"]
 
     db.session.commit()
@@ -238,9 +241,9 @@ def update_a_goal(id):
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
-    #SINGLE USE FUNCTIONS ! (ALL REQUESTS IN OWN FUNCTIONS)
-    #make slack post a route ? Should auth token be global variable or in that function ? 
-    
+    # SINGLE USE FUNCTIONS ! (ALL REQUESTS IN OWN FUNCTIONS)
+    # make slack post a route ? Should auth token be global variable or in that function ?
+
     # potential fixture or helper function that formats :
     # {
     #     "id": task.id,
@@ -248,4 +251,3 @@ def update_a_goal(id):
     #     "description": task.description,
     #     "is_complete": bool(task.completed_at)
     # }
-
