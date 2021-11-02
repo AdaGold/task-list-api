@@ -1,5 +1,6 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 import requests
 from flask import Blueprint, jsonify, request
 from sqlalchemy import asc, desc
@@ -7,6 +8,7 @@ from datetime import date
 import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 auth_token = os.environ.get("AUTHORIZATION_TOKEN")
 
@@ -152,6 +154,41 @@ def update_task_not_completed(id):
         }
     }
     return jsonify(response), 200
+
+@goals_bp.route("", methods=["GET", "POST"])
+def handle_goals():
+    goals = Goal.query.all()
+
+    goals_response = []
+    for goal in goals:
+        goals_response.append({
+            "id": goal.id,
+            "title": goal.title
+        })
+
+    return jsonify(goals_response), 200
+
+@goals_bp.route("", methods=["POST"])
+def add_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal(title=request_body["title"])
+
+        db.session.add(new_goal)
+        db.session.commit()
+
+        response = {
+            "task": {
+                "id": new_goal.id,
+                "title": new_goal.title,
+            }
+        }
+
+        return jsonify(response), 201
+    except KeyError:
+        return jsonify({"details": "Invalid data"}), 400
+
+
 
 
 # potential refactors:
