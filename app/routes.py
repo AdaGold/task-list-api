@@ -202,6 +202,19 @@ def read_one_goal(id):
         }
     }
 
+@goals_bp.route("/<id>", methods=["DELETE"])
+def delete_one_goal(id):
+    goal = Goal.query.get(id)
+    if goal is None:
+        return jsonify(None), 404
+    
+    db.session.delete(goal)
+    db.session.commit()
+
+    response = {
+        'details': f'Goal {goal.id} "{goal.title}" successfully deleted'
+    }
+    return jsonify(response), 200
 
 
 # potential refactors:
