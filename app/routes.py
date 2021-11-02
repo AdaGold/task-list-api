@@ -1,17 +1,21 @@
 from app import db
 from app.models.task import Task
+import requests
 from flask import Blueprint, jsonify, request
 from sqlalchemy import asc, desc
 from datetime import date
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
+auth_token = os.environ.get("AUTHORIZATION_TOKEN")
 
 @tasks_bp.route("", methods=["GET", "POST"])
 def handle_tasks():
     if request.method == "GET":
         sort_query = request.args.get("sort")
         if sort_query:
-            #potential refactor: order by default orders category by asc, so I could remove asc() and just say order_by(Task.title) ?
+            # potential refactor: order by default orders category by asc, so I could remove asc() and just say order_by(Task.title) ?
             if sort_query == "asc":
                 tasks = Task.query.order_by(asc(Task.title))
             else:
@@ -97,6 +101,15 @@ def handle_task(id):
         }
         return jsonify(response), 200
 
+def slack_chat_post_message(task):
+    url = "https://slack.com/api/chat.postMessage"
+    auth = f"Bearer {auth_token}"
+    channel_id = "task-notifications"
+    text = f"Someone just completed the task {task.title}"
+
+    result = requests.post(url, headers=dict(authorization=auth), data=dict(channel=channel_id, text=text))
+
+    
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def update_task_completed(id):
     task = Task.query.get(id)
@@ -104,6 +117,7 @@ def update_task_completed(id):
         return jsonify(None), 404
 
     task.completed_at = date.today()
+
     db.session.commit()
 
     response = {
@@ -114,9 +128,11 @@ def update_task_completed(id):
             "is_complete": bool(task.completed_at)
         }
     }
+
+    slack_chat_post_message(task)
     return jsonify(response), 200
 
-#refactor these two routes to be one /<id?/<mark completion> 
+# refactor these two routes to be one /<id?/<mark completion>
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def update_task_not_completed(id):
@@ -137,14 +153,17 @@ def update_task_not_completed(id):
     }
     return jsonify(response), 200
 
-    
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
+    #SINGLE USE FUNCTIONS ! (ALL REQUESTS IN OWN FUNCTIONS)
+    #make slack post a route ? Should auth token be global variable or in that function ? 
+    
     # potential fixture or helper function that formats :
-        # {
-        #     "id": task.id,
-        #     "title": task.title,
-        #     "description": task.description,
-        #     "is_complete": bool(task.completed_at)
-        # }
+    # {
+    #     "id": task.id,
+    #     "title": task.title,
+    #     "description": task.description,
+    #     "is_complete": bool(task.completed_at)
+    # }
+

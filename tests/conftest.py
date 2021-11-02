@@ -86,3 +86,4 @@ def one_task_belongs_to_one_goal(app, one_goal, one_task):
     goal = Goal.query.first()
     goal.tasks.append(task)
     db.session.commit()
+
