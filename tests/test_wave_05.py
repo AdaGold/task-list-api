@@ -1,4 +1,5 @@
 import pytest
+from app.models.goal import Goal
 
 def test_get_goals_no_saved_goals(client):
     # Act
@@ -69,17 +70,26 @@ def test_create_goal(client):
         }
     }
 
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
-    pass
     # Act
-    # ---- Complete Act Here ----
+    response = client.put("/goals/1", json={
+        "title": "Updated Goal Title"
+    })
+    response_body = response.get_json()
 
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # assertion 3 goes here
+    assert response.status_code == 200
+    assert response_body == {
+        "goal": {
+            "id": 1,
+            "title": "Updated Goal Title"
+        }
+    }
+    goal = Goal.query.get(1)
+    assert goal.title == "Updated Goal Title"
+
     # ---- Complete Assertions Here ----
 
 @pytest.mark.skip(reason="test to be completed by student")

@@ -92,7 +92,7 @@ def handle_task(id):
                 "is_complete": bool(task.completed_at)
             }
         }
-        return jsonify(response)
+        return jsonify(response), 200
 
     elif request.method == "DELETE":
         db.session.delete(task)
@@ -216,6 +216,25 @@ def delete_one_goal(id):
     }
     return jsonify(response), 200
 
+@goals_bp.route("/<id>", methods=["PUT"])
+def update_a_goal(id):
+    goal = Goal.query.get(id)
+    if goal is None:
+        return jsonify(None), 404
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    response = {
+        "goal": {
+            "id": goal.id,
+            "title": goal.title
+        }
+    }
+    return jsonify(response), 200
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
