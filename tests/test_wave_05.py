@@ -90,8 +90,6 @@ def test_update_goal(client, one_goal):
     goal = Goal.query.get(1)
     assert goal.title == "Updated Goal Title"
 
-    # ---- Complete Assertions Here ----
-
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
     # Act
