@@ -155,7 +155,7 @@ def update_task_not_completed(id):
     }
     return jsonify(response), 200
 
-@goals_bp.route("", methods=["GET", "POST"])
+@goals_bp.route("", methods=["GET"])
 def handle_goals():
     goals = Goal.query.all()
 
@@ -171,6 +171,7 @@ def handle_goals():
 @goals_bp.route("", methods=["POST"])
 def add_goal():
     request_body = request.get_json()
+
     try:
         new_goal = Goal(title=request_body["title"])
 
@@ -178,13 +179,14 @@ def add_goal():
         db.session.commit()
 
         response = {
-            "task": {
+            "goal": {
                 "id": new_goal.id,
                 "title": new_goal.title,
             }
         }
 
         return jsonify(response), 201
+
     except KeyError:
         return jsonify({"details": "Invalid data"}), 400
 
