@@ -1,6 +1,7 @@
 import pytest
 from app.models.goal import Goal
 
+
 def test_get_goals_no_saved_goals(client):
     # Act
     response = client.get("/goals")
@@ -53,6 +54,7 @@ def test_get_goal_not_found(client):
     assert response.status_code == 404
     assert response_body == None
 
+
 def test_create_goal(client):
     # Act
     response = client.post("/goals", json={
@@ -79,7 +81,6 @@ def test_update_goal(client, one_goal):
     response_body = response.get_json()
 
     # Assert
-    # ---- Complete Assertions Here ----
     assert response.status_code == 200
     assert response_body == {
         "goal": {
