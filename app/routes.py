@@ -111,7 +111,6 @@ def slack_chat_post_message(task):
 
     result = requests.post(url, headers=dict(authorization=auth), data=dict(channel=channel_id, text=text))
 
-    
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def update_task_completed(id):
     task = Task.query.get(id)
@@ -156,7 +155,7 @@ def update_task_not_completed(id):
     return jsonify(response), 200
 
 @goals_bp.route("", methods=["GET"])
-def handle_goals():
+def read_goals():
     goals = Goal.query.all()
 
     goals_response = []
@@ -190,6 +189,18 @@ def add_goal():
     except KeyError:
         return jsonify({"details": "Invalid data"}), 400
 
+@goals_bp.route("/<id>", methods=["GET"])
+def read_one_goal(id):
+    goal = Goal.query.get(id)
+    if goal is None:
+        return jsonify(None), 404
+
+    return {
+        "goal": {
+            "id": goal.id,
+            "title": goal.title
+        }
+    }
 
 
 
