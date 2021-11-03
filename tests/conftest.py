@@ -70,10 +70,10 @@ def completed_task(app):
 # This fixture creates a goal and saves it in the database
 @pytest.fixture
 def one_goal(app):
-    new_goal = Goal(title="Build a habit of going outside daily")
-    db.session.add(new_goal)
-    db.session.commit()
-
+    # new_goal = Goal(title="Build a habit of going outside daily")
+    # db.session.add(new_goal)
+    # db.session.commit()
+    pass
 
 # This fixture gets called in every test that
 # references "one_task_belongs_to_one_goal"
@@ -82,7 +82,8 @@ def one_goal(app):
 # goal has this task, and the task belongs to one goal
 @pytest.fixture
 def one_task_belongs_to_one_goal(app, one_goal, one_task):
-    task = Task.query.first()
-    goal = Goal.query.first()
-    goal.tasks.append(task)
-    db.session.commit()
+    # task = Task.query.first()
+    # goal = Goal.query.first()
+    # goal.tasks.append(task)
+    # db.session.commit()
+    pass
