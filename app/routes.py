@@ -239,6 +239,40 @@ def update_a_goal(id):
     }
     return jsonify(response), 200
 
+@goals_bp.route("/<id>/tasks", methods=["GET"])
+def read_tasks_from_goal(id):
+    goal = Goal.query.get(id)
+    if goal is None:
+        return jsonify(None), 404
+
+    tasks_response= []
+    for task in goal.tasks:
+        tasks_response.append({
+            "id": task.id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        })
+    
+
+    response_body = {
+        "id": goal.id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }
+
+    return jsonify(response_body)
+
+
+    # request_body = request.get_json()
+    # for task in request_body:
+    #     t
+
+    
+
+    
+
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
     # SINGLE USE FUNCTIONS ! (ALL REQUESTS IN OWN FUNCTIONS)
@@ -251,3 +285,4 @@ def update_a_goal(id):
     #     "description": task.description,
     #     "is_complete": bool(task.completed_at)
     # }
+
