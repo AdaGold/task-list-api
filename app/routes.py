@@ -67,13 +67,24 @@ def handle_task(id):
         return jsonify(None), 404
 
     if request.method == "GET":
-        return {
-            "task": {
+        if task.goal_id:
+            task_body = {
+                "id": task.id,
+                "goal_id":task.goal_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
+        else:
+            task_body = {
                 "id": task.id,
                 "title": task.title,
                 "description": task.description,
                 "is_complete": bool(task.completed_at)
             }
+
+        return {
+            "task": task_body
         }
 
     elif request.method == "PUT":
@@ -239,6 +250,29 @@ def update_a_goal(id):
     }
     return jsonify(response), 200
 
+@goals_bp.route("/<id>/tasks", methods=["POST"])
+def link_task_to_goal(id):
+    request_body = request.get_json()
+    tasks = []
+
+    task_ids = request_body["task_ids"]
+    for task_id in task_ids:
+        # task_id = int(task_id)
+        task = Task.query.get(task_id)
+        tasks.append(task)
+
+    goal = Goal.query.get(id)
+    goal.tasks = tasks
+
+    db.session.commit()
+
+    response = {
+        "id": goal.id,
+        "task_ids": request_body["task_ids"]
+    }
+
+    return jsonify(response)
+
 @goals_bp.route("/<id>/tasks", methods=["GET"])
 def read_tasks_from_goal(id):
     goal = Goal.query.get(id)
@@ -255,7 +289,6 @@ def read_tasks_from_goal(id):
             "is_complete": bool(task.completed_at)
         })
     
-
     response_body = {
         "id": goal.id,
         "title": goal.title,
@@ -264,14 +297,6 @@ def read_tasks_from_goal(id):
 
     return jsonify(response_body)
 
-
-    # request_body = request.get_json()
-    # for task in request_body:
-    #     t
-
-    
-
-    
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
