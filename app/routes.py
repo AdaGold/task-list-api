@@ -1,8 +1,11 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
 from sqlalchemy import desc, asc
+import requests
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -75,5 +78,36 @@ def delete_task(task_id):
     db.session.commit()
     
     return jsonify({"details": f"Task {task_id} \"{task.title}\" successfully deleted"}), 200
+
+def update_completion(task_id, value, send_message=False):
+    task = Task.query.get(task_id)
+
+    if not task:
+        return "", 404
+
+    task.completed_at = value
+
+    db.session.commit()
+
+    if send_message:
+        api_key = os.environ.get("SLACK_API_KEY")
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+        url = f"https://slack.com/api/chat.postMessage?channel=task-notifications&text=Someone just completed the task {task.title}"
+        requests.post(url, headers=headers)
+
+    return jsonify({"task": task.task_dict()}), 200
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    
+    return update_completion(task_id, datetime.now(), send_message=True)
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+
+    return update_completion(task_id, None)
 
 
