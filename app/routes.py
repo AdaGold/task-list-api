@@ -1,34 +1,11 @@
 from flask import Blueprint, jsonify, make_response, request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-"""
-Want to make a helper function to return the dictionaries
-
-def make_dict(json_body):
-    if len(json_body) <= 1:
-        return_dict.append({
-        "id" : item.task_id,
-        "title" : item.title,
-        "description" : item.description,
-        "is_complete" : item.is_complete
-        }
-        return return_dict
-
-    else:
-    return_list = []
-    for item in json_body:
-        return_list.append({
-        "id" : item.task_id,
-        "title" : item.title,
-        "description" : item.description,
-        "is_complete" : item.is_complete
-        })
-
-"""
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["POST", "GET"])
 def handle_tasks():
@@ -215,3 +192,113 @@ def patch_it_down(task_id):
             }
             }
             ), 200
+
+
+
+@goals_bp.route("", methods=["GET", "POST"])
+def handle_goals():
+
+    request_body = request.get_json()
+    goals = Goal.query.all()
+
+    if request.method == "GET":
+ 
+        goals_response = []
+        for goal in goals:
+            goals_response.append(
+                {
+                    "id" : goal.goal_id,
+                    "title" : goal.title
+                }
+            )
+
+        return jsonify(goals_response), 200
+
+    elif request.method == "POST":
+        request_body = request.get_json()
+
+        if "title" not in request_body:
+            return jsonify(
+                {
+                "details": "Invalid data"
+                }
+                ), 400
+
+        new_goal = Goal(title=request_body["title"])
+
+        db.session.add(new_goal)
+        db.session.commit()
+
+        return {
+                "goal": { "id": new_goal.goal_id,
+                "title": new_goal.title
+                }
+                }, 201
+        
+
+@goals_bp.route("/<goal_id>", methods=["GET", "PUT", "DELETE"])
+def handle_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        return jsonify(None), 404
+
+    if request.method == "GET":
+        return {"goal":
+            {
+            "id" : goal.goal_id,
+            "title" : goal.title
+                }
+            }, 200
+
+    elif request.method == "PUT":
+        request_body = request.get_json()
+
+        goal.title = request_body["title"]
+
+        db.session.commit()
+
+        return {
+                "goal": {
+                 "id": goal.goal_id,
+                 "title": goal.title
+                }
+                }, 200
+    elif request.method == "DELETE":
+        db.session.delete(goal)
+        db.session.commit()
+        return jsonify(
+            {
+                'details': (f'Goal {goal.goal_id} \"{goal.title}\" successfully deleted')
+            }
+
+        ), 200
+
+
+
+
+
+"""
+Want to make a helper function to return the dictionaries
+
+def make_dict(json_body):
+    if len(json_body) <= 1:
+        return_dict.append({
+        "id" : item.task_id,
+        "title" : item.title,
+        "description" : item.description,
+        "is_complete" : item.is_complete
+        }
+        return return_dict
+
+    else:
+    return_list = []
+    for item in json_body:
+        return_list.append({
+        "id" : item.task_id,
+        "title" : item.title,
+        "description" : item.description,
+        "is_complete" : item.is_complete
+        })
+
+"""
