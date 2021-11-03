@@ -56,9 +56,17 @@ def handle_a_task(task_id):
         return make_response('',404)
 
     elif request.method == "GET":
-        return {"task": { "id": task.task_id,
+        if not task.goal_id:
+            return {"task": { "id": task.task_id,
                         "title": task.title,
                         "description": task.description,
+                        "is_complete": False if task.completed_at is None else task.completed_at  
+                        }}
+        else:
+            return {"task": { "id": task.task_id,
+                        "title": task.title,
+                        "description": task.description,
+                        "goal_id":task.goal_id,
                         "is_complete": False if task.completed_at is None else task.completed_at  
                         }}
                         
@@ -218,6 +226,7 @@ def handle_tasks_in_goals(goal_id):
             "is_complete": bool(task.completed_at)
             }
         )
+        print(tasks_response)
         return make_response({"id": goal.goal_id,
   "title": goal.title,
   "tasks": tasks_response}, 200)

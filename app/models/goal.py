@@ -1,6 +1,7 @@
 from flask import current_app
 from sqlalchemy.orm import backref
 from app import db
+from .task import Task
 
 
 class Goal(db.Model):
