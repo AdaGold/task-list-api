@@ -1,4 +1,5 @@
 from flask import current_app
+from sqlalchemy.orm import backref
 from app import db
 
 
@@ -7,3 +8,4 @@ class Goal(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True) 
+    tasks=db.relationship('Task', backref='goal', lazy=True)

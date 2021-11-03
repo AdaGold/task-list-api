@@ -1,7 +1,4 @@
 from flask import Blueprint, request, make_response, jsonify
-#To access incoming request data, you can use the global request object. 
-#Response is a Flask class that represents HTTP responses.
-    #but we use a helper method, make_response?
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
@@ -11,9 +8,7 @@ import os
 from dotenv import load_dotenv
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-#Our Blueprint instance. We'll use it to group routes that start with /tasks. 
-    # "tasks" is the debugging?? name for this Blueprint. 
-    #__name__ provides information the blueprint uses for certain aspects of routing.?
+
 
 @tasks_bp.route("", methods=["POST","GET"])
 #decorators
@@ -28,9 +23,6 @@ def handle_tasks():
                         completed_at=request_body["completed_at"])
             db.session.add(new_task)
             db.session.commit()
-            #db.session is the database's way of collecting changes that need to be made. 
-            #Here, we are saying we want the database to add new_task, and then save and commit
-
             return make_response({"task": {
                     "id": new_task.task_id,
                     "title": new_task.title,
@@ -58,7 +50,6 @@ def handle_tasks():
 
     
 @tasks_bp.route("/<task_id>", methods=["GET", "PUT", "DELETE"])
-#this is for when there's a specific task
 def handle_a_task(task_id):
     task = Task.query.get(task_id)
     if task is None:
@@ -76,9 +67,10 @@ def handle_a_task(task_id):
 
         task.title = form_data["title"]
         task.description = form_data["description"]
-        #task.completed_at = form_data["completed_at"]
-
+        
         db.session.commit()
+
+        
 
         return make_response({"task": { "id": task.task_id,
                                         "title": task.title,
@@ -196,37 +188,28 @@ def handle_a_goal(goal_id):
         db.session.commit()
         return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
 
-# @goals_bp.route("/<goal_id>/mark_complete", methods=["PATCH"])
-# def mark_goal_complete(goal_id):
+@goals_bp.route("/<goal_id>/tasks", methods=["POST","GET"])
+def handle_tasks_in_goals(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal is None:
+        return make_response("", 404)
 
-#     goal = Goal.query.get(goal_id)
-#     if not goal is None:
-#         goal.completed_at = datetime.utcnow()
-#         db.session.commit()
-#         # if goal.title == "My Beautiful Goal":
-            
-#         #     client=slack.WebClient(token=os.getenv('SLACK_TOKEN'))
-#         #     client.chat_postMessage(
-#         #             channel="slack-api-test-channel", 
-#         #             text=f"Someone just completed the goal {goal.title}"
-#         #         )
+    if request.method == "POST":
+        request_body = request.get_json()
+        three_task_ids=request_body["task_ids"]
+        goal_tasks=[]
 
-#         return make_response({"goal": { "id": goal.goal_id,
-#                                                 "title": goal.title
-#                                                 }}, 200)
-        
-#     else:
-#         return make_response("",404)
+        for task_id in three_task_ids:
+            goal_task = Task.query.get(task_id)
+            goal_tasks.append(goal_task)
+            goal_task.goal=goal
+            db.session.commit()
+        return make_response({"id": goal.goal_id, "task_ids": three_task_ids})
+    # elif request.method=="GET":
+    #     task = Task.query.get(task_id)
+    
 
-
-# @goals_bp.route("/<goal_id>/mark_incomplete", methods=["PATCH"])
-# def mark_goal_incomplete(goal_id):
-#     goal = Goal.query.get(goal_id)
-#     if not goal is None:
-#         db.session.commit()
-
-#         return make_response({"goal": { "id": goal.goal_id,
-#                                                 "title": goal.title
-#                                                 }}, 200)
-#     else:
-#         return make_response("",404)
+    #     return {"goal": { "id": goal.goal_id,
+    #                     "title": goal.title
+    #                     }}
+                        

@@ -29,10 +29,7 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Register Blueprints here
-    #what this mean, is this why none of my tests are passing 
-    #cause i didnt do this. 
-    # yupthat was it
+    
     from .routes import tasks_bp
     app.register_blueprint(tasks_bp)
     from .routes import goals_bp
