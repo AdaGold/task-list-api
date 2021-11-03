@@ -151,3 +151,43 @@ def goal_id(id):
         }
 
         return jsonify(response_body), 200
+
+@goals_bp.route("/<id>/tasks", methods=["GET", "POST"])
+def goal_id_tasks(id):
+    goal = Goal.query.get(id)
+
+    if not goal:
+        return jsonify(None), 404
+
+    if request.method == "GET":
+        # tasks = []
+        # for task in goal.tasks:
+        #     task_dict = task.to_dict()
+        #     task_dict.update({"goal_id": goal.id})
+        #     tasks.append(task_dict)
+
+        # goal_dict = goal.to_dict()
+        # goal_dict.update({"tasks": tasks})
+
+        # return goal_dict, 200
+
+        return goal.to_dict(tasks=True), 200
+
+    elif request.method == "POST":
+        try:
+            task_ids = request.get_json()["task_ids"]
+        except KeyError:
+            return jsonify("test"), 400
+
+        for task_id in task_ids:
+            task = Task.query.get(task_id)
+            task.goal = goal
+
+        db.session.commit()
+
+        response_body = {
+            "id": goal.id,
+            "task_ids": task_ids
+        }
+
+        return jsonify(response_body), 200
