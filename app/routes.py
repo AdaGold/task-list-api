@@ -205,11 +205,20 @@ def handle_tasks_in_goals(goal_id):
             goal_task.goal=goal
             db.session.commit()
         return make_response({"id": goal.goal_id, "task_ids": three_task_ids})
-    # elif request.method=="GET":
-    #     task = Task.query.get(task_id)
     
+    elif request.method=="GET":
 
-    #     return {"goal": { "id": goal.goal_id,
-    #                     "title": goal.title
-    #                     }}
+        tasks_response = []
+        for task in goal.tasks:
+            tasks_response.append({
+            "id": task.task_id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+            }
+        )
+        return make_response({"id": goal.goal_id,
+  "title": goal.title,
+  "tasks": tasks_response}, 200)
                         
