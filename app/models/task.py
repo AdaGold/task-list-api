@@ -15,14 +15,20 @@ class Task(db.Model):
         return cls(**task_dict)
 
     def to_dict(self):
-        is_complete = False if self.completed_at is None else True
         task_dict = {
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "is_complete": is_complete,
+            "is_complete": self.get_status()
         }
         if self.goal_id:
             task_dict.update({"goal_id": self.goal_id})
-
         return task_dict
+
+    def get_status(self):
+        return False if self.completed_at is None else True
+
+    def edit(self, task_dict):
+        for attribute, value in task_dict.items():
+            if hasattr(self, attribute):
+                setattr(self, attribute, value)
