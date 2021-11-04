@@ -57,7 +57,7 @@ def get_one_task(task):
 def edit_one_task(task):
     request_body = request.get_json()
     if not request_body.get("title"):
-        return details(invalid_msg), 400
+        return details(invalid_msg()), 400
     task.edit(request_body)
     db.session.commit()
     return response(task)
