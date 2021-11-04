@@ -13,51 +13,48 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 auth_token = os.environ.get("AUTHORIZATION_TOKEN")
 
 
-@tasks_bp.route("", methods=["GET", "POST"])
-def handle_tasks():
-    if request.method == "GET":
-        sort_query = request.args.get("sort")
-        if sort_query:
-            # potential refactor: order by default orders category by asc, so I could remove asc() and just say order_by(Task.title) ?
-            if sort_query == "asc":
-                tasks = Task.query.order_by(asc(Task.title))
-            else:
-                tasks = Task.query.order_by(desc(Task.title))
+@tasks_bp.route("", methods=["GET"])
+def read_tasks():
+    sort_query = request.args.get("sort")
+    if sort_query:
+        if sort_query == "desc":
+            tasks = Task.query.order_by(desc(Task.title))
         else:
-            tasks = Task.query.all()
+            tasks = Task.query.order_by(Task.title)
+    else:
+        tasks = Task.query.all()
 
-        tasks_response = []
-        for task in tasks:
-            tasks_response.append({
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            })
-        return jsonify(tasks_response)
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        })
+    return jsonify(tasks_response)
 
-    elif request.method == "POST":
-        request_body = request.get_json()
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+    request_body = request.get_json()
+    try:
+        new_task = Task(title=request_body["title"],
+                        description=request_body["description"], completed_at=request_body["completed_at"])
 
-        try:
-            new_task = Task(title=request_body["title"],
-                            description=request_body["description"], completed_at=request_body["completed_at"])
+        db.session.add(new_task)
+        db.session.commit()
 
-            db.session.add(new_task)
-            db.session.commit()
-
-            response = {
-                "task": {
-                    "id": new_task.id,
-                    "title": new_task.title,
-                    "description": new_task.description,
-                    "is_complete": bool(new_task.completed_at)
-                }
+        response = {
+            "task": {
+                "id": new_task.id,
+                "title": new_task.title,
+                "description": new_task.description,
+                "is_complete": bool(new_task.completed_at)
             }
-            return jsonify(response), 201
-
-        except KeyError:
-            return jsonify({"details": "Invalid data"}), 400
+        }
+        return jsonify(response), 201
+    except KeyError:
+        return jsonify({"details": "Invalid data"}), 400
 
 
 @tasks_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
@@ -117,6 +114,7 @@ def handle_task(id):
 
 def slack_chat_post_message(task):
     url = "https://slack.com/api/chat.postMessage"
+    auth_token = os.environ.get("AUTHORIZATION_TOKEN")
     auth = f"Bearer {auth_token}"
     channel_id = "task-notifications"
     text = f"Someone just completed the task {task.title}"
@@ -310,4 +308,8 @@ def read_tasks_from_goal(id):
     #     "description": task.description,
     #     "is_complete": bool(task.completed_at)
     # }
+
+    #LIST COMPREHENSIONS:
+        #/goal/id/tasks POST endpoint
+
 
