@@ -57,59 +57,68 @@ def create_task():
         return jsonify({"details": "Invalid data"}), 400
 
 
-@tasks_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
-def handle_task(id):
+@tasks_bp.route("/<id>", methods=["GET"])
+def get_one_task(id):
     task = Task.query.get(id)
     if task is None:
         return jsonify(None), 404
 
-    if request.method == "GET":
-        if task.goal_id:
-            task_body = {
-                "id": task.id,
-                "goal_id":task.goal_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            }
-        else:
-            task_body = {
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            }
-
-        return {
-            "task": task_body
+    if task.goal_id:
+        task_body = {
+            "id": task.id,
+            "goal_id":task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        }
+    else:
+        task_body = {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
         }
 
-    elif request.method == "PUT":
-        request_body = request.get_json()
+    return {
+        "task": task_body
+    }
 
-        task.title = request_body["title"]
-        task.description = request_body["description"]
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_one_task(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify(None), 404
 
-        db.session.commit()
+    request_body = request.get_json()
 
-        response = {
-            "task": {
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            }
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    response = {
+        "task": {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
         }
-        return jsonify(response), 200
+    }
+    return jsonify(response), 200
 
-    elif request.method == "DELETE":
-        db.session.delete(task)
-        db.session.commit()
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_one_task(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify(None), 404
+        
+    db.session.delete(task)
+    db.session.commit()
 
-        response = {
-            'details': f'Task {task.id} "{task.title}" successfully deleted'
-        }
-        return jsonify(response), 200
+    response = {
+        'details': f'Task {task.id} "{task.title}" successfully deleted'
+    }
+    return jsonify(response), 200
 
 
 def slack_chat_post_message(task):
