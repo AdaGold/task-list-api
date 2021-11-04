@@ -1,10 +1,12 @@
 from app import db
 from app.models.task import Task
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from datetime import datetime
 import os
 import requests
-from routes import tasks_bp
+
+
+tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods=["GET", "POST"])
 def tasks():

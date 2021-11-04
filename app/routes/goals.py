@@ -1,9 +1,10 @@
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
-from flask import request, jsonify
-from routes import goals_bp
+from flask import Blueprint, request, jsonify
 
+
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @goals_bp.route("", methods=["GET", "POST"])
 def goals():
