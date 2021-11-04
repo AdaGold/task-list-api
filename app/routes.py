@@ -10,8 +10,6 @@ import os
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-auth_token = os.environ.get("AUTHORIZATION_TOKEN")
-
 
 @tasks_bp.route("", methods=["GET"])
 def read_tasks():
@@ -33,6 +31,7 @@ def read_tasks():
             "is_complete": bool(task.completed_at)
         })
     return jsonify(tasks_response)
+
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -66,7 +65,7 @@ def get_one_task(id):
     if task.goal_id:
         task_body = {
             "id": task.id,
-            "goal_id":task.goal_id,
+            "goal_id": task.goal_id,
             "title": task.title,
             "description": task.description,
             "is_complete": bool(task.completed_at)
@@ -82,6 +81,7 @@ def get_one_task(id):
     return {
         "task": task_body
     }
+
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_one_task(id):
@@ -106,12 +106,13 @@ def update_one_task(id):
     }
     return jsonify(response), 200
 
+
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_one_task(id):
     task = Task.query.get(id)
     if task is None:
         return jsonify(None), 404
-        
+
     db.session.delete(task)
     db.session.commit()
 
@@ -149,8 +150,8 @@ def update_task_completed(id):
             "is_complete": bool(task.completed_at)
         }
     }
-
     slack_chat_post_message(task)
+
     return jsonify(response), 200
 
 
@@ -257,6 +258,7 @@ def update_a_goal(id):
     }
     return jsonify(response), 200
 
+
 @goals_bp.route("/<id>/tasks", methods=["POST"])
 def link_task_to_goal(id):
     request_body = request.get_json()
@@ -280,13 +282,14 @@ def link_task_to_goal(id):
 
     return jsonify(response)
 
+
 @goals_bp.route("/<id>/tasks", methods=["GET"])
 def read_tasks_from_goal(id):
     goal = Goal.query.get(id)
     if goal is None:
         return jsonify(None), 404
 
-    tasks_response= []
+    tasks_response = []
     for task in goal.tasks:
         tasks_response.append({
             "id": task.id,
@@ -295,7 +298,7 @@ def read_tasks_from_goal(id):
             "description": task.description,
             "is_complete": bool(task.completed_at)
         })
-    
+
     response_body = {
         "id": goal.id,
         "title": goal.title,
@@ -307,8 +310,6 @@ def read_tasks_from_goal(id):
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
-    # SINGLE USE FUNCTIONS ! (ALL REQUESTS IN OWN FUNCTIONS)
-    # make slack post a route ? Should auth token be global variable or in that function ?
 
     # potential fixture or helper function that formats :
     # {
@@ -318,7 +319,5 @@ def read_tasks_from_goal(id):
     #     "is_complete": bool(task.completed_at)
     # }
 
-    #LIST COMPREHENSIONS:
-        #/goal/id/tasks POST endpoint
-
-
+    # LIST COMPREHENSIONS:
+    # /goal/id/tasks POST endpoint
