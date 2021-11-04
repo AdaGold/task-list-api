@@ -3,7 +3,6 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
-import slack 
 import os
 from dotenv import load_dotenv
 
