@@ -222,12 +222,9 @@ def update_a_goal(id):
 @goals_bp.route("/<id>/tasks", methods=["POST"])
 def link_task_to_goal(id):
     request_body = request.get_json()
-    tasks = []
 
     task_ids = request_body["task_ids"]
-    for task_id in task_ids:
-        task = Task.query.get(task_id)
-        tasks.append(task)
+    tasks = [Task.query.get(task_id) for task_id in task_ids]
 
     goal = Goal.query.get(id)
     goal.tasks = tasks
@@ -236,7 +233,7 @@ def link_task_to_goal(id):
 
     response = {
         "id": goal.id,
-        "task_ids": request_body["task_ids"]
+        "task_ids": task_ids
     }
 
     return jsonify(response)
@@ -249,8 +246,6 @@ def read_tasks_from_goal(id):
         return jsonify(None), 404
 
     tasks_response = [task.to_dict() for task in goal.tasks]
-    # for task in goal.tasks:
-    #     tasks_response.append(task.to_dict())
 
     response_body = {
         "id": goal.id,
