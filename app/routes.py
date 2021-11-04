@@ -22,9 +22,7 @@ def read_tasks():
     else:
         tasks = Task.query.all()
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in tasks]
 
     return jsonify(tasks_response)
 
@@ -139,11 +137,6 @@ def update_task_not_completed(id):
 def read_goals():
     goals = Goal.query.all()
     goals_response = [{"id": goal.id,"title": goal.title} for goal in goals]
-    # for goal in goals:
-    #     goals_response.append({
-    #         "id": goal.id,
-    #         "title": goal.title
-    #     })
 
     return jsonify(goals_response), 200
 
@@ -258,9 +251,5 @@ def read_tasks_from_goal(id):
 
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
-
-
-    # LIST COMPREHENSIONS:
-    # /goal/id/tasks POST endpoint
 
     #adding to_dict() to goal model that uses task as an optional argument ? 
