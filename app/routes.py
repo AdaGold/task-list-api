@@ -3,6 +3,10 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
+import os
+import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -146,7 +150,10 @@ def handle_task(task_id):
             }
 
         ), 200
-        
+
+
+PATH = "https://slack.com/api/chat.postMessage"
+API_KEY = os.environ.get("SLACK_KEY")
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_it_up(task_id):
@@ -156,11 +163,21 @@ def patch_it_up(task_id):
         return jsonify(None), 404
 
     if request.method == "PATCH":
-            task.completed_at = datetime.utcnow()
-            task.is_complete = True
-            db.session.commit()
+        task.completed_at = datetime.utcnow()
+        task.is_complete = True
+        db.session.commit()
 
-            return jsonify(
+        #we put the auth here
+        header = {"authorization" : f"Bearer {API_KEY}"
+        }
+        post_body = {"channel" : "slack-api-test-channel",
+        "text": f"Someone just completed the task {task.title}"
+        }
+        
+        requests.post(PATH, headers=header, json=post_body)
+
+
+        return jsonify(
                 {
                 "task":
                 {
