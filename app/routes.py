@@ -24,12 +24,8 @@ def read_tasks():
 
     tasks_response = []
     for task in tasks:
-        tasks_response.append({
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        })
+        tasks_response.append(task.to_dict())
+
     return jsonify(tasks_response)
 
 
@@ -44,12 +40,7 @@ def create_task():
         db.session.commit()
 
         response = {
-            "task": {
-                "id": new_task.id,
-                "title": new_task.title,
-                "description": new_task.description,
-                "is_complete": bool(new_task.completed_at)
-            }
+            "task": new_task.to_dict()
         }
         return jsonify(response), 201
     except KeyError:
@@ -62,24 +53,8 @@ def get_one_task(id):
     if task is None:
         return jsonify(None), 404
 
-    if task.goal_id:
-        task_body = {
-            "id": task.id,
-            "goal_id": task.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        }
-    else:
-        task_body = {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        }
-
     return {
-        "task": task_body
+        "task": task.to_dict()
     }
 
 
@@ -97,12 +72,7 @@ def update_one_task(id):
     db.session.commit()
 
     response = {
-        "task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        }
+        "task": task.to_dict()
     }
     return jsonify(response), 200
 
@@ -143,12 +113,7 @@ def update_task_completed(id):
     db.session.commit()
 
     response = {
-        "task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        }
+        "task": task.to_dict()
     }
     slack_chat_post_message(task)
 
@@ -165,12 +130,7 @@ def update_task_not_completed(id):
     db.session.commit()
 
     response = {
-        "task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        }
+        "task": task.to_dict()
     }
     return jsonify(response), 200
 
@@ -266,7 +226,6 @@ def link_task_to_goal(id):
 
     task_ids = request_body["task_ids"]
     for task_id in task_ids:
-        # task_id = int(task_id)
         task = Task.query.get(task_id)
         tasks.append(task)
 
@@ -291,13 +250,7 @@ def read_tasks_from_goal(id):
 
     tasks_response = []
     for task in goal.tasks:
-        tasks_response.append({
-            "id": task.id,
-            "goal_id": task.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        })
+        tasks_response.append(task.to_dict())
 
     response_body = {
         "id": goal.id,
@@ -311,13 +264,6 @@ def read_tasks_from_goal(id):
 # potential refactors:
     # formating of the resopnse {task :  {}} repeated throughout, as well as {details: "fka;df"}
 
-    # potential fixture or helper function that formats :
-    # {
-    #     "id": task.id,
-    #     "title": task.title,
-    #     "description": task.description,
-    #     "is_complete": bool(task.completed_at)
-    # }
 
     # LIST COMPREHENSIONS:
     # /goal/id/tasks POST endpoint
