@@ -138,12 +138,12 @@ def update_task_not_completed(id):
 @goals_bp.route("", methods=["GET"])
 def read_goals():
     goals = Goal.query.all()
-    goals_response = []
-    for goal in goals:
-        goals_response.append({
-            "id": goal.id,
-            "title": goal.title
-        })
+    goals_response = [{"id": goal.id,"title": goal.title} for goal in goals]
+    # for goal in goals:
+    #     goals_response.append({
+    #         "id": goal.id,
+    #         "title": goal.title
+    #     })
 
     return jsonify(goals_response), 200
 
@@ -262,3 +262,5 @@ def read_tasks_from_goal(id):
 
     # LIST COMPREHENSIONS:
     # /goal/id/tasks POST endpoint
+
+    #adding to_dict() to goal model that uses task as an optional argument ? 
