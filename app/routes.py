@@ -146,8 +146,7 @@ def handle_task(task_id):
             }
 
         ), 200
-
-#wave threeeeeeee
+        
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_it_up(task_id):
@@ -326,31 +325,3 @@ def goals_and_tasks(goal_id):
             "title" : goal.title,
             "tasks" : task_list
         }), 200
-
-
-
-
-"""
-Want to make a helper function to return the dictionaries
-
-def make_dict(json_body):
-    if len(json_body) <= 1:
-        return_dict.append({
-        "id" : item.task_id,
-        "title" : item.title,
-        "description" : item.description,
-        "is_complete" : item.is_complete
-        }
-        return return_dict
-
-    else:
-    return_list = []
-    for item in json_body:
-        return_list.append({
-        "id" : item.task_id,
-        "title" : item.title,
-        "description" : item.description,
-        "is_complete" : item.is_complete
-        })
-
-"""
