@@ -19,6 +19,7 @@ def validate_task(f):
         return f(*args, task, **kwargs)
     return decorated_function
 
+
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     sort_query = request.args.get("sort")
