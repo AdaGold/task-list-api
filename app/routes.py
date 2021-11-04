@@ -91,14 +91,20 @@ def handle_task(task_id):
         return jsonify(None), 404
 
     if request.method == "GET":
-        return {"task":
+        
+        return_dict = {"task":
             {
             "id" : task.task_id,
             "title" : task.title,
             "description" : task.description,
             "is_complete" : task.is_complete
                 }
-            }, 200
+            }
+
+        if task.goal_id:
+            return_dict["task"]["goal_id"] = task.goal_id
+
+        return return_dict, 200
 
     elif request.method == "PUT":
         request_body = request.get_json()
@@ -275,14 +281,13 @@ def handle_goal(goal_id):
 @goals_bp.route("/<goal_id>/tasks", methods=["POST", "GET"])
 def goals_and_tasks(goal_id):
     goal = Goal.query.get(goal_id)
+    request_body = request.get_json()
 
     if not goal:
         return jsonify(None), 404
 
     if request.method == "POST":
         
-        request_body = request.get_json()
-
         the_list = []
         for num in request_body["task_ids"]:
             the_task = Task.query.get(num)
@@ -301,6 +306,25 @@ def goals_and_tasks(goal_id):
         return jsonify({
             "id" : goal.goal_id,
             "task_ids" : task_id_list
+        }), 200
+    
+    if request.method == "GET":
+
+        task_list = []
+        for task in goal.tasks:
+            task_list.append({
+                "id": task.task_id,
+                "goal_id": task.goal_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": task.is_complete
+            }
+            )
+
+        return jsonify({
+            "id" : goal.goal_id,
+            "title" : goal.title,
+            "tasks" : task_list
         }), 200
 
 
