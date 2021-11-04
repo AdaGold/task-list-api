@@ -248,9 +248,9 @@ def read_tasks_from_goal(id):
     if goal is None:
         return jsonify(None), 404
 
-    tasks_response = []
-    for task in goal.tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in goal.tasks]
+    # for task in goal.tasks:
+    #     tasks_response.append(task.to_dict())
 
     response_body = {
         "id": goal.id,
