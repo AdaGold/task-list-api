@@ -17,10 +17,10 @@ auth_token = os.environ.get("AUTHORIZATION_TOKEN")
 def read_tasks():
     sort_query = request.args.get("sort")
     if sort_query:
-        if sort_query == "desc":
-            tasks = Task.query.order_by(desc(Task.title))
-        else:
+        if sort_query == "asc":
             tasks = Task.query.order_by(Task.title)
+        else:
+            tasks = Task.query.order_by(desc(Task.title))
     else:
         tasks = Task.query.all()
 
