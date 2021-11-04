@@ -1,4 +1,4 @@
-from flask import current_app, jsonify
+from flask import current_app
 from app import db
 
 
