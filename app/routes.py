@@ -11,7 +11,6 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 @tasks_bp.route("", methods=["POST","GET"])
-#decorators
 def handle_tasks():
     if request.method=="POST":
         request_body = request.get_json()
