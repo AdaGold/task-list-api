@@ -24,3 +24,8 @@ class Task(db.Model):
         if self.goal:
             response["goal_id"] = self.goal_id
         return response
+
+    def update(self, request_body):
+        for key, value in request_body.items():
+            if key in Task.__table__.columns.keys():
+                setattr(self, key, value)

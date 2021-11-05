@@ -3,8 +3,8 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
-import os
 import requests
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -24,17 +24,9 @@ def validate(model, id):
 
     try:
         id = int(id)
-    except:
-        abort(400, {"error": "invalid id"})
+    except ValueError:
+        abort(400)
     return model.query.get_or_404(id)
-
-
-@goals_bp.before_request
-@tasks_bp.before_request
-def get_model():
-
-    bps = {"tasks": (Task, "task"), "goals": (Goal, "goal")}
-    g.mod, g.name = bps[request.blueprint]
 
 
 def sort(model):
@@ -48,26 +40,89 @@ def sort(model):
     return model
 
 
+@goals_bp.before_request
+@tasks_bp.before_request
+def get_model():
+
+    bps = {"tasks": (Task, "task"), "goals": (Goal, "goal")}
+    g.model, g.name = bps[request.blueprint]
+
+
 @goals_bp.route("", methods=["GET"])
 @tasks_bp.route("", methods=["GET"])
 def get_all():
-    mod = g.mod
-    if "sort" in request.args:
-        mods = sort(mod)
-    else:
-        mods = mod.query.all()
 
-    return jsonify([mod.to_dict() for mod in mods])
+    model = g.model
+    if "sort" in request.args:
+        models = sort(model)
+    else:
+        models = model.query.all()
+
+    return jsonify([model.to_dict() for model in models])
 
 
 @goals_bp.route("/<id>", methods=["GET"])
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one(id):
 
-    mod, name = g.mod, g.name
-    mod = validate(mod, id)
+    model, name = g.model, g.name
+    model = validate(model, id)
 
-    return {f"{name}": mod.to_dict()}
+    return {f"{name}": model.to_dict()}
+
+
+@goals_bp.route("", methods=["POST"])
+@tasks_bp.route("", methods=["POST"])
+def create():
+    # put request bodies in models?
+    model, name = g.model, g.name
+    request_body = request.get_json()
+
+    try:
+        if model == Task:
+            new_entry = model(
+                title=request_body["title"],
+                description=request_body["description"],
+                completed_at=request_body["completed_at"],
+            )
+        elif model == Goal:
+            new_entry = model(title=request_body["title"])
+
+    except:
+        return {"details": "Invalid data"}, 400
+
+    db.session.add(new_entry)
+    db.session.commit()
+
+    return {f"{name}": new_entry.to_dict()}, 201
+
+
+@goals_bp.route("/<id>", methods=["PUT"])
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_one(id):
+    model, name = g.model, g.name
+    model = validate(model, id)
+    request_body = request.get_json()
+
+    model.update(request_body)
+
+    db.session.commit()
+    return {f"{name}": model.to_dict()}
+
+
+@goals_bp.route("/<id>", methods=["DELETE"])
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_one(id):
+
+    model, name = g.model, g.name
+    model = validate(model, id)
+
+    db.session.delete(model)
+    db.session.commit()
+
+    return {
+        "details": f'{name.capitalize()} {model.id} "{model.title}" successfully deleted'
+    }
 
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
@@ -91,63 +146,6 @@ def mark_task_incomplete(id):
     db.session.commit()
 
     return {"task": task.to_dict()}
-
-
-@goals_bp.route("/<id>", methods=["DELETE"])
-@tasks_bp.route("/<id>", methods=["DELETE"])
-def delete_one(id):
-
-    mod, name = g.mod, g.name
-    mod = validate(mod, id)
-
-    db.session.delete(mod)
-    db.session.commit()
-
-    return {
-        "details": f'{name.capitalize()} {mod.id} "{mod.title}" successfully deleted'
-    }
-
-
-@goals_bp.route("/<id>", methods=["PUT"])
-@tasks_bp.route("/<id>", methods=["PUT"])
-def update_one(id):
-
-    mod, name = g.mod, g.name
-    mod = validate(mod, id)
-    request_body = request.get_json()
-
-    mod.title = request_body["title"]
-
-    if "description" in request_body:
-        mod.description = request_body["description"]
-
-    db.session.commit()
-    return {f"{name}": mod.to_dict()}
-
-
-@goals_bp.route("", methods=["POST"])
-@tasks_bp.route("", methods=["POST"])
-def create():
-    mod, name = g.mod, g.name
-    request_body = request.get_json()
-
-    try:
-        if mod == Task:
-            new_entry = mod(
-                title=request_body["title"],
-                description=request_body["description"],
-                completed_at=request_body["completed_at"],
-            )
-        elif mod == Goal:
-            new_entry = mod(title=request_body["title"])
-
-    except:
-        return {"details": "Invalid data"}, 400
-
-    db.session.add(new_entry)
-    db.session.commit()
-
-    return {f"{name}": new_entry.to_dict()}, 201
 
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])

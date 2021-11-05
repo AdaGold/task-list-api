@@ -17,3 +17,8 @@ class Goal(db.Model):
             response["tasks"] = [task.to_dict() for task in self.tasks]
 
         return response
+
+    def update(self, request_body):
+        for key, value in request_body.items():
+            if key in Goal.__table__.columns.keys():
+                setattr(self, key, value)
