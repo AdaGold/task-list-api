@@ -1,3 +1,18 @@
+"""
+Something went very, very wrong and I had to scrap my original repository, 
+start over and copy paste my code in. Hence, the lack of commits. 
+I was beginning the deployment stage and accidently deleted the origin remote. 
+This lead me down a very dark path, trying different git commands that I didnt fully understand. 
+It was chaos.
+
+Anyways,
+I didn't have time to do docstrings.
+Also, I experimented with doubling up the route decorators since the functions were 
+pretty much the same for Task & Goals.
+Not sure if this is a no no in real life, or if there is a better way to do it. Let me know!
+"""
+
+
 from flask import Blueprint, jsonify, request, abort, g
 from app import db
 from app.models.task import Task
