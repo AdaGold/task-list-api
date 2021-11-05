@@ -74,7 +74,7 @@ def get_one(id):
 @goals_bp.route("", methods=["POST"])
 @tasks_bp.route("", methods=["POST"])
 def create():
-    # put request bodies in models?
+
     model, name = g.model, g.name
     request_body = request.get_json()
 
