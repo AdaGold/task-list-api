@@ -16,7 +16,7 @@ def handle_tasks():
     if request.method == "GET":
         task = request.args.get("task")
         task_query = request.args.get("sort")
-        #wave 2
+
         if task_query:
             if task_query == "asc":
                 tasks = Task.query.order_by(Task.title.asc())
