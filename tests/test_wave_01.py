@@ -33,6 +33,7 @@ def test_get_task(client, one_task):
     # Act
     response = client.get("/tasks/1")
     response_body = response.get_json()
+    print(response_body)
 
     # Assert
     assert response.status_code == 200
