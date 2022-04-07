@@ -25,8 +25,6 @@ This wave requires you to complete **four** tests.
 
 Code coverage is a term used to describe how much application code is executed when a particular test suite is run. It is a good practice to check our code coverage in order to understand how much of our code is exercised by tests vs how much is still untested. A test suite with a high percentage of coverage is likely to be tested more thoroughly and have fewer bugs. A code coverage tool can partner with our testing suite to give us a report illustrating the coverage of our tests.
 
-Given that Ada provided all tests cases in this project, we should anticipate high code coverage.
-
 Review the [code coverage exercise](https://github.com/adaGold/code-coverage-exercise) on how to use `pytest-cov` to generate a code coverage report. We will need to change the directory where the application code is located from `student` to `app`.
 
 `pytest --cov=app --cov-report html --cov-report term`
