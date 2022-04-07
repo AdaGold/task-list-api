@@ -12,13 +12,26 @@ Our goal for this wave is to be able to create, read, update, and delete differe
 
 ## Writing Tests
 
-This wave requires you to complete **four** tests. 
-- The tests you need to write are scaffolded in the `test_wave_05.py` file. 
+This wave requires you to complete **four** tests.
+
+- The tests you need to write are scaffolded in the `test_wave_05.py` file.
   - These tests are currently skipped with `@pytest.mark.skip(reason="test to be completed by student")` and the function body has `pass` in it. Once you implement these tests you should remove the `skip` decorator and the `pass`.
-- For the tests you write, use the requirements in this document to guide your test writing. 
+- For the tests you write, use the requirements in this document to guide your test writing.
   - Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any mispellings.
 - You can model your tests off of the Wave 01 tests for Tasks.
 - Some tests use a [fixture](https://docs.pytest.org/en/6.2.x/fixture.html) named `one_goal` that is defined in `tests/conftest.py`. This fixture saves a specific goal to the test database.
+
+## Code Coverage
+
+Code coverage is a term used to describe how much application code is executed when a particular test suite is run. It is a good practice to check our code coverage in order to understand how much of our code is exercised by tests vs how much is still untested. A test suite with a high percentage of coverage is likely to be tested more thoroughly and have fewer bugs. A code coverage tool can partner with our testing suite to give us a report illustrating the coverage of our tests.
+
+Given that Ada provided all tests cases in this project, we should anticipate high code coverage.
+
+Review the [code coverage exercise](https://github.com/adaGold/code-coverage-exercise) on how to use `pytest-cov` to generate a code coverage report. We will need to change the directory where the application code is located from `student` to `app`.
+
+`pytest --cov=app --cov-report html --cov-report term`
+
+**We should have greater than 95% code coverage in our model and route files.**
 
 # Requirements
 
@@ -95,7 +108,7 @@ As a client, I want to be able to make a `GET` request to `/goals` when there ar
 []
 ```
 
-*This feature requires you to write a test.*
+_This feature requires you to write a test._
 
 ### Get One Goal: One Saved Goal
 
@@ -112,7 +125,7 @@ As a client, I want to be able to make a `GET` request to `/goals/1` when there 
 }
 ```
 
-*This feature requires you to write a test.*
+_This feature requires you to write a test._
 
 ### Get One Goal: No Matching Goal
 
@@ -122,7 +135,7 @@ As a client, I want to be able to make a `GET` request to `/goals/1` when there 
 
 No response body.
 
-*This feature requires you to write a test.*
+_This feature requires you to write a test._
 
 ### Update Goal
 

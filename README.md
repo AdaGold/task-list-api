@@ -3,7 +3,8 @@
 ## Skills Assessed
 
 - Following directions and reading comprehension
-- Reading and using tests
+- Reading, writing, and using tests
+- Verifying >95% code coverage using `pytest-cov`
 - Demonstrating understanding of the client-server model, request-response cycle and conventional RESTful routes
 - Driving development with independent research, experimentation, and collaboration
 - Reading and using existing external web APIs
