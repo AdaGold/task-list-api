@@ -25,9 +25,6 @@ def create_task():
     )
     if "completed_at" in request_body:
         new_task.completed_at = request_body["completed_at"]
-    # else:
-    #     completed = False
-    # task.completed_at = datetime.datetime.now()
     # I create a new dog and I want to put this in the data base (new object)
     db.session.add(new_task)
     
@@ -95,16 +92,7 @@ def get_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    try:
-        task_id = int(task_id)
-    except ValueError:
-        return jsonify({"message":f"Task {task_id} is an invalid entry; must be a valid task id"}), 400
-
-
-    task = Task.query.get(task_id)
-
-    if task is None:
-        return jsonify({"message":f"task {task_id} not found"}), 404
+    task = validated_task(task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -151,13 +139,9 @@ def mark_incomplete_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task_complete_date(task_id):
-    task = Task.query.get(task_id)
-    if task is None:
-        return "Error not found", 404
+    task = validated_task(task_id)
     request_body = request.get_json()
     
-    
-
     task.title = request_body["title"]
     task.description = request_body["description"]
 
@@ -248,16 +232,8 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except ValueError:
-        return jsonify({"message":f"Goal {goal_id} is an invalid entry; must be a valid goal id"}), 400
-
-
-    goal = Goal.query.get(goal_id)
-
-    if goal is None:
-        return jsonify({"message":f"task {goal_id} not found"}), 404
+    
+    goal = validated_goal(goal_id)
 
     db.session.delete(goal)
     db.session.commit()
