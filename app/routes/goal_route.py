@@ -18,13 +18,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    # return {"goal": {
-    #     "id": new_goal.goal_id,
-    #     "title": new_goal.title
-    # }}, 201
-
     return jsonify({"goal": new_goal.to_dict()}), 201
-
 
 def validated_goal(goal_id):
     try:
@@ -58,12 +52,10 @@ def validated_task(task_id):
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    chosen_goal = validated_goal(goal_id)
+    goal = validated_goal(goal_id)
 
     return jsonify(
-        {"goal": {
-        "id": chosen_goal.goal_id,
-        "title": chosen_goal.title,}}), 200
+        {"goal": goal.to_dict()}), 200
 
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
@@ -87,21 +79,16 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return {"goal": {
-        "id": goal.goal_id,
-        "title": goal.title,
-    }}, 200
+    return {"goal": goal.to_dict()}, 200
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_goal(goal_id):
-    
     goal = validated_goal(goal_id)
 
     db.session.delete(goal)
     db.session.commit()
 
     return jsonify({"details": f'Goal "{goal.title}" successfully deleted'}), 200
-
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def goal_to_task(goal_id):

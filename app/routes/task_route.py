@@ -18,22 +18,17 @@ def create_task():
     if "title" not in request_body or "description" not in request_body:
         return make_response({'details': "Invalid data"}, 400)
 
-    # whatever in the request body
     new_task = Task(
         title = request_body["title"],
         description = request_body["description"]
     )
     if "completed_at" in request_body:
         new_task.completed_at = request_body["completed_at"]
-    # I create a new dog and I want to put this in the data base (new object)
+
     db.session.add(new_task)
     db.session.commit()
 
-    return {"task": {
-        "id": new_task.task_id,
-        "title": new_task.title, 
-        "description": new_task.description, 
-        "is_complete": bool(new_task.completed_at)}}, 201
+    return {"task": new_task.to_dict()}, 201
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -80,8 +75,7 @@ def validated_task(task_id):
 def get_one_task(task_id):
     task = validated_task(task_id)
 
-    return jsonify(
-        {"task": task.to_dict()})
+    return {"task": task.to_dict()}
 
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
@@ -115,12 +109,7 @@ def mark_complete_task(task_id):
     url = requests.post(SLACK_API_URL, headers=headers, params=query_params)
 
 
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": bool(task.completed_at)
-    }}, 200
+    return {"task": task.to_dict()}, 200
 
 @tasks_bp.route('/<task_id>/mark_incomplete', methods=["PATCH"])
 def mark_incomplete_task(task_id):
@@ -130,14 +119,7 @@ def mark_incomplete_task(task_id):
     db.session.add(task)
     db.session.commit()
     
-
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": bool(task.completed_at)
-    }}, 200
-
+    return {"task": task.to_dict()}, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task_complete_date(task_id):
@@ -150,12 +132,7 @@ def update_task_complete_date(task_id):
     db.session.add(task)
     db.session.commit()
 
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": bool(task.completed_at)
-    }}, 200
+    return {"task": task.to_dict()}, 200
 
 
 
