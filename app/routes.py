@@ -44,16 +44,21 @@ def read_all_tasks():
     tasks = Task.query.all()
 
     if sort_param:
-        titles = []
-        for task in tasks:
-            titles.append(task.title)
-        sorted_titles = sorted(titles)
-        sorted_tasks = []
-        for title in sorted_titles:
+        if sort_param:
+            titles = []
             for task in tasks:
-                if task.title == title:
-                    sorted_tasks.append(task)
-        tasks = sorted_tasks
+                titles.append(task.title)
+            if sort_param == "desc":
+                sorted_titles = sorted(titles, reverse=True)
+            elif sort_param == "asc":
+                sorted_titles = sorted(titles)
+            sorted_tasks = []
+            for title in sorted_titles:
+                for task in tasks:
+                    if task.title == title:
+                        sorted_tasks.append(task)
+            tasks = sorted_tasks
+        # elif sort_param == "desc":
 
     tasks_response = []
     for task in tasks:
