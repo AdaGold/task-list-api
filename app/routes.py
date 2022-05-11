@@ -165,6 +165,23 @@ def mark_task_complete_by_id(id):
 
     return make_response(jsonify(response), 200)
 
+@tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
+def mark_task_incomplete_by_id(id):
+    task = get_task_record_by_id(id)
+    task.is_complete = False
+    task.completed_at = None
+
+    db.session.commit()
+
+    response = {"task":{
+        "id":task.id,
+        "title":task.title,
+        "description":task.description,
+        "is_complete":task.is_complete
+    }}
+
+    return make_response(jsonify(response), 200)
+
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = get_task_record_by_id(id)
