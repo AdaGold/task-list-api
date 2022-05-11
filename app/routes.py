@@ -113,6 +113,10 @@ def replace_task_by_id(id):
     task.title = request_body["title"]
     task.description = request_body["description"]
 
+    if "completed_at" in request_body.keys():
+        task.completed_at = request_body["completed_at"]
+        task.is_complete = True
+
     db.session.commit()
 
     response = {"task":{
