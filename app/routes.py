@@ -2,10 +2,11 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from .routes_helper import error_message
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
-def validate_task(id):
+def get_task_record_by_id(id):
     try:
         id = int(id)
     except:
@@ -73,18 +74,7 @@ def read_all_tasks():
         )
     return jsonify(tasks_response), 200
 
-def get_task_record_by_id(id):
-    try:
-        id = int(id)
-    except ValueError:
-        error_message(f"Invalid id {id}", 400)
 
-    task = Task.query.get(id)
-
-    if task:
-        return task
-    
-    error_message(f"No task with id {id} found", 404)
 
 @tasks_bp.route("/<id>", methods=("GET",))
 def read_task_by_id(id):
@@ -115,8 +105,8 @@ def create_task():
     return make_response(jsonify(response), 201)
 
 @tasks_bp.route("/<id>", methods=["PUT"])
-def update_task(id):
-    task = validate_task(id)
+def replace_task_by_id(id):
+    task = get_task_record_by_id(id)
 
     request_body = request.get_json()
 
@@ -134,9 +124,50 @@ def update_task(id):
 
     return make_response(jsonify(response), 200)
 
+# @tasks_bp.route("/<id>/mark_complete", methods = ["PATCH"])
+# def update_task_by_id(id):
+#     task = get_task_record_by_id(id)
+#     request_body = request.get_json()
+#     task_keys = request_body.keys()
+
+#     if "title" in task_keys:
+#         task.title = request_body["title"]
+#     if "description" in task_keys:
+#         task.description = request_body["description"]
+#     if "is_complete" in task_keys:
+#         task.is_complete = request_body["is_complete"]
+
+#     db.session.commit()
+
+#     response = {"task":{
+#         "id":task.id,
+#         "title":task.title,
+#         "description":task.description,
+#         "is_complete":task.is_complete
+#     }}
+
+#     return make_response(jsonify(response), 200)
+
+@tasks_bp.route("/<id>/mark_complete", methods = ["PATCH"])
+def mark_task_complete_by_id(id):
+    task = get_task_record_by_id(id)
+    task.is_complete = True
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    response = {"task":{
+        "id":task.id,
+        "title":task.title,
+        "description":task.description,
+        "is_complete":task.is_complete
+    }}
+
+    return make_response(jsonify(response), 200)
+
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = validate_task(id)
+    task = get_task_record_by_id(id)
 
     db.session.delete(task)
     db.session.commit()

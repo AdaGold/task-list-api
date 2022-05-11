@@ -61,7 +61,7 @@ def test_get_task_not_found(client):
     assert response.status_code == 404
 
     # raise Exception("Complete test with assertion about response body")
-    assert response_body == {"details":"No task with id 1 found"}
+    assert response_body == {"message":"task 1 not found"}
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
