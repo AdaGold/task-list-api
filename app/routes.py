@@ -24,11 +24,36 @@ def make_task_safely(data_dict):
     except KeyError as err:
         error_message("Invalid data", 400)
 
+# @bp.route("", methods=("GET",))
+# def index_cats():
+#     color_param = request.args.get("color")
+
+#     if color_param:
+#         cats = Cat.query.filter_by(color=color_param)
+#     else:
+#         cats = Cat.query.all()
+
+#     result_list = [cat.to_dict() for cat in cats]
+
+#     return jsonify(result_list)
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    
+    sort_param = request.args.get("sort")
+
     tasks = Task.query.all()
+
+    if sort_param:
+        titles = []
+        for task in tasks:
+            titles.append(task.title)
+        sorted_titles = sorted(titles)
+        sorted_tasks = []
+        for title in sorted_titles:
+            for task in tasks:
+                if task.title == title:
+                    sorted_tasks.append(task)
+        tasks = sorted_tasks
 
     tasks_response = []
     for task in tasks:
