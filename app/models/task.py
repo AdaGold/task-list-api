@@ -36,21 +36,23 @@ class Task(db.Model):
 
     @classmethod
     def from_dict(cls, data_dict):
-        if not all(["is_complete", "completed_at"]) in data_dict:
+        if "is_complete" not in data_dict and "completed_at" not in data_dict:
             return cls(
                 title = data_dict["title"],
                 description = data_dict["description"]
             )
-        elif "is_complete" not in data_dict:
+        elif "completed_at" in data_dict:
             return cls(
                 title = data_dict["title"],
                 description = data_dict["description"],
+                is_complete = True,
                 completed_at = data_dict["completed_at"]
             )
-        else:
-            return cls(
-                title = data_dict["title"],
-                description = data_dict["description"],
-                completed_at = data_dict["completed_at"],
-                is_complete = data_dict["is_complete"]
-            )
+        # else:
+        #     return cls(
+        #         title = data_dict["title"],
+        #         description = data_dict["description"],
+        #         completed_at = data_dict["completed_at"],
+        #         is_complete = True,
+
+        #     )
