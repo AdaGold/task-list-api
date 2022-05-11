@@ -22,7 +22,7 @@ def make_task_safely(data_dict):
     try:
         return Task.from_dict(data_dict)
     except KeyError as err:
-        error_message(f"Missing key: {err}", 400)
+        error_message("Invalid data", 400)
 
 
 @tasks_bp.route("", methods=["GET"])
