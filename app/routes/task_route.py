@@ -1,5 +1,3 @@
-
-from turtle import title
 from flask import Blueprint, request, make_response, jsonify
 from sqlalchemy import asc, desc
 from app import db
@@ -7,8 +5,6 @@ from app.models.task import Task
 from sqlalchemy.sql.functions import now
 import requests, os
 from app.routes_helper import validated_task
-
-
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -106,35 +102,3 @@ def update_task_complete_date(task_id):
     db.session.commit()
 
     return {"task": task.to_json()}, 200
-
-# @tasks_bp.route("", methods=["GET"])
-# def get_filter_task():
-#     task_query = request.args.get("title")
-
-#     if task_query:
-#         tasks = Task.query.filter_by(title=task_query)
-#     else:
-#         # To get all the task from the table
-#         tasks = Task.query.all()
-
-#     tasks_response = [task.to_json() for task in tasks]
-
-#     return jsonify(tasks_response)
-
-# @tasks_bp.route("", methods=["GET"])
-# def get_filter_task():
-#     task_query = request.args.get("task_id")
-
-#     if task_query:
-#         tasks = Task.query.filter_by(title=task_query)
-#     else:
-#         # To get all the task from the table
-#         tasks = Task.query.all()
-
-#     tasks_response = [task.to_json() for task in tasks]
-
-#     return jsonify(tasks_response)
-
-
-
-
