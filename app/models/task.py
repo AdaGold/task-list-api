@@ -9,7 +9,7 @@ class Task(db.Model):
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
 
 
-    def to_dict(self):
+    def to_json(self):
         task_dict = {
         "id": self.task_id,
         "title": self.title, 
@@ -21,9 +21,10 @@ class Task(db.Model):
 
         return task_dict
 
-    # @classmethod
-    # def from_dict(cls, data):
-    #     return cls(
-    #         title=data["title"],
-    #         description=data["description"])
+    @classmethod
+    def from_json(cls, data):
+        return Task(
+            title=data["title"],
+            description=data["description"])
+
 

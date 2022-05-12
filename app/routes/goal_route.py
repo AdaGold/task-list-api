@@ -63,7 +63,7 @@ def goal_to_task(goal_id):
         task = validated_task(Task, task_id)
     
         goal.tasks.append(task)
-    # db.session.add(task)
+        
     db.session.commit()
 
     return {
@@ -81,7 +81,7 @@ def get_goal_task(goal_id):
     }
 
     for task in goal.tasks:
-        result["tasks"].append(task.to_dict())
+        result["tasks"].append(task.to_json())
 
     return result, 200
 

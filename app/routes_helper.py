@@ -1,9 +1,8 @@
 from flask import jsonify, abort, make_response
-from app.models.goal import Goal
+
 
 def error_message(message, status_code):
     abort(make_response(jsonify(dict(message=message)), status_code))
-
 
 def validated_task(cls, task_id):
     try:
@@ -29,5 +28,8 @@ def validated_goal(cls, goal_id):
         return goal
 
     error_message(f"Goal {goal_id} not found", 404)
+
+
+
 
     

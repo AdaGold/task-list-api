@@ -1,4 +1,5 @@
 
+from turtle import title
 from flask import Blueprint, request, make_response, jsonify
 from sqlalchemy import asc, desc
 from app import db
@@ -16,11 +17,8 @@ def create_task():
     request_body = request.get_json()
     if "title" not in request_body or "description" not in request_body:
         return make_response({'details': "Invalid data"}, 400)
-
-    new_task = Task(
-        title = request_body["title"],
-        description = request_body["description"]
-    )
+   
+    new_task = Task.from_json(request_body)
     
     if "completed_at" in request_body:
         new_task.completed_at = request_body["completed_at"]
@@ -28,7 +26,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return {"task": new_task.to_dict()}, 201
+    return {"task": new_task.to_json()}, 201
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -44,7 +42,7 @@ def get_all_tasks():
         # To get all the task from the table
          tasks = Task.query.all()
 
-    tasks_response = [task.to_dict() for task in tasks]
+    tasks_response = [task.to_json() for task in tasks]
 
     return jsonify(tasks_response)
 
@@ -52,7 +50,7 @@ def get_all_tasks():
 def get_one_task(task_id):
     task = validated_task(Task, task_id)
 
-    return {"task": task.to_dict()}
+    return {"task": task.to_json()}
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
@@ -82,8 +80,9 @@ def mark_complete_task(task_id):
     headers = {"Authorization": SLACK_BOT_TOKEN}
 
     url = requests.post(SLACK_API_URL, headers=headers, params=query_params)
+    
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_json()}, 200
 
 @tasks_bp.route('/<task_id>/mark_incomplete', methods=["PATCH"])
 def mark_incomplete_task(task_id):
@@ -93,7 +92,7 @@ def mark_incomplete_task(task_id):
     db.session.add(task)
     db.session.commit()
     
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_json()}, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task_complete_date(task_id):
@@ -102,14 +101,40 @@ def update_task_complete_date(task_id):
     
     task.title = request_body["title"]
     task.description = request_body["description"]
-
-    # new_task = Task.from_dict(request_body)
-    # new_task.task = task
-
+    
     db.session.add(task)
     db.session.commit()
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_json()}, 200
+
+# @tasks_bp.route("", methods=["GET"])
+# def get_filter_task():
+#     task_query = request.args.get("title")
+
+#     if task_query:
+#         tasks = Task.query.filter_by(title=task_query)
+#     else:
+#         # To get all the task from the table
+#         tasks = Task.query.all()
+
+#     tasks_response = [task.to_json() for task in tasks]
+
+#     return jsonify(tasks_response)
+
+# @tasks_bp.route("", methods=["GET"])
+# def get_filter_task():
+#     task_query = request.args.get("task_id")
+
+#     if task_query:
+#         tasks = Task.query.filter_by(title=task_query)
+#     else:
+#         # To get all the task from the table
+#         tasks = Task.query.all()
+
+#     tasks_response = [task.to_json() for task in tasks]
+
+#     return jsonify(tasks_response)
+
 
 
 
