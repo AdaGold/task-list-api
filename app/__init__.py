@@ -25,6 +25,7 @@ def create_app(test_config=None):
     # Import models here for Alembic setup
     from app.models.task import Task
     from app.models.goal import Goal
+    from app.routes_helper import validated_goal, validated_task
 
     db.init_app(app)
     migrate.init_app(app, db)
