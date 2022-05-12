@@ -21,3 +21,9 @@ class Task(db.Model):
 
         return task_dict
 
+    # @classmethod
+    # def from_dict(cls, data):
+    #     return cls(
+    #         title=data["title"],
+    #         description=data["description"])
+
