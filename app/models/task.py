@@ -19,20 +19,7 @@ class Task(db.Model):
         )
         return task_dict
 
-    # @classmethod
-    # def from_dict(cls, data_dict):
-    #     complete_dict = {k:v for k,v in data_dict.items()}
-    #     if "is_complete" not in data_dict:
-    #         complete_dict["is_complete"] = False
-    #     if "completed_at" not in data_dict:
-    #         complete_dict["completed_at"] = None
 
-    #     return cls(
-    #         title = complete_dict["title"],
-    #         description = complete_dict["description"],
-    #         is_complete = complete_dict["is_complete"],
-    #         completed_at = complete_dict["completed_at"]
-    #     )
 
     @classmethod
     def from_dict(cls, data_dict):
@@ -56,3 +43,19 @@ class Task(db.Model):
         #         is_complete = True,
 
         #     )
+
+
+    # @classmethod
+    # def from_dict(cls, data_dict):
+    #     complete_dict = {k:v for k,v in data_dict.items()}
+    #     if "is_complete" not in data_dict:
+    #         complete_dict["is_complete"] = False
+    #     if "completed_at" not in data_dict:
+    #         complete_dict["completed_at"] = None
+
+    #     return cls(
+    #         title = complete_dict["title"],
+    #         description = complete_dict["description"],
+    #         is_complete = complete_dict["is_complete"],
+    #         completed_at = complete_dict["completed_at"]
+    #     )

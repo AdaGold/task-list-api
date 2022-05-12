@@ -1,8 +1,8 @@
-"""empty message
+"""recreating migrations
 
-Revision ID: 1a0d4204e52d
+Revision ID: 99a8a4048872
 Revises: 
-Create Date: 2022-05-10 15:39:42.458522
+Create Date: 2022-05-12 14:16:43.588034
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1a0d4204e52d'
+revision = '99a8a4048872'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,11 +23,12 @@ def upgrade():
     sa.PrimaryKeyConstraint('goal_id')
     )
     op.create_table('task',
-    sa.Column('task_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
+    sa.Column('is_complete', sa.Boolean(), nullable=True),
     sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
-    sa.PrimaryKeyConstraint('task_id')
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 

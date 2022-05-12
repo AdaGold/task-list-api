@@ -3,6 +3,9 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from .routes_helper import error_message
 from datetime import datetime
+import requests
+
+BOT_TOKEN = "xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo"
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -25,18 +28,19 @@ def make_task_safely(data_dict):
     except KeyError as err:
         error_message("Invalid data", 400)
 
-# @bp.route("", methods=("GET",))
-# def index_cats():
-#     color_param = request.args.get("color")
+def marked_complete_bot_message(title):
+    path = "https://slack.com/api/chat.postMessage"
 
-#     if color_param:
-#         cats = Cat.query.filter_by(color=color_param)
-#     else:
-#         cats = Cat.query.all()
+    query_params = {
+        "channel": "task-list",
+        "text":f"Someone just completed the task {title}"
+    }
 
-#     result_list = [cat.to_dict() for cat in cats]
+    call_headers = {"Authorization": "Bearer xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo" }
 
-#     return jsonify(result_list)
+    api_call_response = requests.post(path, params=query_params, headers=call_headers)
+
+    return api_call_response
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
@@ -128,29 +132,23 @@ def replace_task_by_id(id):
 
     return make_response(jsonify(response), 200)
 
-# @tasks_bp.route("/<id>/mark_complete", methods = ["PATCH"])
-# def update_task_by_id(id):
-#     task = get_task_record_by_id(id)
-#     request_body = request.get_json()
-#     task_keys = request_body.keys()
 
-#     if "title" in task_keys:
-#         task.title = request_body["title"]
-#     if "description" in task_keys:
-#         task.description = request_body["description"]
-#     if "is_complete" in task_keys:
-#         task.is_complete = request_body["is_complete"]
 
-#     db.session.commit()
+# IMDB_API_KEY = "39aa0fecd969cfc4feb999c6fd8e6c8c"
 
-#     response = {"task":{
-#         "id":task.id,
-#         "title":task.title,
-#         "description":task.description,
-#         "is_complete":task.is_complete
-#     }}
+# def generate_token():
+#     path = "https://api.themoviedb.org/3/authentication/token/new"
 
-#     return make_response(jsonify(response), 200)
+#     query_params = {
+#         "api_key": IMDB_API_KEY
+#     }
+
+#     response = requests.get(path, params=query_params)
+
+#     response_body = response.json()
+#     response_body
+#     request_token = response_body["request_token"]
+#     return request_token
 
 @tasks_bp.route("/<id>/mark_complete", methods = ["PATCH"])
 def mark_task_complete_by_id(id):
@@ -166,6 +164,10 @@ def mark_task_complete_by_id(id):
         "description":task.description,
         "is_complete":task.is_complete
     }}
+
+    marked_complete_bot_message(task.title)
+    #Send bot message
+    
 
     return make_response(jsonify(response), 200)
 
