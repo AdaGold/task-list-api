@@ -177,4 +177,4 @@ def delete_goal(id):
     db.session.delete(goal)
     db.session.commit()
 
-    return make_response(jsonify({"details":f'goal {goal.id} "{goal.title}" successfully deleted'}))
+    return make_response(jsonify({"details":f'Goal {goal.id} "{goal.title}" successfully deleted'}))
