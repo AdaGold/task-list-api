@@ -9,3 +9,15 @@ def error_message(message, status_code):
 #     for attribute in attributes:
 #         obj_dict[attribute] = obj.attribute
 #     return obj_dict
+
+# def get_record_by_id(cls, id):
+#     try:
+#         id = int(id)
+#     except ValueError:
+#         error_message(f"Invalid id {id}", 400)
+
+#     model = cls.query.get(id)
+#     if model:
+#         return model
+
+#     error_message(f"No model of type {cls} with id {id} found", 404)

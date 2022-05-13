@@ -1,5 +1,7 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
+from app.routes.task_routes import get_task_record_by_id
 from flask import Blueprint, jsonify, abort, make_response, request
 from .routes_helper import error_message
 from datetime import datetime
@@ -13,7 +15,7 @@ def get_goal_record_by_id(id):
     try:
         id = int(id)
     except:
-        abort(make_response({"message":f"goal {goal.id} invalid"}, 400))
+        abort(make_response({"message":f"goal {id} invalid"}, 400))
     
     goal = Goal.query.get(id)
 
@@ -119,23 +121,6 @@ def replace_goal_by_id(id):
     return make_response(jsonify(response), 200)
 
 
-
-# IMDB_API_KEY = "39aa0fecd969cfc4feb999c6fd8e6c8c"
-
-# def generate_token():
-#     path = "https://api.themoviedb.org/3/authentication/token/new"
-
-#     query_params = {
-#         "api_key": IMDB_API_KEY
-#     }
-
-#     response = requests.get(path, params=query_params)
-
-#     response_body = response.json()
-#     response_body
-#     request_token = response_body["request_token"]
-#     return request_token
-
 @goals_bp.route("/<id>/mark_complete", methods = ["PATCH"])
 def mark_goal_complete_by_id(id):
     goal = get_goal_record_by_id(id)
@@ -178,3 +163,61 @@ def delete_goal(id):
     db.session.commit()
 
     return make_response(jsonify({"details":f'Goal {goal.id} "{goal.title}" successfully deleted'}))
+
+# @goals_bp.route("/<id>/tasks", methods = ["POST"])
+# def create_task_with_goal(id):
+#     goal = get_goal_record_by_id(id)
+    
+#     request_body = request.get_json()
+#     new_task = Task.from_dict(request_body)
+#     new_task.goal = goal
+
+#     db.session.add(new_task)
+#     db.session.commit()
+
+#     return jsonify(new_task.to_dict()), 201
+
+@goals_bp.route("/<id>/tasks", methods = ["POST"])
+def create_task_with_goal(id):
+    goal = get_goal_record_by_id(id)
+    
+    request_body_ids_list = request.get_json()
+
+    for task_id in request_body_ids_list["task_ids"]:
+        task = get_task_record_by_id(task_id) 
+        task.goal_id = goal.id
+
+    db.session.commit()
+
+    return jsonify({"id":goal.id, "task_ids": request_body_ids_list["task_ids"]}), 200
+
+
+@goals_bp.route("/<id>/tasks", methods = ["GET"])
+def get_tasks_for_goal(id):
+    goal = get_goal_record_by_id(id)
+    # tasks_info = [task.to_dict() for task in goal.tasks]
+    tasks_info = []
+    for task in goal.tasks:
+        task_dict = {
+            "id": task.id,
+            "goal_id": goal.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+        }
+        tasks_info.append(task_dict)
+
+    return jsonify({
+        "id":goal.id,
+        "title": goal.title,
+        "tasks": tasks_info}), 200
+    
+    
+    
+    # tasks_info = [task.to_dict() for task in goal.tasks]
+
+    # request_body = request.get_json()
+
+
+
+
