@@ -162,21 +162,21 @@ def delete_goal(id):
 
     return make_response(jsonify({"details":f'Goal {goal.id} "{goal.title}" successfully deleted'}))
 
-# @goals_bp.route("/<id>/tasks", methods = ["POST"])
-# def create_task_with_goal(id):
-#     goal = get_goal_record_by_id(id)
+@goals_bp.route("/<id>/tasks/create", methods = ["POST"])
+def create_task_with_goal(id):
+    goal = get_goal_record_by_id(id)
     
-#     request_body = request.get_json()
-#     new_task = Task.from_dict(request_body)
-#     new_task.goal = goal
+    request_body = request.get_json()
+    new_task = Task.from_dict(request_body)
+    new_task.goal = goal
 
-#     db.session.add(new_task)
-#     db.session.commit()
+    db.session.add(new_task)
+    db.session.commit()
 
-#     return jsonify(new_task.to_dict()), 201
+    return jsonify(new_task.to_dict()), 201
 
 @goals_bp.route("/<id>/tasks", methods = ["POST"])
-def create_task_with_goal(id):
+def associate_tasks_with_goal(id):
     goal = get_goal_record_by_id(id)
     
     request_body_ids_list = request.get_json()

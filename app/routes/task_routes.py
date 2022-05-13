@@ -72,7 +72,7 @@ def read_all_tasks():
                 "id": task.id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": task.is_complete,
+                "is_complete": task.is_complete
                 # "completed_at": task.completed_at
             }
         )
