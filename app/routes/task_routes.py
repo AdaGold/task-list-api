@@ -1,11 +1,10 @@
 from app import db
+import os
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from .routes_helper import error_message
 from datetime import datetime
 import requests
-
-BOT_TOKEN = "xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo"
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -30,13 +29,14 @@ def make_task_safely(data_dict):
 
 def marked_complete_bot_message(title):
     path = "https://slack.com/api/chat.postMessage"
+    SLACK_API_KEY = os.environ.get('SLACK_API_KEY')
 
     query_params = {
         "channel": "task-list",
         "text":f"Someone just completed the task {title}"
     }
 
-    call_headers = {"Authorization": "Bearer xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo" }
+    call_headers = {"Authorization": f"Bearer {SLACK_API_KEY}" }
 
     api_call_response = requests.post(path, params=query_params, headers=call_headers)
 
