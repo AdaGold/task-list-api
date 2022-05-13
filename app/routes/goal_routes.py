@@ -7,8 +7,6 @@ from .routes_helper import error_message
 from datetime import datetime
 import requests
 
-BOT_TOKEN = "xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo"
-
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 def get_goal_record_by_id(id):
@@ -30,19 +28,19 @@ def make_goal_safely(data_dict):
     except KeyError as err:
         error_message("Invalid data", 400)
 
-def marked_complete_bot_message(title):
-    path = "https://slack.com/api/chat.postMessage"
+# def marked_complete_bot_message(title):
+#     path = "https://slack.com/api/chat.postMessage"
 
-    query_params = {
-        "channel": "goal-list",
-        "text":f"Someone just completed the goal {title}"
-    }
+#     query_params = {
+#         "channel": "goal-list",
+#         "text":f"Someone just completed the goal {title}"
+#     }
 
-    call_headers = {"Authorization": "Bearer xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo" }
+#     call_headers = {"Authorization": "Bearer xoxb-3517483621795-3514864472709-eftmGUbZpBrItU54XIpAnwQo" }
 
-    api_call_response = requests.post(path, params=query_params, headers=call_headers)
+#     api_call_response = requests.post(path, params=query_params, headers=call_headers)
 
-    return api_call_response
+#     return api_call_response
 
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
@@ -121,39 +119,39 @@ def replace_goal_by_id(id):
     return make_response(jsonify(response), 200)
 
 
-@goals_bp.route("/<id>/mark_complete", methods = ["PATCH"])
-def mark_goal_complete_by_id(id):
-    goal = get_goal_record_by_id(id)
-    # goal.is_complete = True
-    # goal.completed_at = datetime.now()
+# @goals_bp.route("/<id>/mark_complete", methods = ["PATCH"])
+# def mark_goal_complete_by_id(id):
+#     goal = get_goal_record_by_id(id)
+#     # goal.is_complete = True
+#     # goal.completed_at = datetime.now()
 
-    db.session.commit()
+#     db.session.commit()
 
-    response = {"goal":{
-        "id":goal.id,
-        "title":goal.title
-    }}
+#     response = {"goal":{
+#         "id":goal.id,
+#         "title":goal.title
+#     }}
 
-    marked_complete_bot_message(goal.title)
-    #Send bot message
+#     marked_complete_bot_message(goal.title)
+#     #Send bot message
     
 
-    return make_response(jsonify(response), 200)
+#     return make_response(jsonify(response), 200)
 
-@goals_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
-def mark_goal_incomplete_by_id(id):
-    goal = get_goal_record_by_id(id)
-    # goal.is_complete = False
-    # goal.completed_at = None
+# @goals_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
+# def mark_goal_incomplete_by_id(id):
+#     goal = get_goal_record_by_id(id)
+#     # goal.is_complete = False
+#     # goal.completed_at = None
 
-    db.session.commit()
+#     db.session.commit()
 
-    response = {"goal":{
-        "id":goal.id,
-        "title":goal.title
-    }}
+#     response = {"goal":{
+#         "id":goal.id,
+#         "title":goal.title
+#     }}
 
-    return make_response(jsonify(response), 200)
+#     return make_response(jsonify(response), 200)
 
 @goals_bp.route("/<id>", methods=["DELETE"])
 def delete_goal(id):
