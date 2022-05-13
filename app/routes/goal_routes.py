@@ -168,7 +168,8 @@ def create_task_with_goal(id):
     
     request_body = request.get_json()
     new_task = Task.from_dict(request_body)
-    new_task.goal = goal
+    new_task.goal_id = goal.id
+    new_task.goal = goal.title
 
     db.session.add(new_task)
     db.session.commit()
