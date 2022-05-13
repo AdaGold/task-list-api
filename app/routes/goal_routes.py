@@ -175,6 +175,8 @@ def create_task_with_goal(id):
     new_task.goal_id = goal.id
     new_task.goal = goal.title
 
+    db.session.commit()
+
     return jsonify(new_task.to_dict()), 201
 
 @goals_bp.route("/<id>/tasks", methods = ["POST"])
