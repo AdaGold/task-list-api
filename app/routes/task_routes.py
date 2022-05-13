@@ -83,12 +83,22 @@ def read_all_tasks():
 @tasks_bp.route("/<id>", methods=("GET",))
 def read_task_by_id(id):
     task = get_task_record_by_id(id)
-    return jsonify({"task":{
+    if task.goal_id:
+        response = {
+        "id": task.id,
+        "goal_id": task.goal_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": task.is_complete
+    }
+    else:
+        response ={
         "id": task.id,
         "title": task.title,
         "description": task.description,
         "is_complete": task.is_complete
-    }}), 200
+    }
+    return jsonify({"task":response}), 200
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -98,7 +108,7 @@ def create_task():
 
     db.session.add(new_task)
     db.session.commit()
-
+    
     response = {"task":{
         "id":new_task.id,
         "title":new_task.title,
