@@ -144,22 +144,6 @@ def replace_task_by_id(id):
 
 
 
-# IMDB_API_KEY = "39aa0fecd969cfc4feb999c6fd8e6c8c"
-
-# def generate_token():
-#     path = "https://api.themoviedb.org/3/authentication/token/new"
-
-#     query_params = {
-#         "api_key": IMDB_API_KEY
-#     }
-
-#     response = requests.get(path, params=query_params)
-
-#     response_body = response.json()
-#     response_body
-#     request_token = response_body["request_token"]
-#     return request_token
-
 @tasks_bp.route("/<id>/mark_complete", methods = ["PATCH"])
 def mark_task_complete_by_id(id):
     task = get_task_record_by_id(id)
