@@ -36,7 +36,9 @@ def client(app):
 @pytest.fixture
 def one_task(app):
     new_task = Task(
-        title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=None)
+        title="Go on my daily walk 🏞", 
+        description="Notice something new every day", 
+        completed_at=None)
     db.session.add(new_task)
     db.session.commit()
 
