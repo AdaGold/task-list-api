@@ -21,8 +21,6 @@ def create_one_task():
 def get_all_tasks():
     tasks = Task.query.all()
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response
+    tasks_response = [task.to_dict() for task in tasks]
 
-    return jsonify(tasks_response)
+    return jsonify(tasks_response), 200
