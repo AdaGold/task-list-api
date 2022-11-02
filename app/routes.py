@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app import db
 
@@ -22,3 +22,11 @@ def create_one_task():
         "description": new_task.description,
         "is_complete": False
     }}), 201
+
+@task_bp.route("", methods=["GET"])
+def get_all_tasks():
+    tasks = Task.query.all()
+
+    tasks_response = []
+
+    return jsonify(tasks_response)
