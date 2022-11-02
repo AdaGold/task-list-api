@@ -17,7 +17,7 @@ def create_one_task():
     db.session.commit()
 
     return jsonify({"task": {
-        "id": new_task.id,
+        "task_id": new_task.task_id,
         "title": new_task.title,
         "description": new_task.description,
         "is_complete": False
