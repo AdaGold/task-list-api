@@ -24,3 +24,19 @@ def get_all_tasks():
     tasks_response = [task.to_dict() for task in tasks]
 
     return jsonify(tasks_response), 200
+
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    try:
+        task_id = int(task_id)
+    except ValueError:
+        response_str = f"Invalid task_id: {task_id}. ID must be an integer."  
+        abort(make_response(jsonify({"message": response_str}), 400))
+    
+    requested_task = Task.query.get(task_id)
+
+    if not requested_task:
+        response_str = f"Task with id: {task_id} was not found in the database."
+        abort(make_response(jsonify({"message": response_str}), 404))
+    
+    return jsonify(requested_task.to_dict()), 200
