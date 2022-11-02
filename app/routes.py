@@ -39,4 +39,4 @@ def get_one_task(task_id):
         response_str = f"Task with id: {task_id} was not found in the database."
         abort(make_response(jsonify({"message": response_str}), 404))
     
-    return jsonify(requested_task.to_dict()), 200
+    return jsonify({"task": requested_task.to_dict()}), 200
