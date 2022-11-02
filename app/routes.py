@@ -10,23 +10,19 @@ def create_one_task():
 
     new_task = Task(
         title=request_body["title"],
-        description=request_body["description"],
-        completed_at=request_body["completed_at"]
+        description=request_body["description"]
     )
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify({"task": {
-        "task_id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": False
-    }}), 201
+    return jsonify({"task": new_task.to_dict()}), 201
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks = Task.query.all()
 
     tasks_response = []
+    for task in tasks:
+        tasks_response
 
     return jsonify(tasks_response)
