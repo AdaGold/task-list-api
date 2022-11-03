@@ -45,7 +45,17 @@ def read_all_tasks():
         tasks_response.append({
             "id": task.task_id,
             "title": task.title,
-            "description": task.description
+            "description": task.description,
+            "is_complete": False
         })
 
     return jsonify(tasks_response)
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_task(task_id)
+    return {"task":{
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+        }}
