@@ -22,13 +22,19 @@ def create_task():
     request_body = request.get_json()
     new_task = Task(
         title=request_body["title"],
-        description=request_body["description"],
-        completed_at=request_body["completed_at"]
+        description=request_body["description"]
+    
         )
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(f"Task {new_task.title} successfully created", 201)
+    return ({"task":{
+            "id": new_task.task_id,
+            "title": new_task.title,
+            "description": new_task.description,
+            "is_complete": False
+        }}, 201)
+
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -50,6 +56,7 @@ def read_all_tasks():
         })
 
     return jsonify(tasks_response)
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_task(task_id)
@@ -59,3 +66,30 @@ def get_one_task(task_id):
             "description": task.description,
             "is_complete": False
         }}
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+    request_body = request.get_json()
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    
+    db.session.commit()
+
+    return {"task":{
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+        }}
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task(task_id)
+    
+    db.session.delete(task)
+    db.session.commit()
+
+    return ({
+    "details": f'Task {task_id} "{task.title}" successfully deleted'
+    }, 200)
