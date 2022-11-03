@@ -22,17 +22,10 @@ def create_task():
     request_body = request.get_json()
     new_task = Task(
         title=request_body["title"],
-        description=request_body["description"]
+        description=request_body["description"],
         completed_at=request_body["completed_at"]
-    )
+        )
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response({
-        "task": {
-            "id": 1,
-            "title": "A Brand New Task",
-            "description": "Test Description",
-            "is_complete": False
-        }
-    }, 201)
+    return make_response(f"Task {new_task.title} successfully created", 201)
