@@ -7,11 +7,15 @@ task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @task_bp.route("", methods=["POST"])
 def create_one_task():
     request_body = request.get_json()
+    
+    try:
+        new_task = Task(
+                title=request_body["title"],
+                description=request_body["description"]
+                )
+    except KeyError:
+        return jsonify({"details": "Invalid data"}), 400
 
-    new_task = Task(
-        title=request_body["title"],
-        description=request_body["description"]
-    )
     db.session.add(new_task)
     db.session.commit()
 
