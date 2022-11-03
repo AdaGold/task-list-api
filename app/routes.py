@@ -4,6 +4,7 @@ from app import db
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+
 @task_bp.route("", methods=["POST"])
 def create_one_task():
     request_body = request.get_json()
@@ -21,6 +22,7 @@ def create_one_task():
 
     return jsonify({"task": new_task.to_dict()}), 201
 
+
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks = Task.query.all()
@@ -29,8 +31,15 @@ def get_all_tasks():
 
     return jsonify(tasks_response), 200
 
+
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
+    task = validate_task_by_id(task_id)
+
+    return jsonify({"task": task.to_dict()}), 200
+
+
+def validate_task_by_id(task_id):
     try:
         task_id = int(task_id)
     except ValueError:
@@ -42,5 +51,18 @@ def get_one_task(task_id):
     if not requested_task:
         response_str = f"Task with id: {task_id} was not found in the database."
         abort(make_response(jsonify({"message": response_str}), 404))
-    
-    return jsonify({"task": requested_task.to_dict()}), 200
+
+    return requested_task
+
+
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    update_task = validate_task_by_id(task_id)
+    request_body = request.get_json()
+
+    update_task.title = request_body["title"]
+    update_task.description = request_body["description"]
+
+    db.session.commit()
+
+    return jsonify({"task": update_task.to_dict()}), 200
