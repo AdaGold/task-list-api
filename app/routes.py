@@ -19,22 +19,29 @@ def validate_task(task_id):
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
+
     request_body = request.get_json()
+    
+    attributes = ["title", "description"]
+
+    for attribute in attributes:
+        if attribute not in request_body or len(request_body[attribute]) == 0:
+            abort(make_response({"details": "Invalid data" }, 400))
+
     new_task = Task(
         title=request_body["title"],
         description=request_body["description"],
-        completed_at =request_body["completed_at"]
         )
+
     db.session.add(new_task)
     db.session.commit()
-
+    
     return ({"task":{
             "id": new_task.task_id,
             "title": new_task.title,
             "description": new_task.description,
             "is_complete": False
         }}, 201)
-
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -73,7 +80,7 @@ def update_task(task_id):
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at =request_body["completed_at"]
+    
 
     
     db.session.commit()
