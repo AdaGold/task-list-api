@@ -23,3 +23,11 @@ class Task(db.Model):
             description = task_data["description"],
             completed_at = None
         )
+
+    def true_dict(self):
+        return dict(
+            id = self.task_id,
+            title = self.title,
+            description = self.description,
+            is_complete = True
+        )

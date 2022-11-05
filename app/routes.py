@@ -1,8 +1,9 @@
 from app import db
 from app.models.task import Task 
 from flask import Blueprint, jsonify, abort, make_response, request
-from collections import OrderedDict
 from sqlalchemy import asc, desc
+from datetime import datetime
+
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 def validate_model(cls, model_id):
@@ -81,3 +82,23 @@ def delete_task(task_id):
     return make_response(jsonify({
     "details": f"Task {task_id} \"{task.title}\" successfully deleted"
 }))
+
+@bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def complete_task(task_id):
+    task = validate_model(Task, task_id)
+    
+    task.completed_at = datetime.now()
+    db.session.commit()
+
+    return make_response(jsonify({
+            "task": task.true_dict()})), 200
+
+@bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+    
+    task.completed_at = None
+    db.session.commit()
+
+    return make_response(jsonify({
+            "task": task.to_dict()})), 200
