@@ -39,6 +39,30 @@ def get_one_task(task_id):
     return jsonify({"task": task.to_dict()}), 200
 
 
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    update_task = validate_task_by_id(task_id)
+    request_body = request.get_json()
+
+    update_task.title = request_body["title"]
+    update_task.description = request_body["description"]
+
+    db.session.commit()
+
+    return jsonify({"task": update_task.to_dict()}), 200
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task_by_id(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(jsonify({
+        "details": f'Task {task.task_id} "{task.title}" successfully deleted'
+        }))
+
+
 def validate_task_by_id(task_id):
     try:
         task_id = int(task_id)
@@ -53,16 +77,3 @@ def validate_task_by_id(task_id):
         abort(make_response(jsonify({"message": response_str}), 404))
 
     return requested_task
-
-
-@task_bp.route("/<task_id>", methods=["PUT"])
-def update_one_task(task_id):
-    update_task = validate_task_by_id(task_id)
-    request_body = request.get_json()
-
-    update_task.title = request_body["title"]
-    update_task.description = request_body["description"]
-
-    db.session.commit()
-
-    return jsonify({"task": update_task.to_dict()}), 200
