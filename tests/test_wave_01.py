@@ -171,6 +171,7 @@ def test_delete_task_not_found(client):
     # *****************************************************************
     assert Task.query.all() == []
     assert "message" in response_body
+    assert len(response_body) == 1
 
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
