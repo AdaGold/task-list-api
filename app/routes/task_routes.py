@@ -35,6 +35,7 @@ def create_task():
         abort(make_response({"details": "Invalid data"}, 400))
 
 
+
 # GET ALL TASKS w/ GET REQUEST
 @tasks_bp.route("", methods=['GET'])
 def get_all_tasks():
@@ -55,15 +56,36 @@ def get_all_tasks():
     # convert response into json and give successful status code
     return jsonify(tasks_response), 200
 
+    
+
+#VALIDATE TASK ID, IF TASK_ID NOT FOUND OR INVALID RETURN 404
+def validate_task(task_id):
+    #this code can be refactored to handle invalid data
+    # try:
+    #     task_id = int(task_id)
+    # except:
+    #     abort(make_response({"message":f"{task_id} is invalid"}, 400))
+
+    task = Task.query.get(task_id)
+
+    if not task:
+        abort(make_response({"message": f"{task_id} not found"}, 404))
+    return task 
+
+
 
 # GET ONE TASK w/ GET REQUEST
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
     # query one instance of Task given task_id
-    task = Task.query.get(task_id)
+   # task = Task.query.get(task_id)
+
+   #call helper function to validate the task_id
+   task = validate_task(task_id)
     
+
     # return dictionary with Task data for one task
-    return { "task": {
+   return { "task": {
     "id": task.task_id,
     "title": task.title,
     "description": task.description,
@@ -75,8 +97,11 @@ def get_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
     # query one instance of Task given task_id
-    task = Task.query.get(task_id)
-    
+    #task = Task.query.get(task_id)
+
+    #call helper function to validate the task_id
+    task = validate_task(task_id)
+
     # get put request data and convert to json
     request_body = request.get_json()
 
@@ -100,10 +125,17 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_task(task_id):
     # query one instance of Task given task_id
-    task = Task.query.get(task_id)
+    #task = Task.query.get(task_id)
+
+    #call helper function to validate the task_id
+    task = validate_task(task_id)
 
     # delete task from the database
     db.session.delete(task)
     db.session.commit()
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
+
+
+
+
