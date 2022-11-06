@@ -18,7 +18,7 @@ def create_task():
             description=request_body["description"]
             )
 
-        # add new Task to database 
+        # add new task to database 
         db.session.add(new_task)
         db.session.commit()
 
@@ -63,6 +63,31 @@ def get_one_task(task_id):
     task = Task.query.get(task_id)
     
     # return dictionary with Task data for one task
+    return { "task": {
+    "id": task.task_id,
+    "title": task.title,
+    "description": task.description,
+    "is_complete": task.is_complete
+    }}
+
+
+# UPDATE ONE TASK w/ PUT REQUEST
+@tasks_bp.route("/<task_id>", methods=['PUT'])
+def update_task(task_id):
+    # query one instance of Task given task_id
+    task = Task.query.get(task_id)
+    
+    # get put request data and convert to json
+    request_body = request.get_json()
+
+    # update task attributes
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    # update task in the database
+    db.session.commit()
+
+    # return updated task as a dictionary
     return { "task": {
     "id": task.task_id,
     "title": task.title,
