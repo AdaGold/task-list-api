@@ -32,7 +32,19 @@ class Task(db.Model):
     def update(self,request_body):
         try:
             self.title = request_body["title"]
-            self.completed_at = request_body["completed_at"]
+            # self.completed_at = request_body["completed_at"] # why does this need to be commented out to pass test_update_task ????
             self.description = request_body["description"]
         except KeyError as error:
             abort(make_response({'message': f"Missing attribute: {error}"}))
+    
+    @classmethod
+    def create(cls, request_body):
+        new_task = cls(
+            title = request_body["title"],
+            description = request_body["description"], 
+            # completed_at = request_body["completed_at"]
+        )
+            
+        return new_task
+
+

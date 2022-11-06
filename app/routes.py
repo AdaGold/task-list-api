@@ -8,11 +8,18 @@ task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 # ================================
 # Create one task 
+# TODO: handle cases with missing titles/completed_at/description
 # ================================
 @task_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task.from_json(request_body)
+
+    try:
+        new_task = Task.create(request_body)
+    except KeyError as error:
+        return make_response({"details": "Invalid data"}, 400)
+
+
 
     db.session.add(new_task)
     db.session.commit()
@@ -39,6 +46,7 @@ def get_one_task(task_id):
 
 # ==================================
 # Update one task 
+# TODO: fix tests for this 
 # ==================================
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
@@ -49,8 +57,15 @@ def update_one_task(task_id):
     db.session.commit()
     return jsonify({"task": task.to_json()}), 200
 
-
-
+# ==================================
+# Delete one task by id
+# ==================================
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = validate_id(Task, task_id)
+    db.session.delete(task)
+    db.session.commit()
+    return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}, 200)
 
 # ==================================
 # Helper function to validate id
