@@ -34,4 +34,23 @@ def create_task():
         # abort and show error message if KeyError
         abort(make_response({"details": "Invalid data"}, 400))
 
+
+# GET ALL TASKS w/ GET REQUEST
+@tasks_bp.route("", methods=['GET'])
+def get_all_tasks():
+    # query all instances of Task
+    tasks = Task.query.all()
+    tasks_response = []
+
+    # loop through all the instances of Task, add to response body
+    # convert Task data into dictionary
+    for task in tasks:
+        tasks_response.append({
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+        })
     
+    # convert response into json and give successful status code
+    return jsonify(tasks_response), 200
