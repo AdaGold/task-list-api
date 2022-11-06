@@ -8,7 +8,6 @@ task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 # ================================
 # Create one task 
-# TODO: handle cases with missing titles/completed_at/description
 # ================================
 @task_bp.route("", methods=["POST"])
 def create_task():
@@ -18,8 +17,6 @@ def create_task():
         new_task = Task.create(request_body)
     except KeyError as error:
         return make_response({"details": "Invalid data"}, 400)
-
-
 
     db.session.add(new_task)
     db.session.commit()
@@ -31,10 +28,18 @@ def create_task():
 # ==================================
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
+    sort_query = request.args.get("sort")
+    if sort_query == 'asc':
+        all_tasks = Task.query.order_by(Task.title)
+    elif sort_query == 'desc':
+        all_tasks = Task.query.order_by(Task.title.desc())
+    else:
+        all_tasks = Task.query.all()
+    
     results_list = []
-    all_tasks = Task.query.all()
     for task in all_tasks:
         results_list.append(task.to_json())
+
     return jsonify(results_list), 200
 
 # ==================================
@@ -46,7 +51,6 @@ def get_one_task(task_id):
 
 # ==================================
 # Update one task 
-# TODO: fix tests for this 
 # ==================================
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
@@ -55,6 +59,7 @@ def update_one_task(task_id):
     task.update(request_body)
 
     db.session.commit()
+
     return jsonify({"task": task.to_json()}), 200
 
 # ==================================
@@ -63,8 +68,10 @@ def update_one_task(task_id):
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
     task = validate_id(Task, task_id)
+
     db.session.delete(task)
     db.session.commit()
+
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}, 200)
 
 # ==================================
