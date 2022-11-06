@@ -54,3 +54,18 @@ def get_all_tasks():
     
     # convert response into json and give successful status code
     return jsonify(tasks_response), 200
+
+
+# GET ONE TASK w/ GET REQUEST
+@tasks_bp.route("/<task_id>", methods=['GET'])
+def get_one_task(task_id):
+    # query one instance of Task given task_id
+    task = Task.query.get(task_id)
+    
+    # return dictionary with Task data for one task
+    return { "task": {
+    "id": task.task_id,
+    "title": task.title,
+    "description": task.description,
+    "is_complete": task.is_complete
+    }}
