@@ -132,7 +132,6 @@ def test_update_task_not_found(client):
     # *****************************************************************
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task(client, one_task):
     # Act
     response = client.delete("/tasks/1")

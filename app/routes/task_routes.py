@@ -80,7 +80,7 @@ def update_task(task_id):
     # get put request data and convert to json
     request_body = request.get_json()
 
-    # update task attributes
+    # update task attributes according to request data
     task.title = request_body["title"]
     task.description = request_body["description"]
 
@@ -94,3 +94,16 @@ def update_task(task_id):
     "description": task.description,
     "is_complete": task.is_complete
     }}
+
+
+# DELETE ONE TASK w/ DELETE REQUEST
+@tasks_bp.route("/<task_id>", methods=['DELETE'])
+def delete_task(task_id):
+    # query one instance of Task given task_id
+    task = Task.query.get(task_id)
+
+    # delete task from the database
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
