@@ -14,7 +14,7 @@ class Task(db.Model):
         if self.completed_at == None:
             task_as_dict["is_complete"] = False
         else:
-            task_as_dict["is_complete"] = task_as_dict["completed_at"]
+            task_as_dict["is_complete"] = True
         
         return task_as_dict
 
