@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
-import os, requests
+from datetime import datetime
+
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -30,7 +31,7 @@ def create_task():
 def get_all_tasks():
     sort_query = request.args.get("sort")
     if sort_query == 'asc':
-        all_tasks = Task.query.order_by(Task.title)
+        all_tasks = Task.query.order_by(Task.title.asc())
     elif sort_query == 'desc':
         all_tasks = Task.query.order_by(Task.title.desc())
     else:
@@ -73,6 +74,22 @@ def delete_one_task(task_id):
     db.session.commit()
 
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}, 200)
+
+# ==================================
+# update one task's completeness
+# ==================================
+@task_bp.route("/<task_id>/<mark>", methods=["PATCH"])
+def mark_tasks_complete_or_incomplete(task_id, mark):
+    task = validate_id(Task, task_id)
+    if mark == "mark_complete":
+        task.completed_at = datetime.now()
+        db.session.commit()
+        return jsonify({"task": task.to_json()}), 200
+    elif mark == "mark_incomplete":
+        task.completed_at = None
+        db.session.commit()
+        return jsonify({"task": task.to_json()}), 200
+
 
 # ==================================
 # Helper function to validate id

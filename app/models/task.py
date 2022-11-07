@@ -42,7 +42,7 @@ class Task(db.Model):
         new_task = cls(
             title = request_body["title"],
             description = request_body["description"], 
-            # completed_at = request_body["completed_at"]
+            completed_at = request_body["completed_at"]
         )
             
         return new_task
