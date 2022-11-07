@@ -2,6 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import desc, asc
+from datetime import date
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -53,9 +54,9 @@ def read_all_tasks():  # sourcery skip: list-comprehension
     if task_query:
         tasks = Task.query.filter_by(title=task_query)
     elif sort_at_query == "asc":
-         tasks = Task.query.order_by(Task.title)
+        tasks = Task.query.order_by(Task.title)
     elif sort_at_query == "desc":
-         tasks = Task.query.order_by(Task.title.desc())
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
 
@@ -69,7 +70,6 @@ def read_all_tasks():  # sourcery skip: list-comprehension
         })
 
     return jsonify(tasks_response)
-
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
@@ -88,8 +88,6 @@ def update_task(task_id):
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
-    
-
     
     db.session.commit()
 
@@ -111,3 +109,25 @@ def delete_task(task_id):
     "details": f'Task {task_id} "{task.title}" successfully deleted'
     }, 200)
 
+@tasks_bp.route("/<task_id>/<mark_complete>", methods=["PATCH"])
+def patch_complete_task(task_id, mark_complete):
+    task = validate_task(task_id)
+    
+    if mark_complete == "mark_complete":
+        task.completed_at = date.today()
+        is_complete = True
+    
+    elif mark_complete == "mark_incomplete":
+        task.comepleted_at = None
+        is_complete = False
+
+    db.session.commit()
+
+    task_response = {"task":{
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete
+        }}
+    
+    return make_response(task_response)
