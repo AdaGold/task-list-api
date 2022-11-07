@@ -52,6 +52,18 @@ def read_one_task(task_id):
             "completed at": task.completed_at
         }
     
-    
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    return make_response(f"Task #{task.task_id} successfully updated")
+
     
     
