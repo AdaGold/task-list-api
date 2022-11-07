@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, request, make_response, jsonify, abort
+from sqlalchemy import asc, desc
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -38,6 +39,7 @@ def create_task():
 
 # GET ALL TASKS w/ GET REQUEST
 @tasks_bp.route("", methods=['GET'])
+
 def get_all_tasks():
     # query all instances of Task
     tasks = Task.query.all()
@@ -56,7 +58,6 @@ def get_all_tasks():
     # convert response into json and give successful status code
     return jsonify(tasks_response), 200
 
-    
 
 #VALIDATE TASK ID, IF TASK_ID NOT FOUND OR INVALID RETURN 404
 def validate_task(task_id):
@@ -138,4 +139,34 @@ def delete_task(task_id):
 
 
 
+#Updated get_all_tasks in order to search by title and sort resulsts in ascending and descending order
+# def get_all_tasks():
+    
+# @tasks_bp.route("", methods=['GET'])
+# def get_all_tasks():
+    
+#       #add conditional for ascending or descending ? 
+#     #if query param == sort == "asc": 
+#     #tasks = Task.query.order_by(Task.title).all()
+#     #if query param === sort "desc":
+#    # tasks = Task.query.order_by(Task.title.desc())
+   
+#     tasks = Task.query.order_by(Task.title).all()
 
+#     tasks = Task.query.order_by(Task.title.desc())
+
+
+#     tasks_response = []
+
+#     # loop through all the instances of Task, add to response body
+#     # convert Task data into dictionary
+#     for task in tasks:
+#         tasks_response.append({
+#             "id": task.task_id,
+#             "title": task.title,
+#             "description": task.description,
+#             "is_complete": task.is_complete
+#         })
+    
+#     # convert response into json and give successful status code
+#     return jsonify(tasks_response), 200
