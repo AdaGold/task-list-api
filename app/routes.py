@@ -62,7 +62,7 @@ def update_one_task(task_id):
     return jsonify({"task": update_task.to_dict()}), 200
 
 
-# PATCH route
+# PATCH routes
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_completion(task_id):
     task_to_patch = validate_task_by_id(task_id)
@@ -72,6 +72,14 @@ def update_task_completion(task_id):
 
     return jsonify({"task": task_to_patch.to_dict()}), 200
 
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_incomplete(task_id):
+    task_to_patch = validate_task_by_id(task_id)
+    task_to_patch.completed_at = None
+        
+    db.session.commit()
+
+    return jsonify({"task": task_to_patch.to_dict()}), 200
 
 # DELETE route
 @task_bp.route("/<task_id>", methods=["DELETE"])
