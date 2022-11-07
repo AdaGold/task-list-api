@@ -2,8 +2,24 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, request, make_response, jsonify, abort
 import datetime
+import os
+import requests
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+# create helper function to post message to Slack
+def slack_bot(slack_message):
+    path = "https://slack.com/api/chat.postMessage"
+    SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
+    HEADERS = {"Authorization": SLACK_API_KEY}
+    channel_id ="C049QSML63U"
+    
+    query_params = {
+        "channel": channel_id, 
+        "text": slack_message
+        }
+
+    requests.post(path, params=query_params, headers=HEADERS)
 
 def validate_id(cls, model_id):
     try: 
@@ -84,6 +100,9 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.datetime.now()
 
     db.session.commit()
+
+    slack_message = f"Someone just completed the task {task.title}"
+    slack_bot(slack_message)
 
     response = {"task": task.to_dict()}
     return make_response(jsonify(response))
