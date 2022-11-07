@@ -35,14 +35,21 @@ def create_task():
         # abort and show error message if KeyError
         abort(make_response({"details": "Invalid data"}, 400))
 
-
-
 # GET ALL TASKS w/ GET REQUEST
 @tasks_bp.route("", methods=['GET'])
-
 def get_all_tasks():
-    # query all instances of Task
-    tasks = Task.query.all()
+    
+    #variable to store the tasks in 
+    sort_tasks = request.args.get("sort")
+
+    #order tasks titles in ascending or descending order depending on sort type, if neither return all 
+    if sort_tasks == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_tasks == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
+
     tasks_response = []
 
     # loop through all the instances of Task, add to response body
@@ -72,7 +79,6 @@ def validate_task(task_id):
     if not task:
         abort(make_response({"message": f"{task_id} not found"}, 404))
     return task 
-
 
 
 # GET ONE TASK w/ GET REQUEST
@@ -137,25 +143,10 @@ def delete_task(task_id):
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
 
-
-
-#Updated get_all_tasks in order to search by title and sort resulsts in ascending and descending order
+#first version of get_all_tasks function
 # def get_all_tasks():
-    
-# @tasks_bp.route("", methods=['GET'])
-# def get_all_tasks():
-    
-#       #add conditional for ascending or descending ? 
-#     #if query param == sort == "asc": 
-#     #tasks = Task.query.order_by(Task.title).all()
-#     #if query param === sort "desc":
-#    # tasks = Task.query.order_by(Task.title.desc())
-   
-#     tasks = Task.query.order_by(Task.title).all()
-
-#     tasks = Task.query.order_by(Task.title.desc())
-
-
+#     # query all instances of Task
+#     tasks = Task.query.all()
 #     tasks_response = []
 
 #     # loop through all the instances of Task, add to response body
@@ -170,3 +161,5 @@ def delete_task(task_id):
     
 #     # convert response into json and give successful status code
 #     return jsonify(tasks_response), 200
+
+
