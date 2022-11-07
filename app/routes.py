@@ -39,3 +39,21 @@ def read_one_task(task_id):
     task = validate_id(Task, task_id)
     response = {"task": task.to_dict()}
     return make_response(jsonify(response))
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_id(Task, task_id)
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    if task.completed_at == None:
+        task.is_complete = False
+    else:
+        task.is_complete = request_body["completed_at"]
+    
+    db.session.commit()
+
+    response = {"task": task.to_dict()}
+    return make_response(jsonify(response))
+
