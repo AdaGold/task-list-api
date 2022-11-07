@@ -37,4 +37,5 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_id(Task, task_id)
-    return jsonify(task.to_dict())
+    response = {"task": task.to_dict()}
+    return make_response(jsonify(response))
