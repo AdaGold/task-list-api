@@ -156,7 +156,7 @@ def test_delete_task_not_found(client):
     assert response.status_code == 404
     #This needs to be updated so that it prints the correct task id
     assert response_body == {"message": "1 not found"}
-   # raise Exception("Complete test with assertion about response body")
+    # raise Exception("Complete test with assertion about response body")
     assert Task.query.all() == []
 
 

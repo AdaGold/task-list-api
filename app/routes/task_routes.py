@@ -71,9 +71,6 @@ def validate_task(task_id):
 # GET ONE TASK w/ GET REQUEST
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
-    # query one instance of Task given task_id
-    # task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
     task = validate_task(task_id)
     
@@ -85,9 +82,6 @@ def get_one_task(task_id):
 # UPDATE ONE TASK w/ PUT REQUEST
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
-    # query one instance of Task given task_id
-    #task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
     task = validate_task(task_id)
 
@@ -108,9 +102,6 @@ def update_task(task_id):
 # DELETE ONE TASK w/ DELETE REQUEST
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_task(task_id):
-    # query one instance of Task given task_id
-    #task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
     task = validate_task(task_id)
 
@@ -119,24 +110,3 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
-
-#first version of get_all_tasks function
-# def get_all_tasks():
-#     # query all instances of Task
-#     tasks = Task.query.all()
-#     tasks_response = []
-
-#     # loop through all the instances of Task, add to response body
-#     # convert Task data into dictionary
-#     for task in tasks:
-#         tasks_response.append({
-#             "id": task.task_id,
-#             "title": task.title,
-#             "description": task.description,
-#             "is_complete": task.is_complete
-#         })
-    
-#     # convert response into json and give successful status code
-#     return jsonify(tasks_response), 200
-
-
