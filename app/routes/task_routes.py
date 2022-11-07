@@ -14,22 +14,14 @@ def create_task():
         request_body = request.get_json()
 
         # make a new instance of Task using request data
-        new_task = Task(
-            title=request_body["title"],
-            description=request_body["description"]
-            )
+        new_task = Task.from_dict(request_body)
 
         # add new task to database 
         db.session.add(new_task)
         db.session.commit()
 
         # return new task in json and successfully created status code
-        return make_response(jsonify({"task": 
-                    {"id": new_task.task_id,
-                    "title": new_task.title,
-                    "description": new_task.description,
-                    "is_complete": new_task.is_complete
-                    }}), 201)
+        return make_response(jsonify({f"task": new_task.to_dict()}), 201)
     
     except KeyError:
         # abort and show error message if KeyError
@@ -55,12 +47,7 @@ def get_all_tasks():
     # loop through all the instances of Task, add to response body
     # convert Task data into dictionary
     for task in tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.is_complete
-        })
+        tasks_response.append(task.to_dict())
     
     # convert response into json and give successful status code
     return jsonify(tasks_response), 200
@@ -85,19 +72,14 @@ def validate_task(task_id):
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
     # query one instance of Task given task_id
-   # task = Task.query.get(task_id)
+    # task = Task.query.get(task_id)
 
-   #call helper function to validate the task_id
-   task = validate_task(task_id)
+    #call helper function to validate the task_id
+    task = validate_task(task_id)
     
 
     # return dictionary with Task data for one task
-   return { "task": {
-    "id": task.task_id,
-    "title": task.title,
-    "description": task.description,
-    "is_complete": task.is_complete
-    }}
+    return {"task": task.to_dict()}
 
 
 # UPDATE ONE TASK w/ PUT REQUEST
@@ -120,12 +102,7 @@ def update_task(task_id):
     db.session.commit()
 
     # return updated task as a dictionary
-    return { "task": {
-    "id": task.task_id,
-    "title": task.title,
-    "description": task.description,
-    "is_complete": task.is_complete
-    }}
+    return {"task": task.to_dict()}
 
 
 # DELETE ONE TASK w/ DELETE REQUEST
