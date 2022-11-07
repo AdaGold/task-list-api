@@ -19,7 +19,11 @@ def validate_id(cls, model_id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
+
+    try:
+        new_task = Task.from_dict(request_body)
+    except:
+        abort(make_response({"details":f"Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
