@@ -3,6 +3,7 @@ from app.models.task import Task
 from flask import Blueprint, request, make_response, jsonify, abort
 from sqlalchemy import asc, desc
 import datetime
+from app.routes.route_helpers import validate_model
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -54,26 +55,11 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 
-#VALIDATE TASK ID, IF TASK_ID NOT FOUND OR INVALID RETURN 404
-def validate_task(task_id):
-    #this code can be refactored to handle invalid data
-    # try:
-    #     task_id = int(task_id)
-    # except:
-    #     abort(make_response({"message":f"{task_id} is invalid"}, 400))
-
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message": f"{task_id} not found"}, 404))
-    return task 
-
-
 # GET ONE TASK w/ GET REQUEST
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
 
     # return dictionary with Task data for one task
@@ -84,7 +70,7 @@ def get_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     # get put request data and convert to json
     request_body = request.get_json()
@@ -104,7 +90,7 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_task(task_id):
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     # delete task from the database
     db.session.delete(task)
@@ -116,7 +102,7 @@ def delete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
 def mark_complete_task(task_id):
     # call helper to validate task 
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     # update completed_at from None to current date
     task.is_complete = True
@@ -131,7 +117,7 @@ def mark_complete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
 def mark_incomplete_task(task_id):
     # call helper to validate task 
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     # update completed_at from current date to None
     task.is_complete = False
