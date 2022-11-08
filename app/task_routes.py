@@ -65,7 +65,10 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_id(Task, task_id)
-    response = {"task": task.to_dict()}
+    if not task.goal_id:
+        response = {"task": task.to_dict()}
+    else:
+        response = {"task": task.to_dict_with_goal()}
     return make_response(jsonify(response))
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])

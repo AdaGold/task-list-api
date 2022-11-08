@@ -5,7 +5,7 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable = True)
-    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable = True)
     goal = db.relationship("Goal", back_populates="tasks")
 
     def to_dict(self):
@@ -18,6 +18,19 @@ class Task(db.Model):
         else:
             task_as_dict["is_complete"] = True
         
+        return task_as_dict
+
+    def to_dict_with_goal(self):
+        task_as_dict = {}
+        task_as_dict["id"] = self.task_id
+        task_as_dict["goal_id"] = self.goal_id
+        task_as_dict["title"] = self.title
+        task_as_dict["description"] = self.description
+        if self.completed_at == None:
+            task_as_dict["is_complete"] = False
+        else:
+            task_as_dict["is_complete"] = True
+
         return task_as_dict
 
     @classmethod
