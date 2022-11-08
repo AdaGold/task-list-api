@@ -62,7 +62,7 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
     assert Task.query.get(1).completed_at == None
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_on_completed_task(client, completed_task):
     # Arrange
     """

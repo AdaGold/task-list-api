@@ -113,6 +113,23 @@ def mark_complete_on_incompleted_task(task_id):
     }}
     return make_response(jsonify(response), 200)
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete_on_completed_task(task_id):
+    task = validate_task(task_id)
+    request_body = request.get_json()
+    task.completed_at = None
+    if task.completed_at == None: 
+        status = False
+    else:
+        status = True
+    db.session.commit()
+    response = {"task":{
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": status,
+    }}
+    return make_response(jsonify(response), 200)
 
     
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
