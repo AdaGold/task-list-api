@@ -1,11 +1,15 @@
-from app import db
+
 from app.models.task import Task
 from flask import Blueprint, request, make_response, jsonify, abort
 from sqlalchemy import asc, desc
 import datetime
 from app.routes.route_helpers import validate_model
 
+from app.models.goal import Goal
+
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+from app import db
+
 
 # CREATE ONE TASK w/ POST REQUEST
 @tasks_bp.route("", methods=['POST'])
@@ -127,3 +131,7 @@ def mark_incomplete_task(task_id):
     db.session.commit()
 
     return {"task": task.to_dict()}
+
+
+
+
