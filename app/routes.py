@@ -17,27 +17,49 @@ def validate_task(task_id):
 
     return task     
 
+
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-    request_body = request.get_json()
-    new_task = Task(title=request_body["title"],
+    try:
+        request_body = request.get_json()
+        new_task = Task(title=request_body["title"],
                     description=request_body["description"])
+    except KeyError as err:
+        missing_field_response = {"details": "Invalid data"}
+        return make_response(jsonify(missing_field_response), 400)
+
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(f"Task {new_task.title} successfully created", 201 )
+    response = {"task":{
+                "description": new_task.description,
+                "id": new_task.task_id,
+                "is_complete": False,
+                "title": new_task.title 
+            }}
+    return make_response(jsonify(response), 201)
+
+    
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
+    order_by = request.args.get("sort")
+    if order_by == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif order_by == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
+
     tasks_response = []
-    tasks = Task.query.all()
     for task in tasks:
         tasks_response.append(
             {
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "completed at": task.completed_at
+                "is_complete": False,
             }
         )
     return jsonify(tasks_response)
@@ -45,12 +67,13 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_task(task_id)
-    return {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "completed at": task.completed_at
-        }
+    return {"task":{
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+                }
+            }
     
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -63,8 +86,15 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return make_response(f"Task #{task.task_id} successfully updated")
+    response = {"task":{
+                "description": task.description,
+                "id": task.task_id,
+                "is_complete": False,
+                "title": task.title 
+            }}
+    return make_response(jsonify(response), 200)
 
+    
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_task(task_id)
@@ -72,7 +102,9 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response(f"Task #{task.task_id} successfully deleted")
-    
+    response = {"details":(f"Task {task.task_id} \"{task.title}\" successfully deleted")}
+
+    return make_response(jsonify(response), 200)
+
     
     
