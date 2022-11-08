@@ -9,30 +9,32 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 @goals_bp.route("", methods = ["GET"])
 def get_goals():
     goals = Goal.query.all()
-    goals_json = [] 
+    goals_response = [] 
 
     for goal in goals:
-        goals_json.append(goal.to_dict())
+        goals_response.append(goal.to_dict())
 
-    return jsonify(goals_json)
+    return jsonify(goals_response)
 
 
 #CReate a goal - POST
 @goals_bp.route("", methods=['POST'])
 def create_goal():
-   request_body = request.get_json()
+    try:
+       
+        request_body = request.get_json()
+        new_goal = Goal(title = request_body["title"])
 
-   if not "title" in request_body:
-        return jsonify({"details": "Invalid data"}), 400
+        db.session.add(new_goal)
+        db.session.commit()
 
-   new_goal = Goal(title = request_body["title"])
-
-   db.session.add(new_goal)
-   db.session.commit()
-
-   return {
-    "goal": new_goal.to_dict()
+        return {
+        "goal": new_goal.to_dict()
    }, 201
+
+    except KeyError:
+        # abort and show error message if KeyError
+        abort(make_response({"details": "Invalid data"}, 400))
 
 
 #validate goal as integer
