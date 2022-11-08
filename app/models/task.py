@@ -18,11 +18,9 @@ class Task(db.Model):
         return task_as_dict
 
     @classmethod
-    def from_dict(cls, task_data):
+    def from_dict(cls, request_body):
         return Task(
-            title=task_data["title"],
-            description=task_data["description"],
+            title=request_body["title"],
+            description=request_body["description"],
             completed_at=None
         )
-
-    #create helper function for is_completed?

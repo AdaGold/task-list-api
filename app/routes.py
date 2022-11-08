@@ -15,7 +15,9 @@ def validate_model(cls, model_id):
     if not model:
         abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
+    return model
 
+    
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -30,6 +32,7 @@ def create_task():
 
     return {"task": new_task.to_dict()}, 201
 
+
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
 
@@ -43,3 +46,9 @@ def get_tasks():
     for task in tasks:
         task_response.append(task.to_dict())
     return jsonify(task_response)
+
+
+@tasks_bp.route("/<id>", methods=["GET"])
+def get_task(id):
+    task = validate_model(Task, id)
+    return {"task": task.to_dict()}, 200
