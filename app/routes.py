@@ -3,6 +3,8 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import desc, asc
 from datetime import date
+import os
+import requests
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -117,18 +119,162 @@ def patch_complete_task(task_id, mark_complete):
     if mark_complete == "mark_complete":
         task.completed_at = date.today()
         is_complete = True
+
+        db.session.commit()
+        
+        URL = "https://slack.com/api/chat.postMessage"
+
+        params = {f"channel":"slack-bot-test-channel",
+        "text":"Someone just completed the task {task.title}"}
+
+        headers = {"Authorization": os.environ.get("SLACK_KEY")}
+    
+        return requests.post(URL, params= params, headers= headers) 
+
+        # return make_response(response)
+        
     
     elif mark_complete == "mark_incomplete":
         task.completed_at = None
         is_complete = False
 
-    db.session.commit()
+    # db.session.commit()
 
-    task_response = {"task":{
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete
-        }}
+    # task_response = {"task":{
+    #         "id": task.task_id,
+    #         "title": task.title,
+    #         "description": task.description,
+    #         "is_complete": is_complete
+    #     }}
     
     return make_response(task_response)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# GOAL STARTS HERE
+
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
+
+def validate_goal(goal_id):  
+    try:
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
+
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response({"message":f"goal {goal_id} not found"}, 404))
+
+    return goal
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+
+    request_body = request.get_json()
+    
+    # attributes = ["title", "description"]
+
+    # for attribute in attributes:
+    #     if attribute not in request_body or len(request_body[attribute]) == 0:
+    #         abort(make_response({"details": "Invalid data" }, 400))
+
+    new_goal = Goal(
+        goal_title=request_body["title"],
+        )
+
+    db.session.add(new_goal)
+    db.session.commit()
+    
+    return ({"goal":{
+            "id": new_goal.goal_id,
+            "title": new_goal.goal_title
+        }}, 200)
+
+
+# @goals_bp.route("", methods=["GET"])
+# def read_all_goals():  # sourcery skip: list-comprehension
+
+#     goal_query = request.args.get("goal")
+#     sort_at_query = request.args.get("sort")
+#     if task_query:
+#         tasks = Task.query.filter_by(title=task_query)
+#     elif sort_at_query == "asc":
+#         tasks = Task.query.order_by(Task.title)
+    # elif sort_at_query == "desc":
+    #     tasks = Task.query.order_by(Task.title.desc())
+    # else:
+    #     tasks = Task.query.all()
+
+    # tasks_response = []
+    # for task in tasks:
+    #     tasks_response.append({
+    #         "id": task.task_id,
+    #         "title": task.title,
+    #         "description": task.description,
+    #         "is_complete": False
+    #     })
+
+    return jsonify(tasks_response)
+
+
+# @tasks_bp.route("/<task_id>", methods=["GET"])
+# def get_one_task(task_id):
+#     task = validate_task(task_id)
+#     return {"task":{
+#             "id": task.task_id,
+#             "title": task.title,
+#             "description": task.description,
+#             "is_complete": False
+#         }}
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+    goal.title = request_body["title"]
+    
+    db.session.commit()
+
+    return {"goal":{
+            "id": goal.goal_id,
+            "title": goal.goal_title
+        }}
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_goal(goal_id)
+    
+    db.session.delete(goal)
+    db.session.commit()
+
+    return ({
+    "details": f'Goal {goal_id} "{goal.goal_title}" successfully deleted'
+    }, 200)

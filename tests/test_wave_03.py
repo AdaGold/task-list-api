@@ -133,12 +133,6 @@ def test_mark_complete_missing_task(client):
 
 
 
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
-
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
     # Act
@@ -150,10 +144,3 @@ def test_mark_incomplete_missing_task(client):
     assert response_body == {
         "message":"task 1 not found"
     }
-
-
-
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
