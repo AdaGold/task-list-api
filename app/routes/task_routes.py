@@ -2,6 +2,8 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, request, make_response, jsonify, abort
 from sqlalchemy import asc, desc
+import datetime
+from app.routes.route_helpers import validate_model
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -53,29 +55,11 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 
-#VALIDATE TASK ID, IF TASK_ID NOT FOUND OR INVALID RETURN 404
-def validate_task(task_id):
-    #this code can be refactored to handle invalid data
-    # try:
-    #     task_id = int(task_id)
-    # except:
-    #     abort(make_response({"message":f"{task_id} is invalid"}, 400))
-
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message": f"{task_id} not found"}, 404))
-    return task 
-
-
 # GET ONE TASK w/ GET REQUEST
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
-    # query one instance of Task given task_id
-    # task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
 
     # return dictionary with Task data for one task
@@ -85,11 +69,8 @@ def get_one_task(task_id):
 # UPDATE ONE TASK w/ PUT REQUEST
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
-    # query one instance of Task given task_id
-    #task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     # get put request data and convert to json
     request_body = request.get_json()
@@ -108,11 +89,8 @@ def update_task(task_id):
 # DELETE ONE TASK w/ DELETE REQUEST
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_task(task_id):
-    # query one instance of Task given task_id
-    #task = Task.query.get(task_id)
-
     #call helper function to validate the task_id
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     # delete task from the database
     db.session.delete(task)
@@ -120,23 +98,32 @@ def delete_task(task_id):
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
 
-#first version of get_all_tasks function
-# def get_all_tasks():
-#     # query all instances of Task
-#     tasks = Task.query.all()
-#     tasks_response = []
-
-#     # loop through all the instances of Task, add to response body
-#     # convert Task data into dictionary
-#     for task in tasks:
-#         tasks_response.append({
-#             "id": task.task_id,
-#             "title": task.title,
-#             "description": task.description,
-#             "is_complete": task.is_complete
-#         })
+# MARK COMPLETE w/ PATCH REQUEST
+@tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
+def mark_complete_task(task_id):
+    # call helper to validate task 
+    task = validate_model(Task, task_id)
     
-#     # convert response into json and give successful status code
-#     return jsonify(tasks_response), 200
+    # update completed_at from None to current date
+    task.is_complete = True
+    task.completed_at = datetime.date.today()
 
+    # update task in the database
+    db.session.commit()
 
+    return {"task": task.to_dict()}
+
+# MARK INCOMPLETE w/ PATCH REQUEST
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
+def mark_incomplete_task(task_id):
+    # call helper to validate task 
+    task = validate_model(Task, task_id)
+    
+    # update completed_at from current date to None
+    task.is_complete = False
+    task.completed_at = None
+
+    # update task in the database
+    db.session.commit()
+
+    return {"task": task.to_dict()}
