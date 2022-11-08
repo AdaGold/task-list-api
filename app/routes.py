@@ -17,7 +17,7 @@ def validate_model(cls, model_id):
 
     return model
 
-    
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -52,3 +52,18 @@ def get_tasks():
 def get_task(id):
     task = validate_model(Task, id)
     return {"task": task.to_dict()}, 200
+
+
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    updated_task = validate_model(Task, id)
+
+    request_body = request.get_json()
+
+    updated_task.title = request_body["title"]
+    updated_task.description = request_body["description"]
+
+    db.session.commit()
+
+    return {"task": updated_task.to_dict()}, 200
+
