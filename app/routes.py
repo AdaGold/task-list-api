@@ -1,8 +1,8 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
-from sqlalchemy import desc, asc
 from datetime import date
+import requests, os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -109,19 +109,30 @@ def delete_task(task_id):
     "details": f'Task {task_id} "{task.title}" successfully deleted'
     }, 200)
 
-@tasks_bp.route("/<task_id>/<mark_complete>", methods=["PATCH"])
-def patch_complete_task(task_id, mark_complete):
+
+def make_slack_post(title):
+    url = "https://slack.com/api/chat.postMessage"
     
-    task = validate_task(task_id)        
+    payload={"channel":"slack-bot-test-channel" ,
+    "text": f"Someone just completed the task {title}"}
     
-    if mark_complete == "mark_complete":
+    headers = {"Authorization": f"Bearer {os.environ.get('SLACK_WORKSPACE_AUTH')}"}
+    
+    return requests.post(url, headers=headers, data=payload)
+
+@tasks_bp.route("/<task_id>/<complete>", methods=["PATCH"])
+def patch_complete_task(task_id, complete):
+
+    task = validate_task(task_id) 
+
+    if complete == "mark_complete":     
         task.completed_at = date.today()
         is_complete = True
-    
-    elif mark_complete == "mark_incomplete":
+
+    elif complete == "mark_incomplete":
         task.completed_at = None
         is_complete = False
-
+        
     db.session.commit()
 
     task_response = {"task":{
@@ -130,5 +141,7 @@ def patch_complete_task(task_id, mark_complete):
             "description": task.description,
             "is_complete": is_complete
         }}
-    
+    if is_complete == True:
+        make_slack_post(task.title)
     return make_response(task_response)
+
