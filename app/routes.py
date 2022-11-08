@@ -111,45 +111,41 @@ def delete_task(task_id):
     "details": f'Task {task_id} "{task.title}" successfully deleted'
     }, 200)
 
-@tasks_bp.route("/<task_id>/<mark_complete>", methods=["PATCH"])
-def patch_complete_task(task_id, mark_complete):
+
+def make_slack_post(title):
+    url = "https://slack.com/api/chat.postMessage"
     
-    task = validate_task(task_id)        
+    payload={"channel":"slack-bot-test-channel" ,
+    "text": f"Someone just completed the task {title}"}
     
-    if mark_complete == "mark_complete":
+    headers = {"Authorization": f"Bearer {os.environ.get('SLACK_KEY')}"}
+    
+    return requests.post(url, headers=headers, data=payload)
+
+@tasks_bp.route("/<task_id>/<complete>", methods=["PATCH"])
+def patch_complete_task(task_id, complete):
+
+    task = validate_task(task_id) 
+
+    if complete == "mark_complete":     
         task.completed_at = date.today()
         is_complete = True
 
-        db.session.commit()
-        
-        URL = "https://slack.com/api/chat.postMessage"
-
-        params = {f"channel":"slack-bot-test-channel",
-        "text":"Someone just completed the task {task.title}"}
-
-        headers = {"Authorization": os.environ.get("SLACK_KEY")}
-    
-        return requests.post(URL, params= params, headers= headers) 
-
-        # return make_response(response)
-        
-    
-    elif mark_complete == "mark_incomplete":
+    elif complete == "mark_incomplete":
         task.completed_at = None
         is_complete = False
+        
+    db.session.commit()
 
-    # db.session.commit()
-
-    # task_response = {"task":{
-    #         "id": task.task_id,
-    #         "title": task.title,
-    #         "description": task.description,
-    #         "is_complete": is_complete
-    #     }}
-    
+    task_response = {"task":{
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete
+        }}
+    if is_complete == True:
+        make_slack_post(task.title)
     return make_response(task_response)
-
-
 
 
 
