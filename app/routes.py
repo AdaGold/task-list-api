@@ -1,10 +1,11 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
-from sqlalchemy import desc, asc
 from datetime import date
-import os
 import requests
+import os
+
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -113,14 +114,16 @@ def delete_task(task_id):
 
 
 def make_slack_post(title):
-    url = "https://slack.com/api/chat.postMessage"
+    URL = "https://slack.com/api/chat.postMessage"
     
-    payload={"channel":"slack-bot-test-channel" ,
+    params={"channel":"slack-bot-test-channel" ,
     "text": f"Someone just completed the task {title}"}
     
-    headers = {"Authorization": f"Bearer {os.environ.get('SLACK_KEY')}"}
+
+    headers = {"Authorization": os.environ.get('SLACK_KEY')}
+
     
-    return requests.post(url, headers=headers, data=payload)
+    return requests.post(URL, params= params, headers=headers)
 
 @tasks_bp.route("/<task_id>/<complete>", methods=["PATCH"])
 def patch_complete_task(task_id, complete):
@@ -145,6 +148,7 @@ def patch_complete_task(task_id, complete):
         }}
     if is_complete == True:
         make_slack_post(task.title)
+    
     return make_response(task_response)
 
 
@@ -203,7 +207,7 @@ def create_goal():
     #         abort(make_response({"details": "Invalid data" }, 400))
 
     new_goal = Goal(
-        goal_title=request_body["title"],
+        title=request_body["title"],
         )
 
     db.session.add(new_goal)
@@ -211,66 +215,7 @@ def create_goal():
     
     return ({"goal":{
             "id": new_goal.goal_id,
-            "title": new_goal.goal_title
-        }}, 200)
+            "title": new_goal.title
+        }}, 201)
 
 
-# @goals_bp.route("", methods=["GET"])
-# def read_all_goals():  # sourcery skip: list-comprehension
-
-#     goal_query = request.args.get("goal")
-#     sort_at_query = request.args.get("sort")
-#     if task_query:
-#         tasks = Task.query.filter_by(title=task_query)
-#     elif sort_at_query == "asc":
-#         tasks = Task.query.order_by(Task.title)
-    # elif sort_at_query == "desc":
-    #     tasks = Task.query.order_by(Task.title.desc())
-    # else:
-    #     tasks = Task.query.all()
-
-    # tasks_response = []
-    # for task in tasks:
-    #     tasks_response.append({
-    #         "id": task.task_id,
-    #         "title": task.title,
-    #         "description": task.description,
-    #         "is_complete": False
-    #     })
-
-    return jsonify(tasks_response)
-
-
-# @tasks_bp.route("/<task_id>", methods=["GET"])
-# def get_one_task(task_id):
-#     task = validate_task(task_id)
-#     return {"task":{
-#             "id": task.task_id,
-#             "title": task.title,
-#             "description": task.description,
-#             "is_complete": False
-#         }}
-
-@goals_bp.route("/<goal_id>", methods=["PUT"])
-def update_goal(goal_id):
-    goal = validate_goal(goal_id)
-    request_body = request.get_json()
-    goal.title = request_body["title"]
-    
-    db.session.commit()
-
-    return {"goal":{
-            "id": goal.goal_id,
-            "title": goal.goal_title
-        }}
-
-@goals_bp.route("/<goal_id>", methods=["DELETE"])
-def delete_goal(goal_id):
-    goal = validate_goal(goal_id)
-    
-    db.session.delete(goal)
-    db.session.commit()
-
-    return ({
-    "details": f'Goal {goal_id} "{goal.goal_title}" successfully deleted'
-    }, 200)
