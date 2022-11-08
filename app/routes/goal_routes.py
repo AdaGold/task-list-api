@@ -5,22 +5,19 @@ from app.routes.route_helpers import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-#validate goal as integer
-def validate_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except: 
-        abort(make_response({"message": f"{goal_id} is invalid"}, 400))
+#Get all goals - GET 
+@goals_bp.route("", methods = ["GET"])
+def get_goals():
+    goals = Goal.query.all()
+    goals_json = [] 
 
-    goal = Goal.query.get(goal_id)
+    for goal in goals:
+        goals_json.append(goal.to_dict())
 
-    if not goal:
-        abort(make_response({"message": f"{goal_id} is invalid"}, 404))
+    return jsonify(goals_json)
 
-    return goal
 
-#create a goal 
-
+#CReate a goal - POST
 @goals_bp.route("", methods=['POST'])
 def create_goal():
    request_body = request.get_json()
@@ -38,7 +35,22 @@ def create_goal():
    }, 201
 
 
-# Get one goal 
+#validate goal as integer
+def validate_goal(goal_id):
+    try:
+        goal_id = int(goal_id)
+    except: 
+        abort(make_response({"message": f"{goal_id} is invalid"}, 400))
+
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
+
+    return goal
+
+
+#Get a goal - GET 
 @goals_bp.route("/<goal_id>", methods=['GET'])
 def get_one_goal(goal_id):
     #call helper function to validate the task_id
@@ -47,8 +59,6 @@ def get_one_goal(goal_id):
     # return dictionary with Task data for one task
     return {"goal": goal.to_dict()}
 
-
-#need to finish test
 #Update a goal - put
 @goals_bp.route("/<goal_id>", methods=['PUT'])
 def update_goal(goal_id):
@@ -61,20 +71,7 @@ def update_goal(goal_id):
     db.session.add(goal)
     db.session.commit()
 
-    return make_response(jsonify({f"goal": goal.title}, 201))
-
-@goals_bp.route("", methods = ["GET"])
-def get_goals():
-    goals = Goal.query.all()
-    goals_json = [] 
-
-    for goal in goals:
-        goals_json.append(goal.to_dict())
-
-    return jsonify(goals_json)
-
-
-
+    return {"goal": goal.to_dict()}
 
 #Delete a goal - delete
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
