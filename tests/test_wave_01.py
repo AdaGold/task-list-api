@@ -172,7 +172,7 @@ def test_delete_task_not_found(client):
     assert response_body == {
         "message":"Task 1 not found"
     }
-    # assert Task.query.all() == []
+    assert Task.query.all() == []
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
