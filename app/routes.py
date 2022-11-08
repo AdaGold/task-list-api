@@ -56,14 +56,23 @@ def get_task(id):
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
-    updated_task = validate_model(Task, id)
+    task = validate_model(Task, id)
 
     request_body = request.get_json()
 
-    updated_task.title = request_body["title"]
-    updated_task.description = request_body["description"]
+    task.title = request_body["title"]
+    task.description = request_body["description"]
 
     db.session.commit()
 
-    return {"task": updated_task.to_dict()}, 200
+    return {"task": task.to_dict()}, 200
 
+
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_task(id):
+    task = validate_model(Task,id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return {"details": f'Task {task.id} "{task.title}" successfully deleted'}
