@@ -20,7 +20,7 @@ def validate_model(cls, model_id):
 def create_task():
     request_body = request.get_json()
     
-    if not all(["title" in request_body, "description" in request_body, "completed_at" in request_body ])  :
+    if not all(["title" in request_body, "description" in request_body]):#, "completed_at" in request_body ]):
         return {"details" : "Invalid data"}, 400
 
     new_task = Task.from_dict(request_body)
@@ -29,3 +29,17 @@ def create_task():
     db.session.commit()
 
     return {"task": new_task.to_dict()}, 201
+
+@tasks_bp.route("", methods=["GET"])
+def get_tasks():
+
+    title_query = request.args.get("title")
+    if title_query:
+        tasks = Task.query.filter_by(title=title_query)
+    else:
+        tasks = Task.query.all()
+
+    task_response = []
+    for task in tasks:
+        task_response.append(task.to_dict())
+    return jsonify(task_response)
