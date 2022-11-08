@@ -75,10 +75,11 @@ def update_task(task_id):
 
     task.title = request_body["title"]
     task.description = request_body["description"]
-    if task.completed_at == None:
-        task.is_complete = False
-    else:
-        task.is_complete = request_body["completed_at"]
+    task.completed_at = request_body.get("completed_at", None)
+    # if task.completed_at == None:
+    #     task.is_complete = False
+    # else:
+        # task.is_complete = request_body["completed_at"]
     
     db.session.commit()
 
