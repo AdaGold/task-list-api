@@ -3,9 +3,7 @@ from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import date
-import requests
-import os
-
+import requests, os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -152,32 +150,6 @@ def patch_complete_task(task_id, complete):
     return make_response(task_response)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # GOAL STARTS HERE
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -200,11 +172,8 @@ def create_goal():
 
     request_body = request.get_json()
     
-    # attributes = ["title", "description"]
-
-    # for attribute in attributes:
-    #     if attribute not in request_body or len(request_body[attribute]) == 0:
-    #         abort(make_response({"details": "Invalid data" }, 400))
+    if "title" not in request_body:
+            abort(make_response({"details": "Invalid data" }, 400))
 
     new_goal = Goal(
         title=request_body["title"],
@@ -218,4 +187,16 @@ def create_goal():
             "title": new_goal.title
         }}, 201)
 
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():  
 
+    goals = Goal.query.all()
+
+    goals_response = []
+    for goal in goals:
+        goals_response.append({
+            "id": goal.goal_id,
+            "title": goal.title
+        })
+
+    return jsonify(goals_response)
