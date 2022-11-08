@@ -150,7 +150,10 @@ def patch_complete_task(task_id, complete):
     return make_response(task_response)
 
 
-# GOAL STARTS HERE
+'''
+GOAL STARTS HERE
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'''
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -233,3 +236,25 @@ def update_goal(goal_id):
             "id": goal.goal_id,
             "title": goal.title   
         }}
+'''
+Start of One To Many Routes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'''
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def merge_task_with_goal(goal_id):
+
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+    task_id_list = request_body['task_ids']
+
+    for task_id in task_id_list:
+        task = validate_task(task_id)
+        task.goal_id = goal_id
+
+    db.session.commit()
+    
+    return {
+        "id": goal.goal_id,
+        "task_ids": task_id_list
+    }
