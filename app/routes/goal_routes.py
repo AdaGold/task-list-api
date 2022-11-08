@@ -33,11 +33,11 @@ def create_goal():
    }, 201
 
     except KeyError:
-        # abort and show error message if KeyError
+        
         abort(make_response({"details": "Invalid data"}, 400))
 
 
-#validate goal as integer
+#validate goals
 def validate_goal(goal_id):
     try:
         goal_id = int(goal_id)
@@ -58,12 +58,13 @@ def get_one_goal(goal_id):
     #call helper function to validate the task_id
     goal = validate_goal(goal_id)
     
-    # return dictionary with Task data for one task
+    # return dictionary with goal data
     return {"goal": goal.to_dict()}
 
 #Update a goal - put
 @goals_bp.route("/<goal_id>", methods=['PUT'])
 def update_goal(goal_id):
+    #validate goal using helper function
     goal = validate_goal(goal_id)
 
     request_body = request.get_json()
@@ -72,12 +73,14 @@ def update_goal(goal_id):
 
     db.session.add(goal)
     db.session.commit()
-
+    
+    # return dictionary with goal data
     return {"goal": goal.to_dict()}
 
 #Delete a goal - delete
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
+   #validate goal using helper function
    goal = validate_goal(goal_id)
 
    db.session.delete(goal)
