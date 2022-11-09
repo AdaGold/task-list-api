@@ -58,3 +58,14 @@ def update_goal(goal_id):
     response_body = {"goal": validate_model(Goal, goal_id).to_dict()}
 
     return make_response(jsonify(response_body)), 200
+
+# DELETE
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    response_body = f"Goal {goal_id} \"{goal.title}\" successfully deleted"
+
+    db.session.delete(goal)
+    db.session.commit()
+    
+    return make_response({"details": response_body}, 200)
