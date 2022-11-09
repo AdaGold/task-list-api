@@ -46,19 +46,18 @@ def test_get_goal(client, one_goal):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
-    pass
+    # pass
     # Act
     response = client.get("/goals/1")
     response_body = response.get_json()
 
-    raise Exception("Complete test")
+    #raise Exception("Complete test")
     # Assert
-    # ---- Complete Test ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Test ----
+    assert response.status_code == 404
+    assert "message" in response_body
+    assert response_body == {"message": f"Goal with id: 1 was not found in the database."}
 
 
 @pytest.mark.skip(reason="No way to test this feature yet")
