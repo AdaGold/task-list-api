@@ -2,7 +2,10 @@ from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app import db
 from datetime import datetime
+import requests, os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -67,10 +70,24 @@ def update_one_task(task_id):
 def update_task_completion(task_id):
     task_to_patch = validate_task_by_id(task_id)
     task_to_patch.completed_at = datetime.today()
-        
-    db.session.commit()
 
+    post_to_slack(task_to_patch)
+
+    db.session.commit()
+    
     return jsonify({"task": task_to_patch.to_dict()}), 200
+
+def post_to_slack(task):
+    path= "https://slack.com/api/chat.postMessage"
+    query_params={"channel":"task_notifications", "text":f"Someone just completed the task {task.title}"}
+    slack_token = os.environ.get("SLACK_BOT_TOKEN")
+    headers={"Authorization":slack_token}
+
+    response = requests.post(url=path, data=query_params, headers=headers)
+    print(response)
+
+    return response
+
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incomplete(task_id):
