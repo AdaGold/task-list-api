@@ -39,6 +39,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
+    # return Task.to_dict()
     return ({"task":{
             "id": new_task.task_id,
             "title": new_task.title,
@@ -76,12 +77,14 @@ def read_all_tasks():  # sourcery skip: list-comprehension
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_task(task_id)
-    return {"task":{
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        }}
+    return {"task": task.to_dict()}
+    
+    # {"task":{
+    #         "id": task.task_id,
+    #         "title": task.title,
+    #         "description": task.description,
+    #         "is_complete": False
+    #     }}
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -151,7 +154,10 @@ def patch_complete_task(task_id, complete):
 
 
 
-# GOAL STARTS HERE
+'''
+GOAL STARTS HERE
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'''
 
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -237,7 +243,7 @@ def update_goal(goal_id):
         }}
 '''
 Start of One To Many Routes
-<
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 '''
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
@@ -281,24 +287,3 @@ def get_tasks_for_goal(goal_id):
         "tasks": tasks_response
     }
 
-@tasks_bp.route("/<task_id>", methods=["GET"])
-def get_tasks_with_goal_id(task_id):
-    
-    # goals = Goal.query.all()
-    task = validate_task(task_id)
-
-    # for goal in goals:
-    #     goal = validate_goal(goal_id)
-    #     goal_id = goal.goal_id 
-
-    return {"task":{
-            "id": task.task_id,
-            "goal_id": task.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        }}
-
-
-
-    

@@ -11,20 +11,30 @@ class Task(db.Model):
 
 
     def to_dict(self):
-        task_dict =  {
+        
+        if self.goal_id:
+            return {
+            "id": self.task_id,
+            "goal_id":self.goal_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": self.is_complete()
+        }
+            
+        else:
+            return {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "completed_at": self.completed_at
+            "is_complete": self.is_complete()
         }
+        
+    def is_complete(self):
+        return self.completed_at != None
 
-        if self.goal_id:
-            task_dict["goal_id"] = self.goal_id
-
-        return task_dict
-
-    
-
-
-
-    
+    @classmethod
+    def from_dict(cls, request_body):
+        return cls(
+            title=request_body["title"],
+            description=request_body["description"],
+            is_complete=request_body["is_complete"])
