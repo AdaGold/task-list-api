@@ -130,18 +130,14 @@ def test_delete_goal(client, one_goal):
     }
 
     # Check that the goal was deleted
-def test_delete_goal_not_found(client):
-    # Act
     response = client.get("/goals/1")
-    response_body = response.get_json()
-
-    # Assert
     assert response.status_code == 404
 
     #raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
+    response_body = response.get_json()
     assert Goal.query.all() == []
     assert "message" in response_body
     assert len(response_body) == 1
