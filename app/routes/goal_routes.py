@@ -1,9 +1,8 @@
 from app import db
 from app.models.goal import Goal
 from flask import Blueprint, request, make_response, jsonify, abort
-
+from app.models.task import Task
 from app.routes.route_helpers import validate_model
-
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -93,3 +92,43 @@ def delete_goal(goal_id):
 #         abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
 
 #     return goal
+
+
+
+
+# @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+# def create_task(goal_id):
+
+#     goal = validate_model(Goal, goal_id)
+
+#     request_body = request.get_json()
+
+#     new_task = Task.from_dict(request_body)
+#     new_task.goal = goal
+    
+#     db.session.add(new_task)
+#     db.session.commit()
+
+#     return make_response(jsonify(f"{goal.goal_id} {new_task.id} "))
+
+
+#needs to work for specifical goal with no tasks and get tasks for specific goal with tasks
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks(goal_id):
+
+  
+    goal = validate_model(Goal, goal_id)
+
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+    return jsonify(tasks_response)
+
+
+    #test response expected for no tasks
+    #needs to return empty list when there is no tasks
+    # assert response_body == {
+    #     "id": 1,
+    #     "title": "Build a habit of going outside daily",
+    #     "tasks": []
+    # }
