@@ -140,6 +140,13 @@ def create_goal():
 
     return jsonify({"goal":new_goal.to_dict()}), 201
 
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    goals = Goal.query.all()
+    goals_response = [goal.to_dict() for goal in goals]
+
+    return jsonify(goals_response), 200
+
 
 
 
