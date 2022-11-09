@@ -3,9 +3,11 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import desc
+import requests, os
 
 tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
+# HELPER FUNCTIONS
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -24,6 +26,16 @@ def validate_request(request_body):
         request_body["description"]
     except:
         abort(make_response({"details": "Invalid data"}, 400))
+
+def post_to_slack(task_info):
+    URL = "https://slack.com/api/chat.postMessage"
+    QUERY_PARAMS = {
+        "channel": "task-notifications", 
+        "text": f"Someone just completed the task {task_info['title']}"
+        }
+    AUTHORIZATION = "Bearer " + os.environ.get("SLACK_OAUTH_TOKEN")
+    requests.post(URL, params=QUERY_PARAMS, headers = {"Authorization": AUTHORIZATION}
+    )    
 
 # CREATE
 @tasks_bp.route("", methods=["POST"])
@@ -89,7 +101,10 @@ def complete_task(task_id):
 
     db.session.commit()
 
-    response_body = {"task": validate_model(Task, task_id).to_dict()}
+    completed_task = validate_model(Task, task_id).to_dict()
+    response_body = {"task": completed_task}
+
+    post_to_slack(completed_task)
 
     return make_response(jsonify(response_body)), 200
 
