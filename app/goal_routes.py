@@ -39,3 +39,16 @@ def get_one_goal(goal_id):
     goal = validate_model_by_id(Goal, goal_id)
 
     return jsonify({"goal": goal.to_dict()}), 200
+
+
+# PUT route
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_one_goal(goal_id):
+    update_goal = validate_model_by_id(Goal, goal_id)
+    request_body = request.get_json()
+
+    update_goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return jsonify({"goal": update_goal.to_dict()}), 200
