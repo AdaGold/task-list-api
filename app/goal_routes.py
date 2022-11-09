@@ -19,8 +19,8 @@ def get_all_goals():
     return jsonify(goals_response), 200
 
 
-# @goal_bp.route("/<goal_id>", methods=["GET"])
-# def get_one_goal(goal_id):
-#     goal = validate_model_by_id(Goal, goal_id)
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_model_by_id(Goal, goal_id)
 
-# Don't forget to register blueprints
+    return jsonify({"goal": goal.to_dict()}), 200
