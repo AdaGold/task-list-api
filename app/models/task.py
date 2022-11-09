@@ -1,5 +1,5 @@
 from app import db
-import datetime
+from datetime import datetime
 
 
 class Task(db.Model):
