@@ -98,22 +98,34 @@ def delete_goal(goal_id):
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_task(goal_id):
-
-    goal = validate_model(Goal, goal_id)
-
     request_body = request.get_json()
 
+    goal = validate_model(Goal, goal_id)
+    
+    goal_tasks_data = []
+
+    # loop through the request body and grab each task_id
+    for task_id in request_body["task_ids"]:
+
+        # create instance of each task 
+        new_task = validate_model(Task, task_id)
+
+        # assign each task to goal
+        new_task.goal = goal
+
+        # add all the task ids to goal_tasks_data list
+        goal_tasks_data.append(new_task.task_id)
+    
+    db.session.add(new_task)
+    db.session.commit()
     #new_task = Task.from_dict(request_body)
-    goal_tasks = Goal(
-        tasks=request_body["task_ids"]
-    )
+    # goal_tasks = Goal(
+    #     tasks=request_body["task_ids"]
+    # )
 
     #goal_id should be the key, with a list of task
-    
-    db.session.add(goal_tasks)
-    db.session.commit()
 
-    return jsonify({f"id": {goal.goal_id}, "task_ids": {goal.tasks}})
+    return {"id": goal.goal_id, "task_ids": goal_tasks_data}
 
 
 
@@ -127,7 +139,10 @@ def get_all_tasks(goal_id):
     tasks_response = []
     for task in goal.tasks:
         tasks_response.append(task.to_dict())
-    return jsonify(tasks_response)
+
+    response_body = goal.to_dict()
+    response_body["tasks"] = tasks_response
+    return response_body
 
 
     #test response expected for no tasks

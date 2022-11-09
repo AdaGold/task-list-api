@@ -9,7 +9,6 @@ import os
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
-
 # CREATE ONE TASK w/ POST REQUEST
 @tasks_bp.route("", methods=['POST'])
 def create_task():
