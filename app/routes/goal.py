@@ -17,10 +17,17 @@ def validate_model(cls, model_id):
     
     return model
 
+def validate_request(request_body):
+    try:
+        request_body["title"]
+    except:
+        abort(make_response({"details": "Invalid data"}, 400))
+
 # CREATE
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
+    validate_request(request_body)
     new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
