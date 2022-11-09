@@ -159,7 +159,7 @@ def test_delete_goal_not_found(client):
     assert response_body == {"message": "Goal with id: 1 was not found in the database."}
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_missing_title(client):
     # Act
     response = client.post("/goals", json={})
