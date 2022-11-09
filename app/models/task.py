@@ -6,3 +6,4 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     completed_at = db.Column(db.DateTime)
     title = db.Column(db.String)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable=True)

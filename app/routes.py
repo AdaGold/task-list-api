@@ -123,13 +123,24 @@ def read_all_goals():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_task(task_id)
-    return {"task":{
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
+    if not task.goal_id:
+        return {"task":{
+                    "id": task.task_id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": False
+                    }
                 }
-            }
+    else:
+        return {"task":{
+                    "id": task.task_id,
+                    "goal_id": task.goal_id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": False
+                    }
+                }
+
 #####GOAL#####
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
@@ -161,7 +172,7 @@ def update_task(task_id):
 ####GOAL######
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = validate_task(goal_id)
+    goal = validate_goal(goal_id)
 
     request_body = request.get_json()
 
@@ -238,6 +249,43 @@ def delete_goal(goal_id):
     return make_response(jsonify(response), 200)
 
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def sending_list_of_task_ids_to_goal(goal_id):
+    goal= validate_goal(goal_id)
+    request_body = request.get_json()
+    goal.tasks = []
+    task_ids = request_body["task_ids"]
+
+    for id in task_ids:
+        task = validate_task(id)
+        goal.tasks.append(Task.query.get(id))
+    
+    db.session.add_all(goal.tasks)
+    db.session.commit()
+
+    response = {
+                "id": goal.goal_id,
+                "task_ids": task_ids 
+            }
+    return make_response(jsonify(response), 200)   
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def getting_tasks_of_one_goal(goal_id):
+    goal=validate_goal(goal_id)
+    tasks_list_of_dicts = []
+    for task in goal.tasks:
+        task_dict = {}
+        task_dict["id"] = task.task_id
+        task_dict["goal_id"] = task.goal_id
+        task_dict["title"] = task.title
+        task_dict["description"] = task.description
+        task_dict["is_complete"] = False
+        tasks_list_of_dicts.append(task_dict)
+    return{
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_list_of_dicts
+    }
 
     
     
