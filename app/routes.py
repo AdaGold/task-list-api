@@ -46,7 +46,7 @@ def get_all_tasks():
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task_by_id(task_id)
+    task = validate_model_by_id(Task, task_id)
 
     return jsonify({"task": task.to_dict()}), 200
 
@@ -54,7 +54,7 @@ def get_one_task(task_id):
 # PUT route
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
-    update_task = validate_task_by_id(task_id)
+    update_task = validate_model_by_id(Task, task_id)
     request_body = request.get_json()
 
     update_task.title = request_body["title"]
@@ -68,7 +68,7 @@ def update_one_task(task_id):
 # PATCH routes
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_completion(task_id):
-    task_to_patch = validate_task_by_id(task_id)
+    task_to_patch = validate_model_by_id(Task, task_id)
     task_to_patch.completed_at = datetime.today()
 
     post_to_slack(task_to_patch)
@@ -91,7 +91,7 @@ def post_to_slack(task):
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incomplete(task_id):
-    task_to_patch = validate_task_by_id(task_id)
+    task_to_patch = validate_model_by_id(Task, task_id)
     task_to_patch.completed_at = None
         
     db.session.commit()
@@ -101,7 +101,7 @@ def update_task_incomplete(task_id):
 # DELETE route
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task_by_id(task_id)
+    task = validate_model_by_id(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -112,17 +112,17 @@ def delete_task(task_id):
 
 
 # Helper function
-def validate_task_by_id(task_id):
+def validate_model_by_id(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except ValueError:
-        response_str = f"Invalid task_id: {task_id}. ID must be an integer."
+        response_str = f"Invalid id: {model_id}. ID must be an integer."
         abort(make_response(jsonify({"message": response_str}), 400))
 
-    requested_task = Task.query.get(task_id)
+    requested_object = cls.query.get(model_id)
 
-    if not requested_task:
-        response_str = f"Task with id: {task_id} was not found in the database."
+    if not requested_object:
+        response_str = f"{cls.__name__} with id: {model_id} was not found in the database."
         abort(make_response(jsonify({"message": response_str}), 404))
 
-    return requested_task
+    return requested_object
