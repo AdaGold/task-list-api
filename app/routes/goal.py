@@ -44,3 +44,17 @@ def handle_one_goal(goal_id):
     response_body = {"goal": goal.to_dict()}
 
     return jsonify(response_body), 200
+
+# UPDATE
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    response_body = {"goal": validate_model(Goal, goal_id).to_dict()}
+
+    return make_response(jsonify(response_body)), 200
