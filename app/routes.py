@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from sqlalchemy import asc, desc
 from datetime import datetime, timezone
@@ -119,6 +120,15 @@ def mark_task_incomplete(id):
     return jsonify({"task":task.to_dict()}), 200
 
 ########## Wave 4 ###########
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    new_goal = Goal(title=request_body["title"])
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify({"goal":new_goal.to_dict()}), 201
 
 
 
