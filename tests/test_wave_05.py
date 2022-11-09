@@ -102,17 +102,18 @@ def test_update_goal(client, one_goal):
     assert goal.title == "Updated Goal Title"
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
-    raise Exception("Complete test")
-    # Act
-    # ---- Complete Act Here ----
+    #raise Exception("Complete test")
+    response = client.put("/goals/1", json={
+        "title": "Updated Goal Title"
+    })
+    response_body = response.get_json()
 
     # Assert
-    # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Assertions Here ----
+    assert response.status_code == 404
+    assert "message" in response_body
+    assert response_body == {"message": f"Goal with id: 1 was not found in the database."}
 
 
 @pytest.mark.skip(reason="No way to test this feature yet")
