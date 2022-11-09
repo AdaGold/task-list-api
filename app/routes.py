@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import requests, os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def validate_task(task_id):
     try:
@@ -93,7 +94,7 @@ def post_message_to_slack(task):
 
     # raises an error if status code is not 200
     response.raise_for_status()
-    
+
     return response
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
@@ -118,6 +119,7 @@ def mark_task_incomplete(id):
     return jsonify({"task":task.to_dict()}), 200
 
 ########## Wave 4 ###########
+
 
 
 
