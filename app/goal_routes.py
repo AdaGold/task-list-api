@@ -64,10 +64,7 @@ def get_tasks_for_goal(goal_id):
     goal = validate_model_by_id(Goal, goal_id)
     tasks = goal.get_tasks_list()
 
-    return jsonify({
-        "id": goal.goal_id, 
-        "title": goal.title, 
-        "tasks": tasks}), 200
+    return jsonify(goal.to_dict_with_goal_id()), 200
 
 
 # PUT route

@@ -16,7 +16,8 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": True if self.completed_at else False
             }
-
+        if self.goal_id:
+            result["goal_id"] = self.goal_id
         return result
     
     @classmethod
