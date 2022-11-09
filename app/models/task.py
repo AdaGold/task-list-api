@@ -19,8 +19,6 @@ class Task(db.Model):
         task_as_dict["description"] = self.description
         task_as_dict["is_complete"] = self.is_complete
 
-       
-
         if self.goal_id:
             task_as_dict["goal_id"] = self.goal_id
             
