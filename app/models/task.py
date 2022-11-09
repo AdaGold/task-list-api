@@ -19,8 +19,6 @@ class Task(db.Model):
         task_as_dict["description"] = self.description
         task_as_dict["is_complete"] = self.is_complete
 
-       
-
         if self.goal_id:
             task_as_dict["goal_id"] = self.goal_id
             
@@ -28,8 +26,10 @@ class Task(db.Model):
 
         
     @classmethod
-    def from_dict(cls, task_data):
+    def from_dict(cls, request_body):
         new_task = Task(
-            title = task_data["title"],
-            description = task_data["description"])
+            title = request_body["title"],
+            description = request_body["description"])
         return new_task
+
+   

@@ -5,7 +5,6 @@ from app.models.task import Task
 from app.routes.route_helpers import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
-
 #Get all goals - GET 
 @goals_bp.route("", methods = ["GET"])
 def get_goals():
@@ -28,6 +27,7 @@ def create_goal():
     try:
         request_body = request.get_json()
         new_goal = Goal(title = request_body["title"])
+        #new_goal = Goal.from_dict(request_body)
 
         db.session.add(new_goal)
         db.session.commit()
@@ -96,24 +96,51 @@ def delete_goal(goal_id):
 
 
 
-@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def create_task(goal_id):
 
-    goal = validate_model(Goal, goal_id)
 
-    request_body = request.get_json()
 
-    #new_task = Task.from_dict(request_body)
-    goal_tasks = Goal(
-        tasks=request_body["task_ids"]
-    )
 
-    #goal_id should be the key, with a list of task
-    
-    db.session.add(goal_tasks)
-    db.session.commit()
 
-    return jsonify({f"id": {goal.goal_id}, "task_ids": {goal.tasks}})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -124,6 +151,10 @@ def get_all_tasks(goal_id):
   
     goal = validate_model(Goal, goal_id)
 
+    if not goal:
+        return ""
+
+    #need to print out goal id and info with task.to_dict
     tasks_response = []
     for task in goal.tasks:
         tasks_response.append(task.to_dict())
