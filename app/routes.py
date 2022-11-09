@@ -120,9 +120,19 @@ def mark_task_incomplete(id):
     return jsonify({"task":task.to_dict()}), 200
 
 ########## Wave 4 ###########
+def validate_goal(goal_id):
+    try:
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
+    pass
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
+    if "title" not in request_body:
+        abort(make_response({"details": "Invalid data"}, 400))
+
     new_goal = Goal(title=request_body["title"])
 
     db.session.add(new_goal)
