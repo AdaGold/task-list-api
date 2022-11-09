@@ -3,15 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
-# from slack_bolt import App
 
 
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
-# From Slack
-# app = App(token=os.environ.get("SLACK_BOT_TOKEN"),
-#     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"))
 
 
 def create_app(test_config=None):

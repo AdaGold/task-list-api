@@ -98,6 +98,7 @@ def update_task_incomplete(task_id):
 
     return jsonify({"task": task_to_patch.to_dict()}), 200
 
+
 # DELETE route
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
