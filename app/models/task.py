@@ -21,15 +21,8 @@ class Task(db.Model):
         return task_as_dict
 
     def to_dict_with_goal(self):
-        task_as_dict = {}
-        task_as_dict["id"] = self.task_id
+        task_as_dict = self.to_dict()
         task_as_dict["goal_id"] = self.goal_id
-        task_as_dict["title"] = self.title
-        task_as_dict["description"] = self.description
-        if self.completed_at == None:
-            task_as_dict["is_complete"] = False
-        else:
-            task_as_dict["is_complete"] = True
 
         return task_as_dict
 

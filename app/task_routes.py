@@ -47,10 +47,6 @@ def validate_request_body(cls, request_body):
 def create_task():
     request_body = request.get_json()
 
-    # try:
-    #     new_task = Task.from_dict(request_body)
-    # except:
-    #     abort(make_response({"details":f"Invalid data"}, 400))
     new_task = validate_request_body(Task, request_body)
 
     db.session.add(new_task)
