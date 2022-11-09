@@ -8,6 +8,21 @@ from dotenv import load_dotenv
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
+# POST route
+@goal_bp.route("", methods=["POST"])
+def create_one_goal():
+    request_body = request.get_json()
+
+    try:
+        new_goal = Goal.from_dict(request_body)
+    except KeyError:
+        return jsonify({"details": "Invalid data"}), 400
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify({"goal": new_goal.to_dict()}), 201
+
 # GET routes
 @goal_bp.route("", methods=["GET"])
 def get_all_goals():
