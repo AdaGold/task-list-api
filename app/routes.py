@@ -39,17 +39,11 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
-    # return Task.to_dict()
-    return ({"task":{
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": False
-        }}, 201)
+    return ({"task": new_task.to_dict()}, 201)
 
 
 @tasks_bp.route("", methods=["GET"])
-def read_all_tasks():  # sourcery skip: list-comprehension
+def read_all_tasks():  
 
     task_query = request.args.get("task")
     sort_at_query = request.args.get("sort")
@@ -62,15 +56,8 @@ def read_all_tasks():  # sourcery skip: list-comprehension
     else:
         tasks = Task.query.all()
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        })
-
+    tasks_response = [task.to_dict() for task in tasks]
+    
     return jsonify(tasks_response)
 
 
@@ -79,13 +66,6 @@ def get_one_task(task_id):
     task = validate_task(task_id)
     return {"task": task.to_dict()}
     
-    # {"task":{
-    #         "id": task.task_id,
-    #         "title": task.title,
-    #         "description": task.description,
-    #         "is_complete": False
-    #     }}
-
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_task(task_id)
@@ -95,12 +75,8 @@ def update_task(task_id):
     
     db.session.commit()
 
-    return {"task":{
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        }}
+    return {"task": task.to_dict()}
+
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -120,10 +96,8 @@ def make_slack_post(title):
     params={"channel":"slack-bot-test-channel" ,
     "text": f"Someone just completed the task {title}"}
     
-
     headers = {"Authorization": os.environ.get('SLACK_KEY')}
 
-    
     return requests.post(URL, params= params, headers=headers)
 
 @tasks_bp.route("/<task_id>/<complete>", methods=["PATCH"])
@@ -141,12 +115,7 @@ def patch_complete_task(task_id, complete):
         
     db.session.commit()
 
-    task_response = {"task":{
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete
-        }}
+    task_response = {"task": task.to_dict()}
     if is_complete == True:
         make_slack_post(task.title)
     
@@ -190,33 +159,21 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
     
-    return ({"goal":{
-            "id": new_goal.goal_id,
-            "title": new_goal.title
-        }}, 201)
+    return ({"goal": new_goal.to_dict()}, 201)
 
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():  
 
     goals = Goal.query.all()
 
-    goals_response = []
-    for goal in goals:
-        goals_response.append({
-            "id": goal.goal_id,
-            "title": goal.title
-        })
+    goals_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_response)
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_goal(goal_id)
-    return {"goal":{
-            "id": goal.goal_id,
-            "title": goal.title,
-        }}
-
+    return {"goal": goal.to_dict()}
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -237,10 +194,7 @@ def update_goal(goal_id):
     
     db.session.commit()
 
-    return {"goal": {
-            "id": goal.goal_id,
-            "title": goal.title   
-        }}
+    return {"goal": goal.to_dict()}
 '''
 Start of One To Many Routes
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -264,26 +218,28 @@ def merge_task_with_goal(goal_id):
         "task_ids": task_id_list
     }
 
-
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_for_goal(goal_id):
     
     tasks = Task.query.all()
     goal = validate_goal(goal_id)
 
+    
     tasks_response = []
-    for task in tasks:
-        tasks_response.append({
-        "id": task.task_id,
-        "goal_id": goal.goal_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": False
-        })   
+    tasks_response = [task.to_dict() for task in tasks]
+    # for task in tasks:
+    #     tasks_response.append({
+    #     "id": task.task_id,
+    #     "goal_id": goal.goal_id,
+    #     "title": task.title,
+    #     "description": task.description,
+    #     "is_complete": False
+    #     })   
 
-    return {
-        "id": goal.goal_id,
-        "title": goal.title,
-        "tasks": tasks_response
-    }
+    return (jsonify(tasks_response))
+       # return {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": tasks_response
+    # }
 
