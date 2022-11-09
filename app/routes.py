@@ -82,6 +82,20 @@ def delete_task(id):
 
 
 ########## Wave 3 ###########
+def post_message_to_slack(task):
+    SLACK_API_ROOT = "https://slack.com/api/chat.postMessage"
+    CHANNEL_ID = os.environ.get("CHANNEL_ID")
+
+    message = f"Someone just completed the task {task.title}"
+    endpoint_url = SLACK_API_ROOT + "?channel=" + CHANNEL_ID + "&text=" + message
+
+    response = requests.post(endpoint_url, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
+
+    # raises an error if status code is not 200
+    response.raise_for_status()
+    
+    return response
+
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(id):
     task = validate_task(id)
@@ -89,14 +103,7 @@ def mark_task_complete(id):
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
 
-    # Slack bot
-    SLACK_API_ROOT = "https://slack.com/api/chat.postMessage"
-    CHANNEL_ID = os.environ.get("CHANNEL_ID")
-    message = f"Someone just completed the task {task.title}"
-
-    url = SLACK_API_ROOT + "?channel=" + CHANNEL_ID + "&text=" + message
-    
-    requests.post(url, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
+    post_message_to_slack(task)
 
     return jsonify({"task":task.to_dict()}), 200
 
