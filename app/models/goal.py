@@ -1,9 +1,10 @@
 from app import db
 
-
+# One Side
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
+    tasks = db.relationship('Task', back_populates="goals")
 
     def to_dict(self):
         result = {
