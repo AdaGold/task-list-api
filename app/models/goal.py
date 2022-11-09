@@ -11,15 +11,14 @@ class Goal(db.Model):
             "id": self.goal_id,
             "title": self.title
             }
-
         return result
-    
 
-    # def get_tasks_list(self):
-    #     list_of_tasks = []
-    #     for item in self.task_items:
-    #         list_of_tasks.append(item.to_dict())
-    #     return list_of_tasks
+    def get_tasks_list(self):
+        list_of_tasks = []
+        for item in self.tasks:
+            list_of_tasks.append(item.task_id)
+        return list_of_tasks
+
     
     @classmethod
     def from_dict(cls, task_dict):
