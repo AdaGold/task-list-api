@@ -37,4 +37,4 @@ class Task(db.Model):
         return cls(
             title=request_body["title"],
             description=request_body["description"],
-            is_complete=request_body["is_complete"])
+            completed_at=request_body.get["completed_at"])

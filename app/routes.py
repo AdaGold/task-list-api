@@ -6,19 +6,19 @@ from datetime import date
 import requests, os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
-def validate_task(task_id):  
+# Function to validate both Task and Goal
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
+        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
 
-    if not task:
-        abort(make_response({"message":f"task {task_id} not found"}, 404))
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
-    return task
+    return model
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -63,12 +63,13 @@ def read_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     return {"task": task.to_dict()}
     
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    
+    task = validate_model(Task, task_id)
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
@@ -80,7 +81,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     db.session.delete(task)
     db.session.commit()
@@ -103,7 +104,7 @@ def make_slack_post(title):
 @tasks_bp.route("/<task_id>/<complete>", methods=["PATCH"])
 def patch_complete_task(task_id, complete):
 
-    task = validate_task(task_id) 
+    task = validate_model(Task, task_id)
 
     if complete == "mark_complete":     
         task.completed_at = date.today()
@@ -124,25 +125,13 @@ def patch_complete_task(task_id, complete):
 
 
 '''
-GOAL STARTS HERE
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                     GOAL STARTS HERE
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 '''
 
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
-
-def validate_goal(goal_id):  
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
-
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"message":f"goal {goal_id} not found"}, 404))
-
-    return goal
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -172,12 +161,12 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     return {"goal": goal.to_dict()}
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     
     db.session.delete(goal)
     db.session.commit()
@@ -188,7 +177,7 @@ def delete_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
     goal.title = request_body["title"]
     
@@ -196,19 +185,20 @@ def update_goal(goal_id):
 
     return {"goal": goal.to_dict()}
 '''
-Start of One To Many Routes
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                Start of One To Many Routes
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 '''
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def merge_task_with_goal(goal_id):
 
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
     task_id_list = request_body['task_ids']
 
     for task_id in task_id_list:
-        task = validate_task(task_id)
+        task = validate_model(Task, task_id)
         task.goal_id = goal_id
 
     db.session.commit()
@@ -222,24 +212,22 @@ def merge_task_with_goal(goal_id):
 def get_tasks_for_goal(goal_id):
     
     tasks = Task.query.all()
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
-    
+    # tasks_response = [goal.to_dict() for task in tasks]
     tasks_response = []
-    tasks_response = [task.to_dict() for task in tasks]
-    # for task in tasks:
-    #     tasks_response.append({
-    #     "id": task.task_id,
-    #     "goal_id": goal.goal_id,
-    #     "title": task.title,
-    #     "description": task.description,
-    #     "is_complete": False
-    #     })   
+    for task in tasks:
+        tasks_response.append({
+        "id": task.task_id,
+        "goal_id": goal.goal_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False
+        })   
 
-    return (jsonify(tasks_response))
-       # return {
-    #     "id": goal.goal_id,
-    #     "title": goal.title,
-    #     "tasks": tasks_response
-    # }
-
+    # return (jsonify(tasks_response))
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }
