@@ -3,6 +3,7 @@ from app.models.task import Task
 from app import db
 from sqlalchemy import asc, desc
 from datetime import datetime, timezone
+import requests, os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -80,13 +81,22 @@ def delete_task(id):
     return jsonify({"details": f'Task {id} "{task.title}" successfully deleted'}), 200
 
 
-# wave 3
+########## Wave 3 ###########
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(id):
     task = validate_task(id)
 
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
+
+    # SLack bot
+    slack_url = "https://slack.com/api/chat.postMessage"
+    channel_id = "C04A34WJ94K"
+    message = f"Someone just completed the task {task.title}"
+    url = slack_url + "?channel=" + channel_id + "&text=" + message
+    slack_response = requests.post(url,
+            headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
+    print(slack_response)
 
     return jsonify({"task":task.to_dict()}), 200
 
@@ -99,6 +109,9 @@ def mark_task_incomplete(id):
     db.session.commit()
 
     return jsonify({"task":task.to_dict()}), 200
+
+########## Wave 4 ###########
+
 
 
 
