@@ -93,6 +93,19 @@ def complete_task(task_id):
 
     return make_response(jsonify(response_body)), 200
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = None
+    task.is_complete = False
+
+    db.session.commit()
+
+    response_body = {"task": validate_model(Task, task_id).to_dict()}
+
+    return make_response(jsonify(response_body)), 200
+
 # DELETE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
