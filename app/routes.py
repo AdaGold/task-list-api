@@ -89,14 +89,14 @@ def mark_task_complete(id):
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
 
-    # SLack bot
-    slack_url = "https://slack.com/api/chat.postMessage"
-    channel_id = "C04A34WJ94K"
+    # Slack bot
+    SLACK_API_ROOT = "https://slack.com/api/chat.postMessage"
+    CHANNEL_ID = os.environ.get("CHANNEL_ID")
     message = f"Someone just completed the task {task.title}"
-    url = slack_url + "?channel=" + channel_id + "&text=" + message
-    slack_response = requests.post(url,
-            headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
-    print(slack_response)
+
+    url = SLACK_API_ROOT + "?channel=" + CHANNEL_ID + "&text=" + message
+    
+    requests.post(url, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
 
     return jsonify({"task":task.to_dict()}), 200
 
