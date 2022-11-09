@@ -96,20 +96,25 @@ def delete_goal(goal_id):
 
 
 
-# @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-# def create_task(goal_id):
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
 
-#     goal = validate_model(Goal, goal_id)
+    goal = validate_model(Goal, goal_id)
 
-#     request_body = request.get_json()
+    request_body = request.get_json()
 
-#     new_task = Task.from_dict(request_body)
-#     new_task.goal = goal
+    #new_task = Task.from_dict(request_body)
+    goal_tasks = Goal(
+        tasks=request_body["task_ids"]
+    )
+
+    #goal_id should be the key, with a list of task
     
-#     db.session.add(new_task)
-#     db.session.commit()
+    db.session.add(goal_tasks)
+    db.session.commit()
 
-#     return make_response(jsonify(f"{goal.goal_id} {new_task.id} "))
+    return jsonify({f"id": {goal.goal_id}, "task_ids": {goal.tasks}})
+
 
 
 #needs to work for specifical goal with no tasks and get tasks for specific goal with tasks
