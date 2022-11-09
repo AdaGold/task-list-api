@@ -150,10 +150,9 @@ def patch_complete_task(task_id, complete):
     return make_response(task_response)
 
 
-'''
-GOAL STARTS HERE
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-'''
+
+# GOAL STARTS HERE
+
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -238,7 +237,7 @@ def update_goal(goal_id):
         }}
 '''
 Start of One To Many Routes
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+<
 '''
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
@@ -258,3 +257,48 @@ def merge_task_with_goal(goal_id):
         "id": goal.goal_id,
         "task_ids": task_id_list
     }
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    
+    tasks = Task.query.all()
+    goal = validate_goal(goal_id)
+
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append({
+        "id": task.task_id,
+        "goal_id": goal.goal_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False
+        })   
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_tasks_with_goal_id(task_id):
+    
+    # goals = Goal.query.all()
+    task = validate_task(task_id)
+
+    # for goal in goals:
+    #     goal = validate_goal(goal_id)
+    #     goal_id = goal.goal_id 
+
+    return {"task":{
+            "id": task.task_id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+        }}
+
+
+
+    
