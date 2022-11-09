@@ -172,6 +172,7 @@ def test_delete_task_not_found(client):
     assert Task.query.all() == []
     assert "message" in response_body
     assert len(response_body) == 1
+    assert response_body == {"message": "Task with id: 1 was not found in the database."}
 
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
