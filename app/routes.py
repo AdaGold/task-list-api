@@ -30,10 +30,10 @@ def get_all_tasks():
         tasks_query = Task.query.order_by(desc("title"))
 
     tasks = tasks_query.all()
-
     tasks_response = [task.to_dict() for task in tasks]
     
     return jsonify(tasks_response), 200
+
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
@@ -41,20 +41,21 @@ def get_one_task(id):
 
     return jsonify({"task":task.to_dict()}), 200
 
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    if ("title" not in request_body or "description" not in request_body):
+    if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
     new_task = Task(title=request_body["title"],
                     description=request_body["description"])
-                    #is_complete=request_body["completed_at"])
     
     db.session.add(new_task)
     db.session.commit()
 
     return jsonify({"task":new_task.to_dict()}), 201
+
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
@@ -68,6 +69,7 @@ def update_task(id):
 
     return jsonify({"task":task.to_dict()}), 200
 
+
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = validate_task(id)
@@ -76,6 +78,7 @@ def delete_task(id):
     db.session.commit()
 
     return jsonify({"details": f'Task {id} "{task.title}" successfully deleted'}), 200
+
 
 # wave 3
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
@@ -86,6 +89,7 @@ def mark_task_complete(id):
     db.session.commit()
 
     return jsonify({"task":task.to_dict()}), 200
+
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(id):
