@@ -1,10 +1,7 @@
-from flask import Blueprint, jsonify, request, abort, make_response
+from flask import Blueprint, jsonify, request, make_response
 from app.models.goal import Goal
 from app.routes import validate_model_by_id
 from app import db
-from datetime import datetime
-import requests, os
-from dotenv import load_dotenv
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
