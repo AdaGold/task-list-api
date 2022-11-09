@@ -21,6 +21,7 @@ def slack_bot(slack_message):
 
     requests.post(path, params=query_params, headers=HEADERS)
 
+# validate ids for models
 def validate_id(cls, model_id):
     try: 
         model_id = int(model_id)
@@ -45,8 +46,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    response = {"task": new_task.to_dict()}
-    return make_response(jsonify(response), 201)
+    return make_response(jsonify({"task": new_task.to_dict()}), 201)
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
@@ -69,6 +69,7 @@ def read_one_task(task_id):
         response = {"task": task.to_dict()}
     else:
         response = {"task": task.to_dict_with_goal()}
+    
     return make_response(jsonify(response))
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -79,15 +80,10 @@ def update_task(task_id):
     task.title = request_body["title"]
     task.description = request_body["description"]
     task.completed_at = request_body.get("completed_at", None)
-    # if task.completed_at == None:
-    #     task.is_complete = False
-    # else:
-        # task.is_complete = request_body["completed_at"]
     
     db.session.commit()
 
-    response = {"task": task.to_dict()}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"task": task.to_dict()}))
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -108,8 +104,7 @@ def mark_task_complete(task_id):
     slack_message = f"Someone just completed the task {task.title}"
     slack_bot(slack_message)
 
-    response = {"task": task.to_dict()}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"task": task.to_dict()}))
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
@@ -118,5 +113,4 @@ def mark_task_incomplete(task_id):
 
     db.session.commit()
 
-    response = {"task": task.to_dict()}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"task": task.to_dict()}))

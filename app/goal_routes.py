@@ -18,13 +18,11 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    response = {"goal": new_goal.to_dict()}
-    return make_response(jsonify(response), 201)
+    return make_response(jsonify({"goal": new_goal.to_dict()}), 201)
 
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
     goals = Goal.query.all()
-
     goals_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_response)
@@ -32,8 +30,8 @@ def read_all_goals():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
     goal = validate_id(Goal, goal_id)
-    response = {"goal": goal.to_dict()}
-    return make_response(jsonify(response))
+
+    return make_response(jsonify({"goal": goal.to_dict()}))
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -41,11 +39,9 @@ def update_goal(goal_id):
     request_body = request.get_json()
 
     goal.title = request_body["title"]
-    
     db.session.commit()
 
-    response = {"goal": goal.to_dict()}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"goal": goal.to_dict()}))
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -68,16 +64,12 @@ def add_tasks_to_goal(goal_id):
     
     db.session.commit()
 
-    response = {"id": goal.goal_id, "task_ids": task_ids_list}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"id": goal.goal_id, "task_ids": task_ids_list}))
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_for_goal(goal_id):
     goal = validate_id(Goal, goal_id)
 
-    tasks_response = []
-    for task in goal.tasks:
-        tasks_response.append(task.to_dict_with_goal())
+    tasks_response = [task.to_dict_with_goal() for task in goal.tasks]
             
-    response = {"id": goal.goal_id, "title": goal.title, "tasks": tasks_response}
-    return make_response(jsonify(response))
+    return make_response(jsonify({"id": goal.goal_id, "title": goal.title, "tasks": tasks_response}))
