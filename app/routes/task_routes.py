@@ -4,9 +4,9 @@ from flask import Blueprint, request, make_response, jsonify, abort
 import datetime
 from app import db
 from app.routes.route_helpers import validate_model
+import os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
 
 
 # CREATE ONE TASK w/ POST REQUEST
@@ -100,6 +100,7 @@ def delete_task(task_id):
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
 
+
 # MARK COMPLETE w/ PATCH REQUEST
 @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
 def mark_complete_task(task_id):
@@ -109,11 +110,32 @@ def mark_complete_task(task_id):
     # update completed_at from None to current date
     task.is_complete = True
     task.completed_at = datetime.date.today()
+    
+    #call slack bot after task is marked complete
+    slack_bot(task)
 
     # update task in the database
     db.session.commit()
 
     return {"task": task.to_dict()}
+
+
+# SLACK BOT COMPLETED TASK MESSAGE
+def slack_bot(task):
+    url = "https://slack.com/api/chat.postMessage"
+    
+    params = {"channel": "C049FQLJTBN",
+    "text": "bada beep bada boop"}
+
+    headers = {
+    'Authorization': os.environ.get(
+            "SLACK_API_TOKEN")
+    }
+
+    request.post(url, headers=headers, data=params)
+
+    #return make_response(response)
+
 
 # MARK INCOMPLETE w/ PATCH REQUEST
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
