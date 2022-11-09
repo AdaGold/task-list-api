@@ -28,3 +28,19 @@ def create_goal():
 
     created_goal = {"goal": new_goal.to_dict()}
     return make_response(created_goal, 201)
+
+# READ
+@goals_bp.route("", methods=["GET"])
+def handle_goals():
+    goals = Goal.query.all()
+    response_body = [goal.to_dict() for goal in goals]
+
+    return jsonify(response_body), 200
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def handle_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    
+    response_body = {"goal": goal.to_dict()}
+
+    return jsonify(response_body), 200
