@@ -34,14 +34,24 @@ def validate_id(cls, model_id):
 
     return model
 
+# validate request body information
+def validate_request_body(cls, request_body):
+    try:
+        new_model = cls.from_dict(request_body)
+    except:
+        abort(make_response({"details":f"Invalid data"}, 400))
+
+    return new_model
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
 
-    try:
-        new_task = Task.from_dict(request_body)
-    except:
-        abort(make_response({"details":f"Invalid data"}, 400))
+    # try:
+    #     new_task = Task.from_dict(request_body)
+    # except:
+    #     abort(make_response({"details":f"Invalid data"}, 400))
+    new_task = validate_request_body(Task, request_body)
 
     db.session.add(new_task)
     db.session.commit()
