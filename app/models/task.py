@@ -19,8 +19,17 @@ class Task(db.Model):
         )
 
     def to_dict(self):
+        if not self.goal_id:
+            return dict(
+                id = self.id,
+                title = self.title,
+                description = self.description,
+                is_complete = self.is_complete
+            )
+
         return dict(
             id = self.id,
+            goal_id = self.goal_id,
             title = self.title,
             description = self.description,
             is_complete = self.is_complete
