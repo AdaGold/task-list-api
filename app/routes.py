@@ -124,8 +124,14 @@ def validate_goal(goal_id):
     try:
         goal_id = int(goal_id)
     except:
-        abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
-    pass
+        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
+    
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
+
+    return goal 
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -146,6 +152,12 @@ def get_all_goals():
     goals_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_response), 200
+
+@goals_bp.route("<id>", methods=["GET"])
+def get_one_goal(id):
+    goal = validate_goal(id)
+
+    return jsonify({"goal": goal.to_dict()}), 200
 
 
 
