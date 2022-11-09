@@ -1,11 +1,12 @@
 from flask import Blueprint, jsonify, request, make_response
 from app.models.goal import Goal
 from app.routes import validate_model_by_id
+from app.models.task import Task
 from app import db
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-# POST route
+# POST routes
 @goal_bp.route("", methods=["POST"])
 def create_one_goal():
     request_body = request.get_json()
@@ -19,6 +20,26 @@ def create_one_goal():
     db.session.commit()
 
     return jsonify({"goal": new_goal.to_dict()}), 201
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_task_ids_to_goal(goal_id):
+    goal_to_update = validate_model_by_id(Goal, goal_id)
+    response_body = request.get_json()
+
+    task_list = []
+
+    for task_id in response_body["task_ids"]:
+        validated_task = validate_model_by_id(Task, task_id)
+        task_list.append(validated_task.task_id)
+        validated_task.goal = goal_to_update
+        db.session.commit()
+
+    return jsonify({
+        "id": goal_to_update.goal_id, 
+        "task_ids":response_body["task_ids"]
+        }), 200
+
 
 # GET routes
 @goal_bp.route("", methods=["GET"])
