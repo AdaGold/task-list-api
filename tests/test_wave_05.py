@@ -1,3 +1,4 @@
+from app.models.goal import Goal
 import pytest
 
 
@@ -46,19 +47,15 @@ def test_get_goal(client, one_goal):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
     pass
     # Act
     response = client.get("/goals/1")
     response_body = response.get_json()
 
-    raise Exception("Complete test")
-    # Assert
-    # ---- Complete Test ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Test ----
+    assert response.status_code == 404
+    assert response_body == {"message": "Goal 1 not found"}
 
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
@@ -80,17 +77,29 @@ def test_create_goal(client):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
-    raise Exception("Complete test")
+    #raise Exception("Complete test")
     # Act
-    # ---- Complete Act Here ----
+    response = client.put("/goals/1", json={
+        "title": "Updated Goal Title",
+        "description": "Updated Test Description",
+    })
+    response_body = response.get_json()
 
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # assertion 3 goes here
+    assert response.status_code == 200
+    assert response_body == {
+        "goal": {
+            "id": 1,
+            "title": "Updated Goal Title",
+            "description": "Updated Test Description",
+        }
+    }
+    goal = Goal.query.get(1)
+    assert goal.title == "Updated Goal Title"
+    assert goal.description == "Updated Goal Description"
     # ---- Complete Assertions Here ----
 
 
