@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response
 from app.models.goal import Goal
-from app.routes import validate_model_by_id
+from app.routes.task_routes import validate_model_by_id
 from app.models.task import Task
 from app import db
 
