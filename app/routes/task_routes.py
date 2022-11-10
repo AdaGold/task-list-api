@@ -5,6 +5,7 @@ import datetime
 from app import db
 from app.routes.route_helpers import validate_model
 import os
+import requests
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -125,16 +126,13 @@ def slack_bot(task):
     url = "https://slack.com/api/chat.postMessage"
     
     params = {"channel": "C049FQLJTBN",
-    "text": "bada beep bada boop"}
+    "text": f"Someone just completed the task {task.title}"}
 
     headers = {
     'Authorization': os.environ.get(
-            "SLACK_API_TOKEN")
-    }
+            "SLACK_API_TOKEN")}
 
-    request.post(url, headers=headers, data=params)
-
-    #return make_response(response)
+    requests.post(url, headers=headers, data=params)
 
 
 # MARK INCOMPLETE w/ PATCH REQUEST

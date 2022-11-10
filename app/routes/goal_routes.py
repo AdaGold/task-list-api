@@ -5,6 +5,7 @@ from app.models.task import Task
 from app.routes.route_helpers import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+
 #Get all goals - GET 
 @goals_bp.route("", methods = ["GET"])
 def get_goals():
@@ -78,8 +79,6 @@ def delete_goal(goal_id):
    
    return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
 
-
-
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_task(goal_id):
     request_body = request.get_json()
@@ -102,28 +101,15 @@ def create_task(goal_id):
     
     db.session.add(new_task)
     db.session.commit()
-    #new_task = Task.from_dict(request_body)
-    # goal_tasks = Goal(
-    #     tasks=request_body["task_ids"]
-    # )
-
-    #goal_id should be the key, with a list of task
 
     return {"id": goal.goal_id, "task_ids": goal_tasks_data}
-
-
 
 #needs to work for specifical goal with no tasks and get tasks for specific goal with tasks
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_all_tasks(goal_id):
 
-  
     goal = validate_model(Goal, goal_id)
 
-    if not goal:
-        return ""
-
-    #need to print out goal id and info with task.to_dict
     tasks_response = []
     for task in goal.tasks:
         tasks_response.append(task.to_dict())
