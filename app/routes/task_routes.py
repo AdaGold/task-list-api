@@ -3,9 +3,6 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -18,7 +15,7 @@ def create_one_task():
     try:
         new_task = Task.from_dict(request_body)
     except KeyError:
-        return jsonify({"details": "Invalid data"}), 400
+        return abort(make_response(jsonify({"details": "Invalid data"}), 400))
 
     db.session.add(new_task)
     db.session.commit()
@@ -56,9 +53,12 @@ def get_one_task(task_id):
 def update_one_task(task_id):
     update_task = validate_model_by_id(Task, task_id)
     request_body = request.get_json()
-
-    update_task.title = request_body["title"]
-    update_task.description = request_body["description"]
+    
+    try:
+        update_task.title = request_body["title"]
+        update_task.description = request_body["description"]
+    except KeyError:
+        return jsonify({"message":"KeyError: missing data needed"}),400
 
     db.session.commit()
 
@@ -111,7 +111,7 @@ def delete_task(task_id):
 
     return make_response(jsonify({
         "details": f'Task {task.task_id} "{task.title}" successfully deleted'
-    }))
+    }), 200)
 
 
 # Helper function

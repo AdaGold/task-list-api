@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.goal import Goal
 from app.routes.task_routes import validate_model_by_id
 from app.models.task import Task
@@ -14,7 +14,7 @@ def create_one_goal():
     try:
         new_goal = Goal.from_dict(request_body)
     except KeyError:
-        return jsonify({"details": "Invalid data"}), 400
+        return abort(make_response(jsonify({"details": "Invalid data"}), 400))
 
     db.session.add(new_goal)
     db.session.commit()
@@ -73,7 +73,10 @@ def update_one_goal(goal_id):
     update_goal = validate_model_by_id(Goal, goal_id)
     request_body = request.get_json()
 
-    update_goal.title = request_body["title"]
+    try:
+        update_goal.title = request_body["title"]
+    except KeyError:
+        return abort(make_response(jsonify({"message":"KeyError: Missing data needed"}),400))
 
     db.session.commit()
 
