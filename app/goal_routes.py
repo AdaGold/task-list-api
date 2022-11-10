@@ -58,6 +58,22 @@ def delete_goal(id):
 
     return {"details": f'Goal {goal.id} "{goal.title}" successfully deleted'}
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_task_ids_to_goals(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    request_body = request.get_json()
+    new_task = Task(
+        title=request_body["title"],
+        description=request_body["description"],
+        goal=goal
+    )
+    
+    db.session.add(new_task)
+    db.session.commit()
+
+    return {"id": {goal_id}}# "task_ids:"}
+
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_for_specific_goal(goal_id):
@@ -68,3 +84,4 @@ def get_tasks_for_specific_goal(goal_id):
     # for task in goal.tasks:
     #     tasks_response.append(task.to_dict())
     return jsonify(tasks_response)
+
