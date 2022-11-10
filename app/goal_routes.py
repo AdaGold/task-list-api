@@ -3,9 +3,7 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from app.routes import validate_model
-from datetime import datetime
-import requests
-import os
+
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -58,30 +56,28 @@ def delete_goal(id):
 
     return {"details": f'Goal {goal.id} "{goal.title}" successfully deleted'}
 
-@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def post_task_ids_to_goals(goal_id):
-    goal = validate_model(Goal, goal_id)
 
+@goals_bp.route("/<id>/tasks", methods=["POST"])
+def post_task_ids_to_goal(id):
+    goal = validate_model(Goal, id)
     request_body = request.get_json()
-    new_task = Task(
-        title=request_body["title"],
-        description=request_body["description"],
-        goal=goal
-    )
     
-    db.session.add(new_task)
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        goal.tasks.append(task)
+    
     db.session.commit()
 
-    return {"id": {goal_id}}# "task_ids:"}
+    return {"id": goal.id, "task_ids": request_body["task_ids"]}, 200
 
 
-@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def get_tasks_for_specific_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
+@goals_bp.route("/<id>/tasks", methods=["GET"])
+def get_tasks_for_specific_goal(id):
+    goal = validate_model(Goal, id)
 
     tasks_response = [task.to_dict() for task in goal.tasks]
     
     # for task in goal.tasks:
     #     tasks_response.append(task.to_dict())
-    return jsonify(tasks_response)
+    return {"id": goal.id, "title": goal.title,  "tasks": tasks_response}, 200
 
