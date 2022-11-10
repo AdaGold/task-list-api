@@ -33,7 +33,7 @@ def post_to_slack(task_info):
         "channel": "task-notifications", 
         "text": f"Someone just completed the task {task_info['title']}"
         }
-    AUTHORIZATION = "Bearer " + os.environ.get("SLACK_OAUTH_TOKEN")
+    AUTHORIZATION = os.environ.get("SLACK_OAUTH_TOKEN")
     requests.post(URL, params=QUERY_PARAMS, headers = {"Authorization": AUTHORIZATION}
     )    
 
