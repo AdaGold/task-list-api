@@ -2,6 +2,7 @@ from crypt import methods
 from flask import Blueprint,jsonify,make_response,request,abort
 from app.models.task import Task 
 from app import db
+from datetime import datetime
 
 tasks_bp = Blueprint('tasks_bp',__name__, url_prefix='/tasks')
 
@@ -9,9 +10,9 @@ tasks_bp = Blueprint('tasks_bp',__name__, url_prefix='/tasks')
 def get_all_tasks():
     sorted = request.args.get('sort')
     if sorted == 'asc':
-        all_tasks = Task.query.order_by(Task.title.asc().all())
+        all_tasks = Task.query.order_by(Task.title.asc())
     elif sorted == 'desc':
-        all_tasks = Task.query.order_by(Task.title.desc().all())
+        all_tasks = Task.query.order_by(Task.title.desc())
     else:
         all_tasks = Task.query.all()
     
@@ -65,3 +66,23 @@ def delete_a_task(task_id):
     db.session.commit()
 
     return jsonify({'details': f'Task {task_id} {task_to_delete.title} successfully deleted'}),200
+
+@tasks_bp.route('/<task_id>/mark_incomplete', methods=['PATCH'])
+def mark_task_incomplete(task_id):
+    task = get_task_from_id(task_id)
+    task.completed_at = None
+    task.is_complete = False
+
+    db.session.commit()
+    return make_response(jsonify({'task': task.to_dict()}), 200)
+
+@tasks_bp.route('/<task_id>/mark_complete', methods=['PATCH'])
+def mark_task_complete(task_id):
+    task = get_task_from_id(task_id)
+    task.completed_at = datetime.now()
+    task.is_complete = True
+
+    db.session.commit()
+    return make_response(jsonify({'task': task.to_dict()}), 200)
+
+
