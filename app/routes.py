@@ -10,6 +10,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def validate_task(task_id):
+    #TODO: refactor so that the parameter accepts the class
     try:
         task_id = int(task_id)
     except:
@@ -51,6 +52,7 @@ def create_task():
     if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
+    # TODO: Refactor with from_dict
     new_task = Task(title=request_body["title"],
                     description=request_body["description"])
     
@@ -62,6 +64,7 @@ def create_task():
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
+    # TODO: Handle possible keyerrors like in post
     task = validate_task(id)
     request_body=request.get_json()
 
@@ -93,6 +96,7 @@ def post_message_to_slack(task):
 
     response = requests.post(endpoint_url, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
 
+    # TODO: Create a tailored error message
     # raises an error if status code is not 200
     response.raise_for_status()
 
@@ -121,6 +125,7 @@ def mark_task_incomplete(id):
 
 ########## Wave 4 ###########
 def validate_goal(goal_id):
+    # TODO: refactor so that parameter accepts class
     try:
         goal_id = int(goal_id)
     except:
@@ -153,11 +158,16 @@ def get_all_goals():
 
     return jsonify(goals_response), 200
 
-@goals_bp.route("<id>", methods=["GET"])
+@goals_bp.route("/<id>", methods=["GET"])
 def get_one_goal(id):
     goal = validate_goal(id)
 
     return jsonify({"goal": goal.to_dict()}), 200
+
+@goals_bp.route("<id>", methods=["PUT"])
+def update_goal(id):
+    # TODO: Handle possible keyerrors like in post
+    pass
 
 
 
