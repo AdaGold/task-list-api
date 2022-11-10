@@ -239,7 +239,7 @@ def delete_task(task_id):
 ######GOAL#######
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_task(goal_id)
+    goal = validate_goal(goal_id)
 
     db.session.delete(goal)
     db.session.commit()
