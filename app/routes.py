@@ -27,7 +27,7 @@ def validate_model(cls, model_id):
 def create_task():
     request_body = request.get_json()
     
-    if not all(["title" in request_body, "description" in request_body]):#, "completed_at" in request_body ]):
+    if not all(["title" in request_body, "description" in request_body]):
         return {"details" : "Invalid data"}, 400
 
     new_task = Task.from_dict(request_body)
@@ -50,9 +50,11 @@ def get_tasks():
     else:
         tasks = Task.query.all()
 
-    task_response = []
-    for task in tasks:
-        task_response.append(task.to_dict())
+    # task_response = []
+    # for task in tasks:
+    #     task_response.append(task.to_dict())
+    task_response = [task.to_dict() for task in tasks]
+    
     return jsonify(task_response)
 
 
@@ -120,3 +122,16 @@ def mark_incomplete(id):
     db.session.commit()
 
     return {"task": task.to_dict()}, 200
+
+#####################GOALS FOR TASKS##############
+# @tasks_bp.route("/<task_id>/goals", methods=["GET"])
+# def get_goals_for_task():
+#     #goal = Goal.query.get(id)
+#     tasks = [goal.to_dict() for task in goals.tasks]
+#     return jsonify(tasks)
+#     ...
+
+
+
+
+

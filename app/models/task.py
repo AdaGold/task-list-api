@@ -8,6 +8,7 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
+
     def to_dict(self):
         task_as_dict = {}
         task_as_dict["id"] = self.id
@@ -16,6 +17,7 @@ class Task(db.Model):
         task_as_dict["is_complete"]= bool(self.completed_at)
 
         return task_as_dict
+
 
     @classmethod
     def from_dict(cls, request_body):
