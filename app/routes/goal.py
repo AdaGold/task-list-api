@@ -43,9 +43,10 @@ def add_tasks_to_goal(goal_id):
     task_ids = request_body["task_ids"]
     goal = validate_model(Goal, goal_id)
 
-    added_tasks = [validate_model(Task, task_id) for task_id in task_ids]
-    
-    goal.tasks = added_tasks    
+    for task_id in task_ids:
+        new_task = validate_model(Task, task_id)
+        goal.tasks.append(new_task)
+    db.session.add(goal)    
     db.session.commit()
 
     return make_response({"id": goal.goal_id, "task_ids": task_ids}, 200)
