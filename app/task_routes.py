@@ -1,6 +1,7 @@
 
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint,jsonify,abort,make_response,request
 from sqlalchemy import desc
 from sqlalchemy import asc
@@ -30,8 +31,7 @@ def handle_tasks_data():
     
     for task in tasks:
         
-        tasks_response.append({
-            "id": task.id,
+        tasks_response.append({"id": task.id,
             "title": task.title,
             "description": task.description,
             "is_complete":False
@@ -56,12 +56,9 @@ def validate_task(id):
 def read_one_task(id):
     
     task = validate_task(id)
-    return jsonify({"task":{
-        "id": task.id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete":False
-    }})
+    return jsonify({"task":task.to_dict()
+        
+    })
 
 @tasks_bp.route("", methods=["POST"])
 
