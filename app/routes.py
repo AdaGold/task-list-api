@@ -48,3 +48,20 @@ def get_task_from_id(task_id):
         return abort(make_response({'msg':f'Cannot find provided task id {task_id}'}, 404))
     return choosen_task
 
+@tasks_bp.route('<task_id>', methods = ['PUT'])
+def update_one_task(task_id):
+    request_body = request.get_json()
+    single_task = get_task_from_id(task_id)
+    single_task.title = request_body['title']
+    single_task.description = request_body['description']
+    db.sesssion.commit()
+    return make_response(jsonify({'task':single_task.to_json()}),200)
+
+@tasks_bp.route('/<task_id>', methods=['DELETE'])
+def delete_a_task(task_id):
+    task_to_delete = get_task_from_id(task_id)
+
+    db.session.delete(task_to_delete)
+    db.session.commit()
+
+    return jsonify({'details': f'Task {task_id} {task_to_delete.title} successfully deleted'}),200
