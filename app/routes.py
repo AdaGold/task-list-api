@@ -79,7 +79,9 @@ def update_task_completion(task_id):
 
 def post_to_slack(task):
     path= "https://slack.com/api/chat.postMessage"
-    query_params={"channel":"task_notifications", "text":f"Someone just completed the task {task.title}"}
+    query_params={
+        "channel":"task_notifications", 
+        "text":f"Someone just completed the task {task.title}"}
     slack_token = os.environ.get("SLACK_BOT_TOKEN")
     headers={"Authorization":slack_token}
 
