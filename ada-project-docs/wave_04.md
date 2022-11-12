@@ -98,9 +98,13 @@ Visit https://api.slack.com/methods/chat.postMessage to read about the Slack API
 Answer the following questions. These questions will help you become familiar with the API, and make working with it easier.
 
 - What is the responsibility of this endpoint?
+This endpoint posts a message to a channel.
 - What is the URL and HTTP method for this endpoint?
+POST https://slack.com/api/chat.postMessage
 - What are the _two_ _required_ arguments for this endpoint?
+token and channel (string)
 - How does this endpoint relate to the Slackbot API key (token) we just created?
+The token we just made is one of the arguments we have to pass in to the endpoint
 
 Now, visit https://api.slack.com/methods/chat.postMessage/test.
 
@@ -119,8 +123,11 @@ Press the "Test Method" button!
 Scroll down to see the HTTP response. Answer the following questions:
 
 - Did we get a success message? If so, did we see the message in our actual Slack workspace?
+The actual text I put in the test did show up as a message in the slack workspace. There was also a response that came back on the test webpage that said the message had been successful.
 - Did we get an error emssage? If so, why?
+I did not get an error message.
 - What is the shape of this JSON? Is it a JSON object or array? What keys and values are there?
+The JSON is an object enclosed in {} and has many key value pairs such as "ok" : true and "deleted": false.
 
 ### Verify with Postman
 

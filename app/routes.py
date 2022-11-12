@@ -1,8 +1,12 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+
 from app import db
 from app.models.task import Task
 from datetime import datetime
-
+import logging
+import os
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -82,6 +86,7 @@ def delete_one_task(task_id):
 def mark_tasks_complete_or_incomplete(task_id, mark):
     task = validate_id(Task, task_id)
     if mark == "mark_complete":
+        send_to_slack(task.title, "task-notifications")
         task.completed_at = datetime.now()
         db.session.commit()
         return jsonify({"task": task.to_json()}), 200
@@ -89,7 +94,7 @@ def mark_tasks_complete_or_incomplete(task_id, mark):
         task.completed_at = None
         db.session.commit()
         return jsonify({"task": task.to_json()}), 200
-
+# can combine this into one expression - ternary https://www.geeksforgeeks.org/ternary-operator-in-python/
 
 # ==================================
 # Helper function to validate id
@@ -105,3 +110,20 @@ def validate_id(class_name,id):
         abort(make_response({"message":f"Id {id} not found"}, 404))
 
     return query_result
+
+# ==================================
+# Helper function to send message to slack
+# ==================================
+def send_to_slack(title, channel_name):
+    client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+    logger = logging.getLogger(__name__)
+    try:
+    # Call the chat.postMessage method using the WebClient
+        result = client.chat_postMessage(
+            channel=channel_name, 
+            text= f"Someone just completed the task '{title}'"
+        )
+        logger.info(result)
+
+    except SlackApiError as e:
+        logger.error(f"Error posting message: {e}")
