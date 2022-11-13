@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, abort, make_response, request
-
 from app import db
 from app.models.task import Task
 from datetime import datetime
