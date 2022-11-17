@@ -9,19 +9,18 @@ import requests, os
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-def validate_task(task_id):
-    #TODO: refactor so that the parameter accepts the class
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message":f"Task {task_id} invalid"}, 400))
+        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
 
-    if not task:
-        abort(make_response({"message":f"Task {task_id} not found"}, 404))
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
-    return task
+    return model
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -41,7 +40,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     return jsonify({"task":task.to_dict()}), 200
 
@@ -63,7 +62,7 @@ def create_task():
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
     # TODO: Handle possible keyerrors like in post
-    task = validate_task(id)
+    task = validate_model(Task, id)
     request_body=request.get_json()
 
     task.title = request_body["title"]
@@ -76,7 +75,7 @@ def update_task(id):
 
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     db.session.delete(task)
     db.session.commit()
@@ -102,7 +101,7 @@ def post_message_to_slack(task):
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
@@ -114,7 +113,7 @@ def mark_task_complete(id):
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     task.completed_at = None
     db.session.commit()
@@ -122,20 +121,6 @@ def mark_task_incomplete(id):
     return jsonify({"task":task.to_dict()}), 200
 
 ########## Wave 4 ###########
-def validate_goal(goal_id):
-    # TODO: refactor so that parameter accepts class
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
-    
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
-
-    return goal 
-
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -158,7 +143,7 @@ def get_all_goals():
 
 @goals_bp.route("/<id>", methods=["GET"])
 def get_one_goal(id):
-    goal = validate_goal(id)
+    goal = validate_model(Goal, id)
 
     return jsonify({"goal": goal.to_dict()}), 200
 
@@ -166,6 +151,18 @@ def get_one_goal(id):
 def update_goal(id):
     # TODO: Handle possible keyerrors like in post
     pass
+
+@goals_bp.route("<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    request_body = request.get_json()
+
+    new_task = Task.from_dict(request_body)
+    
+    db.session.add(new_task)
+    db.session.commit()
+
+    return jsonify({"id":goal_id}), 200
+
 
 
 
