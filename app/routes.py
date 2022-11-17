@@ -52,9 +52,7 @@ def create_task():
     if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
-    # TODO: Refactor with from_dict
-    new_task = Task(title=request_body["title"],
-                    description=request_body["description"])
+    new_task = Task.from_dict(request_body)
     
     db.session.add(new_task)
     db.session.commit()
@@ -144,7 +142,7 @@ def create_goal():
     if "title" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
-    new_goal = Goal(title=request_body["title"])
+    new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
