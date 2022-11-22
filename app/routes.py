@@ -154,7 +154,14 @@ def get_one_goal(id):
 @goals_bp.route("<id>", methods=["PUT"])
 def update_goal(id):
     # TODO: Handle possible keyerrors like in post
-    pass
+    goal = validate_model(Goal, id)
+    request_body=request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return jsonify({"goal":goal.to_dict()}), 200
 
 @goals_bp.route("<id>", methods=["DELETE"])
 def delete_goal(id):
