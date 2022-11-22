@@ -42,7 +42,11 @@ def get_all_tasks():
 def get_one_task(id):
     task = validate_model(Task, id)
 
-    return jsonify({"task":task.to_dict()}), 200
+    response_body = task.to_dict()
+    if task.goal_id:
+        response_body["goal_id"] = task.goal_id
+
+    return jsonify({"task": response_body}), 200
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -152,16 +156,32 @@ def update_goal(id):
     # TODO: Handle possible keyerrors like in post
     pass
 
+################ Wave 6 #####################
 @goals_bp.route("<goal_id>/tasks", methods=["POST"])
-def create_task(goal_id):
+def create_tasks_relationship_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
-    new_task = Task.from_dict(request_body)
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        goal.tasks.append(task)
     
-    db.session.add(new_task)
     db.session.commit()
 
-    return jsonify({"id":goal_id}), 200
+    return jsonify({"id":goal.id, "task_ids": [task.id for task in goal.tasks]}), 200
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_tasks_from_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    response_body = goal.to_dict()
+    response_body["tasks"] = [task.to_dict() for task in goal.tasks]
+    for task in response_body["tasks"]:
+        task["goal_id"] = goal.id
+
+    return jsonify(response_body), 200
+
+
 
 
 

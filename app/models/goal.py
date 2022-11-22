@@ -8,8 +8,7 @@ class Goal(db.Model):
 
     @classmethod
     def from_dict(cls, goal_data):
-        new_goal = Goal(title=goal_data["title"])
-        return new_goal
+        return Goal(title=goal_data["title"])
 
     def to_dict(self):
         return {
