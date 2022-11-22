@@ -22,6 +22,7 @@ def validate_model(cls, model_id):
 
     return model
 
+
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     sort_query = request.args.get("sort")
@@ -38,9 +39,9 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 
-@tasks_bp.route("/<id>", methods=["GET"])
-def get_one_task(id):
-    task = validate_model(Task, id)
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_model(Task, task_id)
 
     response_body = task.to_dict()
     if task.goal_id:
@@ -63,10 +64,10 @@ def create_task():
     return jsonify({"task":new_task.to_dict()}), 201
 
 
-@tasks_bp.route("/<id>", methods=["PUT"])
-def update_task(id):
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
     # TODO: Handle possible keyerrors like in post
-    task = validate_model(Task, id)
+    task = validate_model(Task, task_id)
     request_body=request.get_json()
 
     task.title = request_body["title"]
@@ -77,17 +78,16 @@ def update_task(id):
     return jsonify({"task":task.to_dict()}), 200
 
 
-@tasks_bp.route("/<id>", methods=["DELETE"])
-def delete_task(id):
-    task = validate_model(Task, id)
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
-    return jsonify({"details": f'Task {id} "{task.title}" successfully deleted'}), 200
+    return jsonify({"details": f'Task {task.id} "{task.title}" successfully deleted'}), 200
 
 
-########## Wave 3 ###########
 def post_message_to_slack(task):
     SLACK_API_ROOT = "https://slack.com/api/chat.postMessage"
     CHANNEL_ID = os.environ.get("CHANNEL_ID")
@@ -98,14 +98,16 @@ def post_message_to_slack(task):
     response = requests.post(endpoint_url, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
 
     # TODO: Create a tailored error message
+
     # raises an error if status code is not 200
     response.raise_for_status()
 
     return response
 
-@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
-def mark_task_complete(id):
-    task = validate_model(Task, id)
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = validate_model(Task, task_id)
 
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
@@ -115,16 +117,16 @@ def mark_task_complete(id):
     return jsonify({"task":task.to_dict()}), 200
 
 
-@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
-def mark_task_incomplete(id):
-    task = validate_model(Task, id)
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_model(Task, task_id)
 
     task.completed_at = None
     db.session.commit()
 
     return jsonify({"task":task.to_dict()}), 200
 
-########## Wave 4 ###########
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -138,6 +140,7 @@ def create_goal():
 
     return jsonify({"goal":new_goal.to_dict()}), 201
 
+
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
     goals = Goal.query.all()
@@ -145,16 +148,18 @@ def get_all_goals():
 
     return jsonify(goals_response), 200
 
-@goals_bp.route("/<id>", methods=["GET"])
-def get_one_goal(id):
-    goal = validate_model(Goal, id)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
 
     return jsonify({"goal": goal.to_dict()}), 200
 
-@goals_bp.route("<id>", methods=["PUT"])
-def update_goal(id):
+
+@goals_bp.route("<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
     # TODO: Handle possible keyerrors like in post
-    goal = validate_model(Goal, id)
+    goal = validate_model(Goal, goal_id)
     request_body=request.get_json()
 
     goal.title = request_body["title"]
@@ -163,16 +168,17 @@ def update_goal(id):
 
     return jsonify({"goal":goal.to_dict()}), 200
 
-@goals_bp.route("<id>", methods=["DELETE"])
-def delete_goal(id):
-    goal = validate_model(Goal, id)
+
+@goals_bp.route("<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
 
-    return jsonify({"details": f'Goal {id} "{goal.title}" successfully deleted'}), 200
+    return jsonify({"details": f'Goal {goal.id} "{goal.title}" successfully deleted'}), 200
 
-################ Wave 6 #####################
+
 @goals_bp.route("<goal_id>/tasks", methods=["POST"])
 def create_tasks_relationship_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -186,6 +192,7 @@ def create_tasks_relationship_to_goal(goal_id):
 
     return jsonify({"id":goal.id, "task_ids": [task.id for task in goal.tasks]}), 200
 
+
 @goals_bp.route("<goal_id>/tasks", methods=["GET"])
 def get_tasks_from_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -196,11 +203,3 @@ def get_tasks_from_goal(goal_id):
         task["goal_id"] = goal.id
 
     return jsonify(response_body), 200
-
-
-
-
-
-
-
-
