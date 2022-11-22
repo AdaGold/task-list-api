@@ -156,6 +156,15 @@ def update_goal(id):
     # TODO: Handle possible keyerrors like in post
     pass
 
+@goals_bp.route("<id>", methods=["DELETE"])
+def delete_goal(id):
+    goal = validate_model(Goal, id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return jsonify({"details": f'Goal {id} "{goal.title}" successfully deleted'}), 200
+
 ################ Wave 6 #####################
 @goals_bp.route("<goal_id>/tasks", methods=["POST"])
 def create_tasks_relationship_to_goal(goal_id):
