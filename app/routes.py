@@ -8,7 +8,7 @@ def validate_task(request_body):
     try:
         new_task = Task.from_dict(request_body)
     except KeyError:
-        return make_response({"details": "Invalid data"}, 400)
+        return abort(make_response({"details": "Invalid data"}, 400))
     return new_task
 
 @task_bp.route("", methods=["POST"])
@@ -56,9 +56,9 @@ def update_one_task(task_id):
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    task = validate_id(task_id)
+    task = validate_id(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
-    return make_response({"details": f"Task {task.id} \"{task.description}\" successfully deleted"}, 200)
+    return make_response({"details": f"Task {task.id} \"{task.title}\" successfully deleted"}, 200)
