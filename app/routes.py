@@ -24,7 +24,14 @@ def create_one_task():
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     response = []
-    tasks = Task.query.all()
+    sort_query = request.args.get("sort")
+
+    if sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    elif sort_query == "asc":
+        tasks = Task.query.order_by(Task.title)
+    else:
+        tasks = Task.query.all()
     
     for task in tasks:
         response.append(task.to_dict())
