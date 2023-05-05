@@ -19,7 +19,15 @@ def validate_task(task_id):
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    tasks = Task.query.all()
+
+    sort_query = request.args.get("sort")
+    if sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    elif sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    else:
+        tasks = Task.query.all()
+        
     tasks_response = []
 
     for task in tasks:
