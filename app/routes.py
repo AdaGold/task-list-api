@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, make_response, request, abort
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
-
 def validate_task(request_body):
     try:
         new_task = Task.from_dict(request_body)
@@ -69,3 +69,13 @@ def delete_one_task(task_id):
     db.session.commit()
 
     return make_response({"details": f"Task {task.id} \"{task.title}\" successfully deleted"}, 200)
+
+@task_bp.route("/<task_id>/<complete_status>", methods=["PATCH"])
+def mark_complete(task_id, complete_status):
+    task = validate_id(Task, task_id)
+    if complete_status == "mark_complete":
+        task.completed_at = datetime.now()
+    elif complete_status == "mark_incomplete":
+        task.completed_at = None
+    db.session.commit()
+    return make_response({"task": task.to_dict()}, 200)
