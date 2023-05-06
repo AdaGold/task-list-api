@@ -5,8 +5,6 @@ from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
 import os
-from sqlalchemy.orm import lazyload
-import json
 
 def validate_item(cls, request_body):
     try:
@@ -31,12 +29,10 @@ def create_one_task():
 
     db.session.add(new_task)
     db.session.commit()
-
     return make_response({"task": new_task.to_dict()}, 201)
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-    response = []
     sort_query = request.args.get("sort")
 
     if sort_query == "desc":
@@ -46,9 +42,7 @@ def get_all_tasks():
     else:
         tasks = Task.query.all()
     
-    for task in tasks:
-        response.append(task.to_dict())
-
+    response = [task.to_dict() for task in tasks]
     return jsonify(response), 200
 
 @task_bp.route("/<task_id>", methods=["GET"])
@@ -72,7 +66,6 @@ def delete_one_task(task_id):
 
     db.session.delete(task)
     db.session.commit()
-
     return make_response({"details": f"Task {task.id} \"{task.title}\" successfully deleted"}, 200)
 
 @task_bp.route("/<task_id>/<complete_status>", methods=["PATCH"])
@@ -83,6 +76,7 @@ def mark_complete(task_id, complete_status):
         requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
     elif complete_status == "mark_incomplete":
         task.completed_at = None
+
     db.session.commit()
     return make_response({"task": task.to_dict()}, 200)
 
@@ -94,16 +88,12 @@ def create_one_goal():
 
     db.session.add(new_goal)
     db.session.commit()
-
     return make_response({"goal": new_goal.to_dict()}, 201)
 
 @goal_bp.route("", methods=["GET"])
 def get_all_goals():
-    response = []
     goals = Goal.query.all()
-
-    for goal in goals:
-        response.append(goal.to_dict())
+    response = [goal.to_dict() for goal in goals]
     return jsonify(response), 200
 
 @goal_bp.route("/<goal_id>", methods=["GET"])
@@ -133,8 +123,8 @@ def post_tasks_to_goal(goal_id):
     goal = validate_id(Goal, goal_id)
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
-    for id in task_ids:
-        goal.tasks.append(Task.query.get(id))
+    goal.tasks = [Task.query.get(id) for id in task_ids]
+
     db.session.commit()
     return jsonify(id=goal.id, task_ids=task_ids), 200
 
@@ -143,7 +133,5 @@ def get_tasks_of_one_goal(goal_id):
     goal = validate_id(Goal, goal_id)
     tasks = goal.tasks
     tasks_to_dict = []
-    for task in tasks:
-        tasks_to_dict.append(task.to_dict())
+    tasks_to_dict = [task.to_dict() for task in tasks]
     return jsonify(id=goal.id, title=goal.title, tasks=tasks_to_dict), 200
-
