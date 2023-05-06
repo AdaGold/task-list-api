@@ -1,20 +1,31 @@
 from flask import Blueprint, jsonify, make_response, request, abort
+import requests
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
+import os
 
-task_bp = Blueprint("task", __name__, url_prefix="/tasks")
-def validate_task(request_body):
+def validate_item(cls, request_body):
     try:
-        new_task = Task.from_dict(request_body)
+        new_task = cls.from_dict(request_body)
     except KeyError:
         return abort(make_response({"details": "Invalid data"}, 400))
     return new_task
 
+def validate_id(cls, id):
+    try:
+        id = int(id)
+    except:
+        return abort(make_response({"message": f"{cls.__name__} {id} invalid"}, 400))
+    record = cls.query.get_or_404(id)
+    return record
+
+task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 @task_bp.route("", methods=["POST"])
 def create_one_task():
     request_body = request.get_json()
-    new_task = validate_task(request_body)
+    new_task = validate_item(Task, request_body)
 
     db.session.add(new_task)
     db.session.commit()
@@ -37,14 +48,6 @@ def get_all_tasks():
         response.append(task.to_dict())
 
     return jsonify(response), 200
-
-def validate_id(cls, id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message": f"{cls.__name__} {id} invalid"}, 400))
-    record = cls.query.get_or_404(id)
-    return record
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
@@ -75,7 +78,10 @@ def mark_complete(task_id, complete_status):
     task = validate_id(Task, task_id)
     if complete_status == "mark_complete":
         task.completed_at = datetime.now()
+        requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
     elif complete_status == "mark_incomplete":
         task.completed_at = None
     db.session.commit()
     return make_response({"task": task.to_dict()}, 200)
+
+
