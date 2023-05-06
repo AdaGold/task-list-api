@@ -1,6 +1,7 @@
-from datetime import datetime
+from sqlalchemy import asc, desc
 from app import db
 from app.models.task import Task
+from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
 
 def get_valid_item_by_id(model, id):
@@ -35,9 +36,11 @@ def create_task():
 def get_all_tasks():
 
     # get 1 task by param
-    title_query = request.args.get("title")
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
+    query_request = request.args.get("sort")
+    if query_request == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif query_request == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     # get all tasks
     else:
         tasks = Task.query.all()
@@ -47,6 +50,7 @@ def get_all_tasks():
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
+
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
@@ -79,3 +83,25 @@ def delete_one_task(task_id):
     title_task = task_to_delete.title
 
     return {"details": f'Task {task_id} "{title_task}" successfully deleted'}, 200
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_as_completed(task_id):
+
+    task_is_valid: Task = get_valid_item_by_id(Task, task_id)
+
+    task_is_valid.completed_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return {"task": task_is_valid.to_dict()}, 200
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_as_incompleted(task_id):
+
+    task_is_valid: Task = get_valid_item_by_id(Task, task_id)
+
+    task_is_valid.completed_at = None
+
+    db.session.commit()
+
+    return {"task": task_is_valid.to_dict()}, 200
