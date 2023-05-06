@@ -34,6 +34,7 @@ def test_mark_complete_on_incomplete_task(client, one_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": True
@@ -54,6 +55,7 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": False
@@ -91,6 +93,7 @@ def test_mark_complete_on_completed_task(client, completed_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": True
@@ -111,6 +114,7 @@ def test_mark_incomplete_on_incomplete_task(client, one_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": False
