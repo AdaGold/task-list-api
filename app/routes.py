@@ -5,6 +5,8 @@ from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
 import os
+from sqlalchemy.orm import lazyload
+import json
 
 def validate_item(cls, request_body):
     try:
@@ -125,4 +127,23 @@ def delete_one_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
     return make_response({"details": f"Goal {goal.id} \"{goal.title}\" successfully deleted"}, 200)
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_to_goal(goal_id):
+    goal = validate_id(Goal, goal_id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+    for id in task_ids:
+        goal.tasks.append(Task.query.get(id))
+    db.session.commit()
+    return jsonify(id=goal.id, task_ids=task_ids), 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_id(Goal, goal_id)
+    tasks = goal.tasks
+    tasks_to_dict = []
+    for task in tasks:
+        tasks_to_dict.append(task.to_dict())
+    return jsonify(id=goal.id, title=goal.title, tasks=tasks_to_dict), 200
 

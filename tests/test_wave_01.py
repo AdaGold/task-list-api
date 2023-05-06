@@ -25,6 +25,7 @@ def test_get_tasks_one_saved_tasks(client, one_task):
     assert response_body == [
         {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": False
@@ -44,6 +45,7 @@ def test_get_task(client, one_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": False
@@ -77,6 +79,7 @@ def test_create_task(client):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "A Brand New Task",
             "description": "Test Description",
             "is_complete": False
@@ -105,6 +108,7 @@ def test_update_task(client, one_task):
     assert response_body == {
         "task": {
             "id": 1,
+            "goal_id": None,
             "title": "Updated Task Title",
             "description": "Updated Test Description",
             "is_complete": False
