@@ -3,3 +3,22 @@ from app import db
 
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+
+
+
+    @classmethod
+    def dict_for_post_method(cls, goal_details):
+
+        result = cls(
+            title=goal_details["title"])
+        return result
+
+
+
+    def to_dict(self):
+        return \
+            {
+                "id": self.goal_id,
+                "title": self.title,
+            }
