@@ -84,14 +84,15 @@ def delete_one_goal(goal_id):
 
     return {"details": f'Goal {goal_id} "{title_goal}" successfully deleted'}, 200
 
+
+
+
 # ROUTES FOR RELATIONSHIP ONE TO MANY
 @goal_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_tasks_to_goal(goal_id):
 
     request_body = request.get_json()
-
     goal: Goal = get_valid_item_by_id(Goal, goal_id)
-    
     list_tasks = request_body["task_ids"]
 
     tasks_list = []
@@ -104,3 +105,16 @@ def create_tasks_to_goal(goal_id):
     db.session.commit()
 
     return jsonify({"id": goal.goal_id, "task_ids": tasks_list})
+
+
+# Get tasks for specific goal
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def handle_tasks_for_specific_goal(goal_id):
+
+    goal: Goal = get_valid_item_by_id(Goal, goal_id)
+
+    return jsonify({
+                "id": goal.goal_id,
+                "title": goal.title,
+                "tasks": goal.tasks_dict()
+                }), 200

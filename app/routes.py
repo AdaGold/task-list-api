@@ -54,8 +54,13 @@ def get_all_tasks():
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
+
     task: Task = get_valid_item_by_id(Task, task_id)
-    return {"task": task.to_dict()}, 200
+
+    if not task.goal_id:
+        return {"task": task.to_dict()}, 200
+    else:
+        return {"task": task.to_dict_with_goal_id()}, 200
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])

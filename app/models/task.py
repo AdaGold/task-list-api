@@ -39,3 +39,13 @@ class Task(db.Model):
                 "description": self.description,
                 "is_complete": self.is_complete()
             }
+    
+    def to_dict_with_goal_id(self):
+        return \
+            {
+                "id": self.task_id,
+                "goal_id": self.goal_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": self.is_complete()
+            }
