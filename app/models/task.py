@@ -1,14 +1,14 @@
 # from datetime import datetime
 # from sqlalchemy import DateTime
 from app import db
-
+#hola3
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
-
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable=True)
 
     def is_complete(self):
 
@@ -27,6 +27,7 @@ class Task(db.Model):
             title=tasks_details["title"],
             description=tasks_details["description"],
             completed_at=None)
+            # goal_id=tasks_details["goal_id"])
         return result
     
 

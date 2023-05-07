@@ -1,6 +1,7 @@
 from sqlalchemy import asc, desc
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
 
@@ -82,3 +83,24 @@ def delete_one_goal(goal_id):
     title_goal = goal_to_delete.title
 
     return {"details": f'Goal {goal_id} "{title_goal}" successfully deleted'}, 200
+
+# ROUTES FOR RELATIONSHIP ONE TO MANY
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_tasks_to_goal(goal_id):
+
+    request_body = request.get_json()
+
+    goal: Goal = get_valid_item_by_id(Goal, goal_id)
+    
+    list_tasks = request_body["task_ids"]
+
+    tasks_list = []
+
+    for task_id in list_tasks:
+        task: Task = get_valid_item_by_id(Task, task_id)
+        goal.tasks.append(task)
+        tasks_list.append(task.task_id)
+
+    db.session.commit()
+
+    return jsonify({"id": goal.goal_id, "task_ids": tasks_list})
