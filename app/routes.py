@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, make_response, abort, request
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import requests
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -43,12 +45,20 @@ def update_task(task_id):
     db.session.commit()
     return jsonify({'task': task.to_dict()}), 200
 
+############# PATCH ########################
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_task_complete(task_id):
     task = validate_model(Task, task_id)
     
     task.completed_at = datetime.today()
     
+    channel_id = 'task-notifications'
+    url_endpoint = 'https://slack.com/api/chat.postMessage'
+    params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title}"}
+    headers = {'Authorization': f"Bearer {os.environ.get('SLACK_API_KEY')}"}
+    
+    requests.post(url=url_endpoint, params=params, headers=headers)
+
     db.session.commit()
     return jsonify({'task': task.to_dict()}), 200
 
