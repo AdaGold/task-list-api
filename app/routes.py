@@ -50,9 +50,11 @@ def read_one_task(task_id):
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    task_query = request.args.get("task")
-    if task_query:
-        tasks = Task.query.filter_by(task=task_query)
+    task_query = request.args.get("sort")
+    if task_query == 'asc':
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif task_query == 'desc':
+        tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
 
