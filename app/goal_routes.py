@@ -5,6 +5,7 @@ from app.models.task import Task
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
 
+
 def get_valid_item_by_id(model, id):
     try:
         id = int(id)

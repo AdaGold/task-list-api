@@ -37,11 +37,4 @@ def create_app(test_config=None):
         app.register_blueprint(goal_bp)
 
         return app
-
-
-# if test_config is None:
-        #         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
-
-        #         with app.app_context():
-        #                 db.create_all()
         

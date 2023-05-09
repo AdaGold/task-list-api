@@ -3,6 +3,8 @@ from app import db
 from app.models.task import Task
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
+import os
+from slack_sdk import WebClient
 
 def get_valid_item_by_id(model, id):
     try:
@@ -89,16 +91,23 @@ def delete_one_task(task_id):
 
     return {"details": f'Task {task_id} "{title_task}" successfully deleted'}, 200
 
+
+
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_as_completed(task_id):
 
     task_is_valid: Task = get_valid_item_by_id(Task, task_id)
-
     task_is_valid.completed_at = datetime.utcnow()
 
     db.session.commit()
+    slack_token = os.environ["SLACK_BOT_TOKEN"]
+    client = WebClient(token=slack_token)
+
+    response = client.chat_postMessage(channel="task-list-api",
+                                    text="Task completed")
 
     return {"task": task_is_valid.to_dict()}, 200
+
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_as_incompleted(task_id):
