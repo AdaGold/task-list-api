@@ -1,24 +1,26 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 import datetime as dt
 import os
 import requests
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
-def validate_task(task_id):
+def validate_item(model, item_id):
     try:
-        task_id = int(task_id)
+        item_id = int(item_id)
     except:
-        abort(make_response({"message": "Invalid task id"}), 400)
+        abort(make_response({"message": "Invalid id"}), 400)
 
-    task = Task.query.get(task_id)
+    item = model.query.get(item_id)
 
-    if not task:
-        abort(make_response({"message": "Task id {task_id} not found."}, 404))
+    if not item:
+        abort(make_response({"message": f"Id {item_id} not found."}, 404))
 
-    return task
+    return item
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
@@ -59,13 +61,13 @@ def add_one_task():
 @tasks_bp.route("<task_id>", methods=["GET"])
 def get_one_task_by_id(task_id):
     # validate task id
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     request_body = request.get_json()
 
@@ -78,7 +80,7 @@ def update_one_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH", "POST"])
 def mark_one_task_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     task.is_complete = True
     task.completed_at = dt.datetime.now()
@@ -102,7 +104,7 @@ def mark_one_task_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_one_task_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     task.is_complete = False
     task.completed_at = None
@@ -113,9 +115,75 @@ def mark_one_task_incomplete(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
     return make_response({"details": f'Task {task_id} "{task.title}" successfully deleted'})
+
+
+## Goal Routes ##
+
+@goals_bp.route("", methods=["POST"])
+def add_one_goal():
+    print('request', request)
+    request_body = request.get_json()
+    print('body', request_body)
+    try:
+        new_goal = Goal(
+            title=request_body["title"]
+            )
+    except KeyError:
+        return make_response({"details": "Invalid data"}), 400
+    
+    # print(new_goal)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return make_response({"goal": new_goal.to_dict()}, 201)
+
+# TODO: passes tests, but POST requests for both task and goal doesn't work in postman.\
+
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+
+    goals = Goal.query.all()
+
+    goal_list = []
+
+    for goal in goals:
+        goal_list.append(goal.to_dict())
+
+    return jsonify(goal_list)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal_by_id(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    return make_response({"goal": goal.to_dict()}, 200)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return make_response({"goal": goal.to_dict()}, 200)
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({
+        "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
+    }, 200)
