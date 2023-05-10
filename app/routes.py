@@ -105,3 +105,38 @@ def delete_task(task_id):
     return {
         "details": f"Task {task_id} \"{task.title}\" successfully deleted"
     }, 200
+
+# Mark a task complete
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = Task.query.get(task_id)
+    
+    if not task:
+        return {"message": f"Task {task_id} not found"}, 404
+
+    task.completed_at = date.today()
+
+    db.session.add(task)
+    db.session.commit()
+
+    return {
+        "task": task.to_json()
+    }, 200
+
+# Mark a task incomplete
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = Task.query.get(task_id)
+    
+    if not task:
+        return {"message": f"Task {task_id} not found"}, 404
+
+    task.completed_at = None
+
+    db.session.add(task)
+    db.session.commit()
+
+    return {
+        "task": task.to_json()
+    }, 200
+    
