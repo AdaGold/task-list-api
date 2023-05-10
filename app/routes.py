@@ -127,17 +127,14 @@ def delete_one_task(task_id):
 
 @goals_bp.route("", methods=["POST"])
 def add_one_goal():
-    print('request', request)
     request_body = request.get_json()
-    print('body', request_body)
+
     try:
         new_goal = Goal(
             title=request_body["title"]
             )
     except KeyError:
         return make_response({"details": "Invalid data"}), 400
-    
-    # print(new_goal)
 
     db.session.add(new_goal)
     db.session.commit()
@@ -208,11 +205,9 @@ def add_tasks_to_goal(goal_id):
 def get_all_tasks_for_one_goal(goal_id):
     goal = validate_item(Goal, goal_id)
 
-    if not goal.tasks:
-        goal_dict = goal.to_dict()
-        goal_dict["tasks"] = []
-        return goal_dict
-    else:
-        return goal.to_dict(), 200
+    goal_dict = goal.to_dict()
 
-# FIXME: jimmy-rigged this to pass my tests - is there a better way?
+    if not goal.tasks:
+        goal_dict["tasks"] = []
+
+    return goal_dict, 200
