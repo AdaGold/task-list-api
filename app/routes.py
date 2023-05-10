@@ -8,6 +8,9 @@ from flask import Blueprint, jsonify, make_response, request
 tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/tasks')
 root_bp = Blueprint("root_bp", __name__)
 
+SLACK_API_URL = "https://slack.com/api/chat.postMessage"
+SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
+
 # Home page
 @root_bp.route("/", methods=["GET"])
 def root():
@@ -118,10 +121,28 @@ def mark_task_complete(task_id):
 
     db.session.add(task)
     db.session.commit()
+    
+    headers = {
+        "Authorization": f"Bearer {SLACK_BOT_TOKEN}",
+    }
+    
+    if task.completed_at:
+        data = {
+            "channel": "task-notifications",
+            "text": f"Someone just completed the task {task.title}!",
+        }
+    else:
+        data = {
+            "channel": "task-notifications",
+            "text": f"Task {task.title} has been marked incomplete",
+        }
+
+    r = requests.post(SLACK_API_URL, headers=headers, data=data)
 
     return {
         "task": task.to_json()
     }, 200
+
 
 # Mark a task incomplete
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
@@ -136,7 +157,10 @@ def mark_task_incomplete(task_id):
     db.session.add(task)
     db.session.commit()
 
+    headers = {
+        "Authorization": f"Bearer {SLACK_BOT_TOKEN}",
+    }
+    
     return {
         "task": task.to_json()
     }, 200
-    
