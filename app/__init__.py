@@ -36,8 +36,5 @@ def create_app(test_config=None):
         from .goal_routes import goal_bp
         app.register_blueprint(goal_bp)
 
-        # with app.app_context():
-        #         db.create_all()
-
         return app
         

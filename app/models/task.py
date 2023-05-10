@@ -1,7 +1,5 @@
-# from datetime import datetime
-# from sqlalchemy import DateTime
 from app import db
-#hola3
+
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
