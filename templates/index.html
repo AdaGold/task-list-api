@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>KaTasks</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th>Task</th>
+                <th>Actions</th>
+            </tr>
+            {% for task in tasks %}
+            <tr>
+                <td> {{ task.content }} </td>
+                <td>
+                    <a href="ui/delete/{{task.id}}">Delete</a> <br>
+                    <a href="ui/update/{{task.id}}">Update</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <form action="/" method="POST">
+            <input type="text" name="title" id="title">
+            <input type="text" name="description" id="description">
+            <input type="submit" value="Add Task">
+        </form>
+
+        <script src="" async defer></script>
+    </body>
+</html>

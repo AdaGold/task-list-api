@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, abort, request
+from flask import Blueprint, jsonify, make_response, abort, request, render_template, redirect
 from app import db
 from app.models.task import Task
 from datetime import datetime
@@ -103,3 +103,49 @@ def delete_task(task_id):
     db.session.commit()
     
     return jsonify({"details": f'Task {task.task_id} "{task.title}" successfully deleted'})
+
+######## UI ROUTES #######################
+@tasks_bp.route("/ui", methods=["GET", "POST"])
+def ui_route():
+    if request.method == 'POST':
+        task_title = request.form['title']
+        task_description = request.form['description']
+        new_task = Task(title=task_title, description=task_description)
+
+        try:
+            db.session.add(new_task)
+            db.session.commit()
+            return redirect('/')
+        except:
+            return 'There was an error while adding the task'
+
+    else:
+        tasks = Task.query.all()
+        return render_template("index.html", tasks=tasks)
+    
+@tasks_bp.route('/delete/<int:id>')
+def delete(id):
+    task_to_delete = Task.query.get_or_404(id)
+    try:
+        db.session.delete(task_to_delete)
+        db.session.commit()
+        return redirect('/ui')
+    except:
+        return 'There was an error while deleting that task'
+    
+@tasks_bp.route('/update/<int:id>', methods=['GET','POST'])
+def update(id):
+    task = Task.query.get_or_404(id)
+
+    if request.method == 'POST':
+        task.title = request.form['title']
+        task.description = request.form['description']
+
+        try:
+            db.session.commit()
+            return redirect('/ui')
+        except:
+            return 'There was an issue while updating that task'
+
+    else:
+        return render_template('update.html', task=task)
