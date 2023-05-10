@@ -277,7 +277,10 @@ def goal_tasks_post(goal_id):
     for task_id in request_body["task_ids"]:
         task = Task.query.get(task_id)
         if not task:
-            return {"message": f"Task {task_id} not found"}, 404
+            return {
+                "message": 
+                    f"Task {task_id} not found"
+            }, 404
 
         goal.tasks.append(task)
 
