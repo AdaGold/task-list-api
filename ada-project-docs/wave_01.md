@@ -227,14 +227,3 @@ If the HTTP request is missing `description`, we should also get this response:
 }
 ```
 
-#### Missing `completed_at`
-
-If the HTTP request is missing `completed_at`, we should also get this response:
-
-`400 Bad Request`
-
-```json
-{
-  "details": "Invalid data"
-}
-```

@@ -6,6 +6,7 @@ from .task_routes import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
+######## POST GOAL ########################
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -19,6 +20,7 @@ def create_goal():
 
     return jsonify({'goal': new_goal.to_dict()}), 201
 
+########## GET GOAL ############################
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -33,6 +35,7 @@ def read_all_goals():
         goals_response.append(goal.to_dict())
     return jsonify(goals_response), 200
 
+######## PUT GOAL ############################
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -44,6 +47,7 @@ def update_goal(goal_id):
     db.session.commit()
     return jsonify({'goal': goal.to_dict()}), 200
 
+######## DELETE GOAL ################################
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -67,19 +71,9 @@ def create_goal_with_tasks(goal_id):
     db.session.commit()
     return jsonify({"id": goal.goal_id, "task_ids": task_ids}), 200
 
+####### GET ONE-TO-MANY TASKS ###############################
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def read_tasks(goal_id):
+def read_tasks_from_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     
-    tasks_response = []
-    for task in goal.tasks:
-        tasks_response.append(
-            {
-            "id": task.task_id,
-            "goal_id": task.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.completed_at if task.completed_at else False
-            }
-        )
-    return jsonify(goal.to_dict(tasks=True)), 200
+    return jsonify(goal.to_dict(has_tasks=True)), 200
