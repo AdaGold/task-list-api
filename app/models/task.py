@@ -17,8 +17,8 @@ class Task(db.Model):
             "is_complete": True if self.completed_at else False 
         }
 
-        # if self.goal_id:
-        #     task_dict["goal_id"] = self.goal_id
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
     
         return task_dict
     

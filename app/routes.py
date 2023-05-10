@@ -3,10 +3,12 @@ from app import db
 import requests
 from datetime import date
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request
 
 tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/tasks')
 root_bp = Blueprint("root_bp", __name__)
+goals_bp = Blueprint('goals_bp', __name__, url_prefix='/goals')
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
@@ -164,3 +166,77 @@ def mark_task_incomplete(task_id):
     return {
         "task": task.to_json()
     }, 200
+
+# Get all goals
+@goals_bp.route("", methods=["GET"])
+def read_all_goals():
+    goals = Goal.query.all()
+    goals_json = []
+
+    for goal in goals:
+        goals_json.append(goal.to_json())
+
+    return jsonify(goals_json)
+
+# Get one goal
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def read_single_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    if goal:
+        return {
+            "goal": goal.to_json()
+        }
+    else:
+        return {"message": f"Goal {goal_id} not found"}, 404
+
+# Create a goal
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    if not "title" in request_body:
+        return jsonify({
+            "details": "Invalid data"
+        }), 400
+
+    new_goal = Goal(title=request_body["title"])
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {
+        "goal": new_goal.to_json()
+    }, 201
+
+# Update a goal
+@ goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        return {"message": f"Goal {goal_id} not found"}, 404
+
+    request_body = request.get_json()
+    goal.title = request_body["title"]
+
+    db.session.add(goal)
+    db.session.commit()
+
+    return {
+        "goal": goal.to_json()
+    }, 200
+
+# Delete a goal
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        return {"message": f"Goal {goal_id} not found"}, 404
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {
+        "details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"
+    }, 200
+
