@@ -58,7 +58,7 @@ def add_one_task():
     # return make_response(jsonify(f"task {new_task.title} successfully created"), 201)
 
 
-@tasks_bp.route("<task_id>", methods=["GET"])
+@tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task_by_id(task_id):
     # validate task id
     task = validate_item(Task, task_id)
@@ -144,8 +144,6 @@ def add_one_goal():
 
     return make_response({"goal": new_goal.to_dict()}, 201)
 
-# TODO: passes tests, but POST requests for both task and goal doesn't work in postman.\
-
 
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
@@ -187,3 +185,34 @@ def delete_one_goal(goal_id):
     return make_response({
         "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
     }, 200)
+
+## wave 6 combo routes ##
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = validate_item(Task, task_id)
+        task.goal_id = goal_id
+
+    db.session.commit()
+
+    task_ids = [task.task_id for task in goal.tasks]
+
+    return {"id": goal.goal_id, "task_ids": task_ids}, 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_for_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    if not goal.tasks:
+        goal_dict = goal.to_dict()
+        goal_dict["tasks"] = []
+        return goal_dict
+    else:
+        return goal.to_dict(), 200
+
+# FIXME: jimmy-rigged this to pass my tests - is there a better way?
