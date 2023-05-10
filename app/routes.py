@@ -6,20 +6,11 @@ from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request
 
-tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/tasks')
-root_bp = Blueprint("root_bp", __name__)
-goals_bp = Blueprint('goals_bp', __name__, url_prefix='/goals')
+tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
+goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
-
-# Home page
-@root_bp.route("/", methods=["GET"])
-def root():
-    return {
-        "name": "Ghameerah's Task List API",
-        "message": "Fun with Flask",
-    }
 
 # Get all tasks
 @tasks_bp.route("", methods=["GET"])
