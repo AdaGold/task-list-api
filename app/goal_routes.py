@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, abort, request, session
+from flask import Blueprint, jsonify, make_response, abort, request
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
