@@ -53,12 +53,10 @@ def test_get_goal_not_found(client):
     response = client.get("/goals/1")
     response_body = response.get_json()
 
-    raise Exception("Complete test")
     # Assert
-    # ---- Complete Test ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Test ----
+    assert response.status_code == 404
+    assert "message" in response_body
+    assert response_body["message"] == "Goal 1 not found"
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
