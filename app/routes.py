@@ -4,10 +4,16 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
 import requests
+from pprint import pp
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 # Instantiate Blueprint instances here
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+SLACK_API_URL = "https://slack.com/api/chat.postMessage"
+# SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
+SLACK_API_KEY = os.environ["SLACK_API_KEY"]
 
 
 def validate_task(task_id):
@@ -138,15 +144,26 @@ def mark_complete(task_id):
     db.session.add(task)
     db.session.commit()
 
-    if task.completed_at:
-        result = {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": True
-            }}
+    headers = {
+        "Authorization": f"Bearer {SLACK_API_KEY}"
+    }
 
+    data = {
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task: {task.title}"
+    }
+
+    result = {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True
+        }
+    }
+
+    r = requests.post(SLACK_API_URL, headers=headers, data=data)
+    # r.json()
     return make_response(jsonify(result), 200)
 
 
