@@ -148,22 +148,25 @@ def mark_complete(task_id):
     return make_response(jsonify(result), 200)
 
 
-# @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-# def mark_incomplete(task_id):
-#     task = Task.query.get(task_id)
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = Task.query.get(task_id)
 
-#     task.completed_at = datetime.utcnow()
+    if not task:
+        return {"details": f"Task {task_id} not found"}, 404
 
-#     db.session.add(task)
-#     db.session.commit()
+    task.completed_at = None
 
-#     if task.completed_at:
-#         result = {
-#             "task": {
-#                 "id": task.task_id,
-#                 "title": task.title,
-#                 "description": task.description,
-#                 "is_complete": False
-#             }}
+    db.session.add(task)
+    db.session.commit()
 
-#     return make_response(jsonify(result), 200)
+    if not task.completed_at:
+        result = {
+            "task": {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+            }}
+
+    return make_response(jsonify(result), 200)
