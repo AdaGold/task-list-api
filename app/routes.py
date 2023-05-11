@@ -197,3 +197,25 @@ def mark_incomplete(task_id):
 # *************************************************************************
 # ********************************* GOALS *********************************
 # *************************************************************************
+
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    if not "title" in request_body:
+        abort(make_response({"details": "Invalid data"}, 400))
+
+    new_goal = Goal(title=request_body["title"])
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    # return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
+    return make_response(jsonify({
+        "goal": {
+            "id": new_goal.goal_id,
+            "title": new_goal.title
+
+        }
+    }), 201)
