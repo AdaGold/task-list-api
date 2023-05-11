@@ -1,15 +1,16 @@
 from os import abort
 from app import db
+from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
 import requests
-from pprint import pp
 import os
 from dotenv import load_dotenv
 load_dotenv()
 # Instantiate Blueprint instances here
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
 # SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
