@@ -20,18 +20,19 @@ SLACK_API_KEY = os.environ["SLACK_API_KEY"]
 # *************************************************************************
 
 
-def validate_task(task_id):
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
         abort(make_response({"details": f"Invalid data"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
 
-    if not task:
-        abort(make_response({"details": f"Task {task_id} not found"}, 404))
+    if not model:
+        abort(make_response(
+            {"details": f"{cls.__name__} {model_id} not found"}, 404))
 
-    return task
+    return model
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -41,9 +42,7 @@ def create_task():
     if not "title" in request_body or not "description" in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
-    new_task = Task(title=request_body["title"],
-                    description=request_body["description"])
-
+    new_task = Task.from_dict(request_body)
     if new_task.completed_at:
         completed = True
     else:
@@ -91,7 +90,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     return make_response(jsonify({
         "task": {
             "id": task.task_id,
@@ -105,7 +104,7 @@ def get_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -127,7 +126,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
