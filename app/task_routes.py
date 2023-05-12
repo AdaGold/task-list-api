@@ -91,6 +91,17 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
+    if task.goal_id:
+        return make_response(jsonify({
+            "task": {
+                "id": task.task_id,
+                "goal_id": task.goal_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+
+            }
+        }), 200)
     return make_response(jsonify({
         "task": {
             "id": task.task_id,
