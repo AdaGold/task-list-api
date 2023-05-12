@@ -10,7 +10,7 @@ tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
-SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
+SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 
 # Get all tasks
 @tasks_bp.route("", methods=["GET"])
