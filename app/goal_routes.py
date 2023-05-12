@@ -1,3 +1,4 @@
+from app.task_routes import validate_model
 from os import abort
 from app import db
 from app.models.goal import Goal
@@ -16,21 +17,6 @@ goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 # *************************************************************************
 # ********************************* GOALS *********************************
 # *************************************************************************
-
-
-def validate_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"details": f"Invalid data"}, 400))
-
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"details": f"Goal {goal_id} not found"}, 404))
-
-    return goal
-
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -72,7 +58,7 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     return make_response(jsonify({
         "goal": {
             "id": goal.goal_id,
@@ -83,7 +69,7 @@ def get_one_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     request_body = request.get_json()
 
@@ -101,7 +87,7 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
