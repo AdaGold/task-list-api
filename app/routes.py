@@ -199,6 +199,20 @@ def mark_incomplete(task_id):
 # *************************************************************************
 
 
+def validate_goal(goal_id):
+    try:
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"details": f"Invalid data"}, 400))
+
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response({"details": f"Goal {goal_id} not found"}, 404))
+
+    return goal
+
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -235,3 +249,16 @@ def get_all_goals():
             }
         )
     return jsonify(goal_response)
+
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+    return make_response(jsonify({
+        "goal": {
+            "id": goal.goal_id,
+            "title": goal.title,
+
+
+        }
+    }), 200)
