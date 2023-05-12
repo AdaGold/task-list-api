@@ -94,3 +94,61 @@ def delete_goal(goal_id):
 
     return make_response(
         {"details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"}, 200)
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response(
+            {"details": f"{goal_id} not found"}, 404))
+    request_body = request.get_json()
+
+    result = {
+        "id": goal.goal_id,
+        "task_ids": request_body["task_ids"]
+    }
+
+    for task_id in request_body["task_ids"]:
+        task = Task.query.get(task_id)
+
+        if not task:
+            abort(make_response(
+                {"details": f"{task_id} not found"}, 404))
+        goal.tasks.append(task)
+
+    db.session.commit()
+
+    return make_response(jsonify(result), 200)
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+
+    if not goal:
+        abort(make_response(
+            {"details": f"{goal_id} not found"}, 404))
+    request_body = request.get_json()
+
+    result = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": []
+    }
+
+    for task in goal.tasks:
+        result["tasks"].append(
+            {
+                "id": task.task_id,
+                "goal_id": task.goal_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+            }
+        )
+
+    return make_response(jsonify(result), 200)
