@@ -13,11 +13,12 @@ load_dotenv()
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    if test_config is None:
+    if not test_config:
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-            "SQLALCHEMY_DATABASE_URI")
+            "RENDER_DATABASE_URI")
+
     else:
         app.config["TESTING"] = True
 
@@ -26,8 +27,9 @@ def create_app(test_config=None):
         # "SQLALCHEMY_TEST_DATABASE_URI")
 
         # Connects our app to RENDER database
+        app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "RENDER_DATABASE_URI")
+            "SQLALCHEMY_TEST_DATABASE_URI")
 
     # Import models here for Alembic setup
     from app.models.task import Task
