@@ -10,6 +10,15 @@ class Task(db.Model):
     goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
     goal = db.relationship("Goal", back_populates="tasks")
 
+    def to_dict(self):
+        task_as_dict = {}
+        task_as_dict["id"] = self.task_id
+        task_as_dict["title"] = self.title
+        task_as_dict["description"] = self.description
+        task_as_dict["completed_at"] = self.completed_at
+
+        return task_as_dict
+
     @classmethod
     def from_dict(cls, task_data):
         """Takes in a dictionary and returns a new Task instance"""
