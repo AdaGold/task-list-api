@@ -13,7 +13,8 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
-SLACK_API_KEY = os.environ["SLACK_API_KEY"]
+# SLACK_API_KEY = os.environ["SLACK_API_KEY"]
+SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
 
 # *************************************************************************
 # ********************************* TASKS *********************************
