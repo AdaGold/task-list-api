@@ -9,3 +9,10 @@ class Task(db.Model):
     # establishes the one-to-many relationship
     goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
     goal = db.relationship("Goal", back_populates="tasks")
+
+    @classmethod
+    def from_dict(cls, task_data):
+        """Takes in a dictionary and returns a new Task instance"""
+        new_task = Task(title=task_data["title"],
+                        description=task_data["description"])
+        return new_task
