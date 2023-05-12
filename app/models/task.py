@@ -7,5 +7,5 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime)
     # establishes the one-to-many relationship
-    goal_id = db.Column(db.Integer, db.ForeignKey("goal.id"))
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
     goal = db.relationship("Goal", back_populates="tasks")
