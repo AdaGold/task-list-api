@@ -1,22 +1,19 @@
-from app.task_routes import validate_model
-from os import abort
 from app import db
+from os import abort
+from app.task_routes import validate_model
 from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
-from datetime import datetime
-import requests
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
 # Instantiate Blueprint instances here
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
-
 # *************************************************************************
 # ********************************* GOALS *********************************
 # *************************************************************************
+
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -35,7 +32,6 @@ def create_goal():
         "goal": {
             "id": new_goal.goal_id,
             "title": new_goal.title
-
         }
     }), 201)
 
@@ -50,7 +46,6 @@ def get_all_goals():
             {
                 "id": goal.goal_id,
                 "title": goal.title,
-
             }
         )
     return jsonify(goal_response)
@@ -142,13 +137,7 @@ def get_all_tasks(goal_id):
 
     for task in goal.tasks:
         result["tasks"].append(
-            {
-                "id": task.task_id,
-                "goal_id": task.goal_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
-            }
+            task.to_dict()
         )
 
     return make_response(jsonify(result), 200)
