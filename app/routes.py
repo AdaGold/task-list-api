@@ -2,6 +2,15 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
     # review then evaluate if needed:
+from sqlalchemy import asc
+    # vscode asc breadcrum notes:
+# statement symbol()
+# statement _create_asc(column)
+# asc = public_factory(UnaryExpression._create_asc, ".sql.expression.asc")
+# Full name: sqlalchemy.sql.expression.asc
+    # review then evaluate if needed:
+from sqlalchemy import desc
+    # review then evaluate if needed:
 from datetime import datetime
     # review then evaluate if needed:
 # from flask import Flask
@@ -28,18 +37,24 @@ def validate_model(cls, model_id):
 ## CREATE
 @task_bp.route("", methods=['POST'])
 def create_task():
+# def create_task(task_title, task_description):
+    # task = validate_model(Task)
+    
     request_body = request.get_json()
     
-    new_task = Task.from_dict(request_body)
+    if not request_body.get('title') or not request_body.get('description'):
+        abort(make_response({"details": "Invalid data"}, 400))
+        
+    task = Task.from_dict(request_body)
     
-    db.session.add(new_task)
+    db.session.add(task)
     db.session.commit()
-    
-    return jsonify(f"New task: {new_task.title} successfully created!"), 201
+ 
+    return {"task": task.to_dict()}, 201
 
-## READ
+## READ 
 @task_bp.route("", methods=["GET"])
-def read_all_tasks():
+def get_all_tasks():
     title_query = request.args.get("title")
     description_query = request.args.get("description")
     
@@ -57,12 +72,38 @@ def read_all_tasks():
     
     return jsonify(tasks_response)
 
-## READ
+# READ
 @task_bp.route("/<task_id>", methods=["GET"])
-def read_one_tasks(task_id):
+def get_one_task(task_id):
     task = validate_model(Task, task_id)
     
-    return task.to_dict(), 200
+    return {"task": task.to_dict()}, 200
+    
+# READ - SORTED 
+# # ASCENDING TITLE READ_ALL_TASKS
+    # SUDO CODE:
+# # @task_bp.route("", methods=["GET"])
+# # def read_all_tasks():
+#     # asc_title = request.args.get("sort")
+    
+#     # get all tasks
+#     # 
+#     # if sort == "asc" use sorted method (of dict title value)
+#     # elif sort for desc
+#     # or sort == "desc"
+
+# @task_bp.route("", methods=["GET"])
+# def get_tasks_sorted():
+#     sort_order = requests.args.get("sort")
+    
+#     if sort_order == "asc":
+#         sorted_tasks = sorted(tasks.items(), key=lambda x: x[1]["title"])
+#         tasks = list(sorted_tasks)    
+#     elif sort_order == "desc":
+#         sorted_tasks = sorted(tasks.items(), key=lambda x: x[1]["title"], reverse=True)
+#         tasks = list(sorted_tasks)
+        
+#     return tasks
 
 ## UPDATE
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -72,11 +113,10 @@ def update_task(task_id):
     
     task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at = request_body["completed_at"]
 
     db.session.commit()
-    
-    return task.to_dict(), 200
+        
+    return {"task": task.to_dict()}, 200
 
 ## DELETE
 @task_bp.route("/<task_id>", methods=["DELETE"])
@@ -86,7 +126,10 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     
-    return make_response(f"Task #{task.id} successfully deleted")
+    return {
+        "details": f'Task {task_id} "{task.title}" successfully deleted'
+    }
+
 
 ###############################
     # review and evaluation implementing after task routes are passing tests:
@@ -162,46 +205,46 @@ def delete_task(task_id):
 # ###########################################
 # #### Early Implimentation of Task Routes:
 #     # review then decide how or if to impliment:
-# # @task_bp.route('/tasks', methods=['GET', 'POST'])
-# # def tasks():
-# #     if request.method == 'GET':
-# #         tasks = Task.query.all()
-# #         return jsonify([task.to_dict() for task in tasks]), 200
+# @task_bp.route('/tasks', methods=['GET', 'POST'])
+# def tasks():
+#     if request.method == 'GET':
+#         tasks = Task.query.all()
+#         return jsonify([task.to_dict() for task in tasks]), 200
 
-# #     elif request.method == 'POST':
-# #         request_data = request.get_json()
+#     elif request.method == 'POST':
+#         request_data = request.get_json()
 
-# #         title = request_data.get('title')
-# #         description = request_data.get('description')
+#         title = request_data.get('title')
+#         description = request_data.get('description')
 
-# #         task = Task(title=title, description=description)
-# #         db.session.add(task)
-# #         db.session.commit()
+#         task = Task(title=title, description=description)
+#         db.session.add(task)
+#         db.session.commit()
 
-# #         return jsonify({'task': task.to_dict()}), 201
+#         return jsonify({'task': task.to_dict()}), 201
 
-# # @task_bp.route('/tasks/<int:task_id>', methods=['GET', 'PUT', 'DELETE'])
-# # def task(task_id):
-# #     task = Task.query.get_or_404(task_id)
+# @task_bp.route('/tasks/<int:task_id>', methods=['GET', 'PUT', 'DELETE'])
+# def task(task_id):
+#     task = Task.query.get_or_404(task_id)
 
-# #     if request.method == 'GET':
-# #         return jsonify({'task': task.to_dict()}), 200
+#     if request.method == 'GET':
+#         return jsonify({'task': task.to_dict()}), 200
 
-# #     elif request.method == 'PUT':
-# #         request_data = request.get_json()
+#     elif request.method == 'PUT':
+#         request_data = request.get_json()
 
-# #         title = request_data.get('title')
-# #         description = request_data.get('description')
+#         title = request_data.get('title')
+#         description = request_data.get('description')
 
-# #         task.title = title
-# #         task.description = description
-# #         db.session.commit()
+#         task.title = title
+#         task.description = description
+#         db.session.commit()
 
-# #         return jsonify({'task': task.to_dict()}), 200
+#         return jsonify({'task': task.to_dict()}), 200
 
-# #     elif request.method == 'DELETE':
-# #         db.session.delete(task)
-# #         db.session.commit()
+#     elif request.method == 'DELETE':
+#         db.session.delete(task)
+#         db.session.commit()
 
-# #         return jsonify({}), 204
+#         return jsonify({}), 204
 

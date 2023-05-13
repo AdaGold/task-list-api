@@ -44,7 +44,7 @@ I want to get this response:
 
 ### Sorting Tasks: By Title, Descending
 
-As a client, I want to be able to make a `GET` request to `/tasks?sort=desc` when there is more than one saved task, and get an array of tasks sorted by **title**. The titles should be in _descending_ order, where a task with the title "B" is sorted before a task with the title "A."
+As a client, I want to be able to make a `GET` request to`/tasks?sort=desc`  when there is more than one saved task, and get an array of tasks sorted by **title**. The titles should be in _descending_ order, where a task with the title "B" is sorted before a task with the title "A."
 
 I want to get this response:
 
