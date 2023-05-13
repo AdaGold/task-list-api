@@ -1,13 +1,14 @@
-from os import abort
 from app import db
-from app.models.goal import Goal
+from os import abort
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+
 from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 # Instantiate Blueprint instances here
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -54,13 +55,7 @@ def create_task():
 
     # return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
     return make_response(jsonify({
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": completed
-
-        }
+        "task": new_task.to_dict()
     }), 201)
 
 
@@ -79,12 +74,7 @@ def get_all_tasks():
     task_response = []
     for task in tasks:
         task_response.append(
-            {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
-            }
+            task.to_dict()
         )
     return jsonify(task_response)
 
@@ -92,25 +82,9 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
-    if task.goal_id:
-        return make_response(jsonify({
-            "task": {
-                "id": task.task_id,
-                "goal_id": task.goal_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
 
-            }
-        }), 200)
     return make_response(jsonify({
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-
-        }
+        "task": task.to_dict()
     }), 200)
 
 
@@ -126,13 +100,7 @@ def update_task(task_id):
     db.session.commit()
 
     return make_response(jsonify({
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-
-        }
+        "task": task.to_dict()
     }), 200)
 
 
@@ -169,16 +137,11 @@ def mark_complete(task_id):
     }
 
     result = {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True
-        }
+        "task": task.to_dict()
     }
 
     r = requests.post(SLACK_API_URL, headers=headers, data=data)
-    # r.json()
+
     return make_response(jsonify(result), 200)
 
 
@@ -196,11 +159,6 @@ def mark_incomplete(task_id):
 
     if not task.completed_at:
         result = {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
-            }}
+            "task": task.to_dict()}
 
     return make_response(jsonify(result), 200)
