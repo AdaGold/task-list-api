@@ -92,7 +92,7 @@ def get_one_task(task_id):
 #     # elif sort for desc
 #     # or sort == "desc"
 
-# @task_bp.route("", methods=["GET"])
+@task_bp.route("", methods=["GET"])
 # def get_tasks_sorted():
 #     sort_order = requests.args.get("sort")
     
@@ -104,6 +104,25 @@ def get_one_task(task_id):
 #         tasks = list(sorted_tasks)
         
 #     return tasks
+@task_bp.route("", methods=["GET"])
+def get_sorted_tasks():
+    
+    sort_order = request.args.get("sort")
+    
+    if sort_order == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_order == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
+        
+    ordered_tasks = []
+
+    for task in tasks:
+        ordered_tasks.append(task.to_dict())
+    
+    return jsonify(ordered_tasks), 200
+    
 
 ## UPDATE
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -160,7 +179,6 @@ def delete_task(task_id):
 #         healers_response.append({ "name": healer.name, "id": healer.id })
     
 #     return jsonify(healers_response)
-
 
 # @goal_bp.route("/<goal_id>/tasks", methods=["POST"])
 # def create_task_by_id(goal_id):

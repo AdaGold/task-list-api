@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String
 
 class Task(db.Model):
 
-    __tablename__ = "tasks"
+    # __tablename__ = "tasks"
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
@@ -34,14 +34,14 @@ class Task(db.Model):
                 'is_complete': bool(self.completed_at)
             }
         
-# `/tasks?sort=asc`
-# @task_bp.route("/<task_id>", methods=["GET"])
-    def asc(self):
-        pass
-    # someselect.order_by(asc(table1.mycol))
+# # `/tasks?sort=asc`
+# # @task_bp.route("/<task_id>", methods=["GET"])
+#     def asc(self):
+#         pass
+#     # someselect.order_by(asc(table1.mycol))
 
-    # `/tasks?sort=desc
-    def desc(task_id):
-        pass
+#     # `/tasks?sort=desc
+#     def desc(task_id):
+#         pass
         
-    # someselect.order_by(desc(table1.mycol))
+#     # someselect.order_by(desc(table1.mycol))
