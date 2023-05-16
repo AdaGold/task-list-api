@@ -37,7 +37,7 @@ def create_task():
 
 ## READ - ALL
 @task_bp.route("", methods=["GET"])
-def get_all_tasks():
+def read_all_tasks():
     task_query = request.args.get("sort")
     if task_query == 'asc':
         tasks = Task.query.order_by(Task.title.asc()).all()
