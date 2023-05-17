@@ -128,7 +128,7 @@ def patch_task_complete(task_id):
     
     params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title}."}
     
-    headers == {'Authorization': f"Bearer {os.environ.get('SLACKBOT_API_KEY')}"}
+    headers = {'Authorization': f"Bearer {os.environ.get('SLACKBOT_API_KEY')}"}
     requests.post(url=url, params=params, headers=headers)
 
     db.session.commit()
