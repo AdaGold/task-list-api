@@ -3,10 +3,16 @@ from app import db
 from app.models.task import Task
 from sqlalchemy import asc, desc
 from datetime import date, time, datetime
+import json
 import requests
 import os
+from dotenv import load_dotenv
     # uncomment when implementing goal model:
 # from app.models.goal import Goal
+
+load_dotenv()
+
+# token = os.environ.get("SLACKBOT_API_KEY")
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
     # uncomment when implementing goal model:
@@ -95,16 +101,39 @@ def patch_task_incomplete(task_id):
                 "is_complete": False}
             }     
     
-## UPDATE - COMPLETE
+# ## UPDATE - COMPLETE
+# @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+# def patch_task_complete(task_id):
+#     task = validate_model(Task, task_id)
+    
+#     task.completed_at = datetime.today()
+
+#     db.session.commit()
+#     return {'task': task.to_dict()}, 200
+
+## UPDATE - COMPLETE - SLACK
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_task_complete(task_id):
     task = validate_model(Task, task_id)
-    
     task.completed_at = datetime.today()
+    
+    # if headers != {'Authorization': f"Bearer {os.environ.get('SLACKBOT_API_KEY')}"}:
+    #     return {
+    #             "ok": False,
+    #             "error": "invalid_auth"
+    #         }, 400 .abort(status)
+
+    channel_id = 'task-notifications'
+    url = 'https://slack.com/api/chat.postMessage'
+    
+    params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title}."}
+    
+    headers == {'Authorization': f"Bearer {os.environ.get('SLACKBOT_API_KEY')}"}
+    requests.post(url=url, params=params, headers=headers)
 
     db.session.commit()
     return {'task': task.to_dict()}, 200
-    
+
 ## DELETE
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
