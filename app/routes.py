@@ -239,6 +239,6 @@ def read_tasks_by_goal(goal_id):
     }
     
     for task in goal.tasks: 
-        response_body["tasks"].append(task.id_to_dict())
+        response_body["tasks"].append(task.to_dict())
 
     return jsonify(response_body), 200
