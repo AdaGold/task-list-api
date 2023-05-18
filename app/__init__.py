@@ -25,17 +25,16 @@ def create_app(test_config=None):
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_TEST_DATABASE_URI")
 
+    from app.models.task import Task
+    from app.models.goal import Goal
+    
     db.init_app(app)
     migrate.init_app(app, db)
     
     from .routes import task_bp
-        # uncomment when implimenting Goal model:
-    # from .routes import task_bp, goal_bp
+    from .routes import goal_bp
 
     app.register_blueprint(task_bp)
+    app.register_blueprint(goal_bp)
     
-    from app.models.task import Task
-        # uncomment when implimenting Goal model:
-    # from app.models.goal import Goal
-
     return app

@@ -7,16 +7,12 @@ import json
 import requests
 import os
 from dotenv import load_dotenv
-    # uncomment when implementing goal model:
-# from app.models.goal import Goal
+from app.models.goal import Goal
 
 load_dotenv()
 
-# token = os.environ.get("SLACKBOT_API_KEY")
-
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-    # uncomment when implementing goal model:
-# goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def validate_model(cls, model_id):
     try:
@@ -147,73 +143,63 @@ def delete_task(task_id):
     }
 
 
-###############################
+############## GOALS #################
 
-    # review and evaluation implementing after task routes are passing tests:
-    # (code below references learn lessons and flasky live code for healer routes)
-    
-#### Goal Routes:
-# @goal_bp.route("", methods=['POST'])
-# # define a route for creating a task resource
-# def create_goal():
-#     request_body = request.get_json()
-    
-#     new_goal = Goal(
-#         title=request_body["title"]
-#     )
-    
-#     db.session.add(new_goal)
-#     db.session.commit()
-    
-#     return jsonify(f"New goal: {new_goal.title} successfully created!"), 201
 
-# @goal_bp.route("", methods=["GET"])
-# def read_all_goals():
+## CREATE
+@goal_bp.route("", methods=['POST'])
+def create_goal():
+    request_body = request.get_json()
     
-#     goals = Goal.query.all()
+    if not request_body.get('title'):
+        abort(make_response({"details": "Invalid data"}, 400))
         
-#     goals_response = []
+    new_goal = Goal.from_dict(request_body)
     
-#     for goal in goals:
-#         goals_response.append({ "name": goal.name, "id": goal.id })
+    db.session.add(new_goal)
+    db.session.commit()
+    return {"goal": goal.to_dict()}, 201
+
+## READ - ALL
+@task_bp.route("", methods=["GET"])
+def read_all_goals():
+    goals = Goal.query.all()
+    goals_response = []
     
-#     return jsonify(healers_response)
+    for goal in goals:
+        goal_dict = goal.to_dict()
+        goals_response.append(goal_dict)
+    
+    return jsonify(tasks_response), 200
 
-# @goal_bp.route("/<goal_id>/tasks", methods=["POST"])
-# def create_task_by_id(goal_id):
+## READ - ONE
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def read_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
 
-#     goal = validate_model(Goal, goal_id)
+    return {"goal": goal.to_dict()}, 200
 
-#     request_body = request.get_json()
+## UPDATE - PUT
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    
+    goal.title = request_body["title"]
 
-#     new_task = Task(
-#         title=request_body["title"],
-#         description=request_body["description"],
-#         completed_at=request_body["completed_at"],
-#         goal=goal
-#     )
+    db.session.commit()
+    
+    return {"goal": goal.to_dict()}, 200
 
-#     db.session.add(new_task)
-#     db.session.commit()
 
-#     return jsonify(f"Task {new_task.title} owned by {new_task.goal.title} was successfully created."), 201
-
-# @goal_bp.route("/<goal_id>/tasks", methods=["GET"])
-# def get_all_tasks_with_id(goal_id):
-#     goal = validate_model(Goal, goal_id)
-
-#     task_response = []
-
-#     for goal in goal.tasks:
-#         goal_response.append(task.to_dict())
-
-#     return jsonify(goal_response), 200
-
-# @goal_bp.route("/<goal_id>", methods=["GET"])
-# def get_goal_by_id(goal_id):
-#     goal = validate_model(Goal, goal_id)
-
-#     return jsonify({
-#         "id": goal.id,
-#         "title": goal.name
-#     }), 200
+## DELETE
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    
+    db.session.delete(goal)
+    db.session.commit()
+    
+    return {
+        "details": f'Task {goal_id} "{goal.title}" successfully deleted'
+    }, 200

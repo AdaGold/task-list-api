@@ -1,15 +1,13 @@
 from app import db
 
-# db = SQLAlchemy()
-
 class Task(db.Model):
-
-    # __tablename__ = "tasks"
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(120), nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True, default=None)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
+    goal = db.relationship("Goal", back_populates="tasks")
 
     @classmethod
     def from_dict(cls, task_data):
