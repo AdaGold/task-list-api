@@ -1,16 +1,23 @@
 import pytest
 from app import create_app
+from app.db import db
+from flask.signals import request_finished
+from dotenv import load_dotenv
+import os
 from app.models.task import Task
 from app.models.goal import Goal
-from app import db
 from datetime import datetime
-from flask.signals import request_finished
 
+load_dotenv()
 
 @pytest.fixture
 def app():
-    # create the app with a test config dictionary
-    app = create_app({"TESTING": True})
+    # create the app with a test configuration
+    test_config = {
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": os.environ.get('SQLALCHEMY_TEST_DATABASE_URI')
+    }
+    app = create_app(test_config)
 
     @request_finished.connect_via(app)
     def expire_session(sender, response, **extra):
@@ -35,8 +42,9 @@ def client(app):
 # This fixture creates a task and saves it in the database
 @pytest.fixture
 def one_task(app):
-    new_task = Task(
-        title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=None)
+    new_task = Task(title="Go on my daily walk 🏞", 
+                    description="Notice something new every day", 
+                    completed_at=None)
     db.session.add(new_task)
     db.session.commit()
 
@@ -48,12 +56,15 @@ def one_task(app):
 @pytest.fixture
 def three_tasks(app):
     db.session.add_all([
-        Task(
-            title="Water the garden 🌷", description="", completed_at=None),
-        Task(
-            title="Answer forgotten email 📧", description="", completed_at=None),
-        Task(
-            title="Pay my outstanding tickets 😭", description="", completed_at=None)
+        Task(title="Water the garden 🌷", 
+             description="", 
+             completed_at=None),
+        Task(title="Answer forgotten email 📧", 
+             description="", 
+             completed_at=None),
+        Task(title="Pay my outstanding tickets 😭", 
+             description="", 
+             completed_at=None)
     ])
     db.session.commit()
 
@@ -64,8 +75,9 @@ def three_tasks(app):
 # valid completed_at date
 @pytest.fixture
 def completed_task(app):
-    new_task = Task(
-        title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=datetime.utcnow())
+    new_task = Task(title="Go on my daily walk 🏞", 
+                    description="Notice something new every day", 
+                    completed_at=datetime.utcnow())
     db.session.add(new_task)
     db.session.commit()
 

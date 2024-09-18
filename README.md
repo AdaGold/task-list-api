@@ -2,7 +2,7 @@
 
 ## Skills Assessed
 
-- Following directions and reading comprehension
+- Gathering technical requirements from written documentation
 - Reading, writing, and using tests
 - Demonstrating understanding of the client-server model, request-response cycle and conventional RESTful routes
 - Driving development with independent research, experimentation, and collaboration

@@ -28,9 +28,9 @@ This wave requires more test writing.
 
 There should be a `Goal` model that lives in `app/models/goal.py`.
 
-Goals should contain these attributes. Feel free to change the name of the `goal_id` column if you would like. **The tests require the title column to be named exactly** as `title`.
+Goals should contain these attributes. **The tests require the title column to be named exactly** as `title`.
 
-- `goal_id`: a primary key for each goal
+- `id`: a primary key for each goal
 - `title`: text to name the goal
 
 ### Tips

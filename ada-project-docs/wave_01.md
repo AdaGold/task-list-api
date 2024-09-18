@@ -18,17 +18,17 @@ Our goal for this wave is to be able to create, read, update, and delete differe
 
 There should be a `Task` model that lives in `app/models/task.py`.
 
-Tasks should contain these attributes. Feel free to change the name of the `task_id` column if you would like. **The tests require the remaining columns to be named exactly** as `title`, `description`, and `completed_at`.
+Tasks should contain these attributes. **The tests require the following columns to be named exactly** as `title`, `description`, and `completed_at`.
 
-- `task_id`: a primary key for each task
+- `id`: a primary key for each task
 - `title`: text to name the task
 - `description`: text to describe the task
-- `completed_at`: a datetime that has the date that a task is completed on. **Can be _nullable_,** and contain a null value. A task with a `null` value for `completed_at` has not been completed. When we create a new task, `completed_at` should be `null` AKA `None` in Python.
+- `completed_at`: a datetime that represents the date that a task is completed on. **Can be _nullable_,** and contain a null value. A task with a `null` value for `completed_at` has not been completed. When we create a new task, `completed_at` should be `null` AKA `None` in Python.
 
 ### Tips
 
-- SQLAlchemy's column type for text is `db.String`. The column type for datetime is `db.DateTime`.
-- SQLAlchemy supports _nullable_ columns with specific syntax.
+- To work with date information, we can import the `datetime` data type with the import line `from datetime import datetime`. `datetime` 
+- SQLAlchemy supports optional, or _nullable_, columns with specific syntax.
 - Don't forget to run:
   - `flask db init` once during setup
   - `flask db migrate` every time there's a change in models, in order to generate migrations
@@ -37,8 +37,6 @@ Tasks should contain these attributes. Feel free to change the name of the `task
 - We can assume that the API will designate `is_complete` as `false`, until wave 3. (Read below for examples)
 
 ## CRUD for Tasks
-
-The following are required routes for wave 1. Feel free to implement the routes in any order within this wave.
 
 ### Tips
 
@@ -52,9 +50,15 @@ The following are required routes for wave 1. Feel free to implement the routes 
 
 ### CLI
 
-In addition to testing your code with pytest and postman, you can play test your code with the CLI (Command Line Interface) by running `python3 cli/main.py`. The flask server needs to be running to run the CLI.
+In addition to testing your code with pytest and postman, you can play test your code with the CLI (Command Line Interface) by running `python3 cli/main.py`. 
 
-### Create a Task: Valid Task With `null` `completed_at`
+The flask server needs to be running first before running the CLI.
+
+### CRUD Routes
+
+The following are required routes for wave 1. Feel free to implement the routes in any order within this wave.
+
+#### Create a Task: Valid Task With `null` `completed_at`
 
 As a client, I want to be able to make a `POST` request to `/tasks` with the following HTTP request body
 
@@ -83,7 +87,7 @@ and get this response:
 
 so that I know I successfully created a Task that is saved in the database.
 
-### Get Tasks: Getting Saved Tasks
+#### Get Tasks: Getting Saved Tasks
 
 As a client, I want to be able to make a `GET` request to `/tasks` when there is at least one saved task and get this response:
 
@@ -106,7 +110,7 @@ As a client, I want to be able to make a `GET` request to `/tasks` when there is
 ]
 ```
 
-### Get Tasks: No Saved Tasks
+#### Get Tasks: No Saved Tasks
 
 As a client, I want to be able to make a `GET` request to `/tasks` when there are zero saved tasks and get this response:
 
@@ -116,7 +120,7 @@ As a client, I want to be able to make a `GET` request to `/tasks` when there ar
 []
 ```
 
-### Get One Task: One Saved Task
+#### Get One Task: One Saved Task
 
 As a client, I want to be able to make a `GET` request to `/tasks/1` when there is at least one saved task and get this response:
 
@@ -133,7 +137,7 @@ As a client, I want to be able to make a `GET` request to `/tasks/1` when there 
 }
 ```
 
-### Update Task
+#### Update Task
 
 As a client, I want to be able to make a `PUT` request to `/tasks/1` when there is at least one saved task with this request body:
 
@@ -161,7 +165,7 @@ and get this response:
 
 Note that the update endpoint does update the `completed_at` attribute. This will be updated with custom endpoints implemented in Wave 03.
 
-### Delete Task: Deleting a Task
+#### Delete Task: Deleting a Task
 
 As a client, I want to be able to make a `DELETE` request to `/tasks/1` when there is at least one saved task and get this response:
 
@@ -173,7 +177,7 @@ As a client, I want to be able to make a `DELETE` request to `/tasks/1` when the
 }
 ```
 
-### No matching Task: Get, Update, and Delete
+#### No matching Task: Get, Update, and Delete
 
 As a client, if I make any of the following requests:
 
@@ -181,7 +185,7 @@ As a client, if I make any of the following requests:
   * `UPDATE` `/tasks/<task_id>`
   * `DELETE` `/tasks/<task_id>`
 
-and there is no existing task with `task_id`
+and there is no existing task with an `id` of `task_id`
 
 The response code should be `404`.
 
@@ -190,9 +194,9 @@ You may choose the response body.
 Make sure to complete the tests for non-existing tasks to check that the correct response body is returned.
  
 
-### Create a Task: Invalid Task With Missing Data
+#### Create a Task: Invalid Task With Missing Data
 
-#### Missing `title`
+##### Missing `title`
 
 As a client, I want to be able to make a `POST` request to `/tasks` with the following HTTP request body
 
@@ -215,21 +219,9 @@ and get this response:
 
 so that I know I did not create a Task that is saved in the database.
 
-#### Missing `description`
+##### Missing `description`
 
 If the HTTP request is missing `description`, we should also get this response:
-
-`400 Bad Request`
-
-```json
-{
-  "details": "Invalid data"
-}
-```
-
-#### Missing `completed_at`
-
-If the HTTP request is missing `completed_at`, we should also get this response:
 
 `400 Bad Request`
 

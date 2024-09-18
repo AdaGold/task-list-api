@@ -16,7 +16,7 @@ Secondly, we should create our new route, `/goals/<goal_id>/tasks`, so that our 
 
 ### Tips
 
-- Use independent research to discover how to set up a one-to-many relationship in Flask.
+- Use lesson materials and independent research to review how to set up a one-to-many relationship in Flask.
 - Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to the model.
 - Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any mispellings.
 - Use the tests in `tests/test_wave_06.py` to guide your implementation.
@@ -24,24 +24,18 @@ Secondly, we should create our new route, `/goals/<goal_id>/tasks`, so that our 
 
 ### Updates to the Goal Model
 
-Use independent research to discover how to set up a one-to-many relationship in Flask.
-
 The Goal model should have a _relationship_ with the model Task.
 
-After learning the strategy for creating a one-to-many relationship, in the Goal model, we recommend:
-
-- Setting the `lazy` value to `True`
+After reviewing the strategy for creating a one-to-many relationship, it is up to you if you would like to add convenience attributes for accessing the `Goal` model from it's related `Task`s and vice versa, accessing the list of associated `Task`s from a `Goal` model.
 
 ### Updates to the Task Model
 
-Use independent research to discover how to set up a one-to-many relationship in Flask.
-
 The Task model should belong to one `Goal`.
 
-After learning the strategy for creating a one-to-many relationship, in the Task model, we recommend:
+After reviewing the strategy for creating a one-to-many relationship, in the Task model, we recommend:
 
 - Setting the foreign key to `goal`'s primary key column
-- Setting the `nullable` to `True`
+- Setting `nullable` to `True`
 
 Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to the model.
 

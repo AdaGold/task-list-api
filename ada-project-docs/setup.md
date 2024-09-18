@@ -63,14 +63,14 @@ Run `$ flask db init`.
 
 **_After you make your first model in Wave 1_**, run the other commands `migrate` and `upgrade`.
 
-## Run `$ flask run` or `$ FLASK_ENV=development flask run`
+## Run `$ flask run` or `$ flask run --debug`
 
 Check that your Flask server can run with `$ flask run`.
 
 We can run the Flask server specifying that we're working in the development environment. This enables hot-reloading, which is a feature that refreshes the Flask server every time there is a detected change.
 
 ```bash
-$ FLASK_ENV=development flask run
+$ flask run --debug
 ```
 
 **It is highly recommended to run the Flask servers with this command**.
