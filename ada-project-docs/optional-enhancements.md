@@ -28,14 +28,6 @@ How would you write tests for it? How would you implement it?
 
 Your decisions should not break the other tests.
 
-### Re-organize Routes
-
-Consider refactoring how endpoints are written in the `routes.py` file.
-
-Here are some ideas to start:
-
-- Instead of having `if/elif` blocks to handle many HTTP methods in one route method, separate them into different route methods
-
 ### Model Instance Methods
 
 We can define instance methods in our model classes.
@@ -54,13 +46,13 @@ Here are some ideas to start:
 
 ### Use List Comprehensions
 
-Use list comprehensions in your `routes.py` logic.
+Use list comprehensions in your routes functions where applicable.
 
 ### Route Helper Methods
 
-If you have not already refactored your `routes.py` to use helper methods, do so now!
+If you have not already refactored your route files to use helper methods, do so now!
 
-Consider code with complex or repetitive logic, and refactor it into helper methods. Watch your `routes.py` file become cleaner and more readable!
+Consider code with complex or repetitive logic, and refactor it into helper methods. Watch your route files become cleaner and more readable!
 
 ### More Query Params
 
