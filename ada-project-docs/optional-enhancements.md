@@ -46,7 +46,7 @@ Here are some ideas to start:
 
 ### Use List Comprehensions
 
-Use list comprehensions in your routes functions where applicable.
+Use list comprehensions in your route functions where applicable.
 
 ### Route Helper Methods
 
