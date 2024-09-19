@@ -7,7 +7,7 @@ import requests
 import os
 
 
-SLACK_API_URL = "https://slack.com/api/chat.postMessage"
+SLACK_API_URL = os.environ["SLACK_API_URL"]
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
@@ -36,7 +36,7 @@ def create_task():
         new_task = Task.from_dict(request_body)
 
     except KeyError as error:
-        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        response = {"details": f"Invalid data"}
         abort(make_response(response, 400))
 
     db.session.add(new_task)
@@ -48,7 +48,7 @@ def create_task():
 @bp.get("/<task_id>")
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
-    return task.to_dict()
+    return {"task": task.to_dict()}
 
 
 @bp.put("/<task_id>")
@@ -62,7 +62,7 @@ def update_task(task_id):
     db.session.add(task)
     db.session.commit()
 
-    return Response(status=204, mimetype="application/json") # 204 No Content
+    return {"task": task.to_dict()}
 
 
 @bp.delete("/<task_id>")
@@ -71,7 +71,8 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return Response(status=204, mimetype="application/json")
+    message = f"Task {task_id} \"{task.title}\" successfully deleted"
+    return {"details": message}
 
 
 @bp.patch("/<task_id>/mark_complete")
@@ -84,7 +85,7 @@ def mark_task_complete(task_id):
 
     #post_to_slack(task)
 
-    return Response(status=204, mimetype="application/json")
+    return {"task": task.to_dict()}
 
 
 @bp.patch("/<task_id>/mark_incomplete")
@@ -97,7 +98,7 @@ def mark_task_incomplete(task_id):
     
     #post_to_slack(task)
 
-    return Response(status=204, mimetype="application/json")
+    return {"task": task.to_dict()}
 
 
 def post_to_slack(task):
