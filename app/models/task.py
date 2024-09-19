@@ -20,7 +20,7 @@ class Task(db.Model):
             completed = False
 
         task_dict = {
-            "id": self.task_id,
+            "id": self.id,
             "title": self.title,
             "description": self.description,
             "is_complete": completed,
@@ -36,11 +36,11 @@ class Task(db.Model):
         completed_at = task_data.get("completed_at")
         goal_id = task_data.get("goal_id")
 
-        new_book = cls(
+        new_task = cls(
             title=task_data["title"],
             description=task_data["description"],
             completed_at=completed_at,
             goal_id=goal_id
         )
 
-        return new_book
+        return new_task
