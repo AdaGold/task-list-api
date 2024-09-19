@@ -35,7 +35,7 @@ The Task model should belong to one `Goal`.
 After reviewing the strategy for creating a one-to-many relationship, in the Task model, we recommend:
 
 - Setting the foreign key to `goal`'s primary key column
-- Setting `nullable` to `True`
+- Using `Optional` syntax to make the attribute nullable
 
 Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to the model.
 
