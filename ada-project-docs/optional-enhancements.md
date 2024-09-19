@@ -44,7 +44,7 @@ Consider places in your code that deal with one model at a time. Is there any re
 
 Here are some ideas to start:
 
-- Create an instance method in `Task` named `to_json()`
+- Create an instance method in `Task` named `to_dict()`
     - Converts a `Task` instance into JSON
     - Returns a Python dictionary in the shape of the JSON our API returns in the `GET` `/tasks` route
 - Create a class method in `Task` named `from_json()`
