@@ -10,7 +10,7 @@ Tasks are entities that describe a task a user wants to complete. They contain a
 - description to hold details about the task
 - an optional datetime that the task is completed on
 
-Our goal for this wave is to be able to create, read, update, and delete different tasks. We will create RESTful routes for this different operations.
+Our goal for this wave is to be able to create, read, update, and delete different tasks. We will create RESTful routes for these different operations.
 
 # Requirements
 
@@ -163,7 +163,7 @@ and get this response:
 }
 ```
 
-Note that the update endpoint does update the `completed_at` attribute. This will be updated with custom endpoints implemented in Wave 03.
+Note that the update endpoint does update the `completed_at` attribute. This will be updated with custom endpoints implemented in Wave 3.
 
 #### Delete Task: Deleting a Task
 

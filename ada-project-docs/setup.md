@@ -9,7 +9,7 @@ The goal for setup is to cover all of the set up needed at the beginning of this
 1. Setting up development and test databases
 1. Setting up a `.env` file
 1. Running `$ flask db init`
-1. Running `$ flask run` and `$ FLASK_ENV=development flask run`
+1. Running `$ flask run` and `$ flask run --debug`
 
 # Requirements
 
