@@ -27,7 +27,7 @@ Tasks should contain these attributes. **The tests require the following columns
 
 ### Tips
 
-- To work with date information, we can import the `datetime` data type with the import line `from datetime import datetime`. `datetime` 
+- To work with date information, we can import the `datetime` data type with the import line `from datetime import datetime`. 
 - SQLAlchemy supports optional, or _nullable_, columns with specific syntax.
 - Don't forget to run:
   - `flask db init` once during setup
@@ -177,7 +177,7 @@ As a client, I want to be able to make a `DELETE` request to `/tasks/1` when the
 }
 ```
 
-#### No matching Task: Get, Update, and Delete
+#### No Matching Task: Get, Update, and Delete
 
 As a client, if I make any of the following requests:
 
