@@ -1,12 +1,12 @@
 from flask import Blueprint, abort, make_response, request, Response
-from ..models.task import Task
-from ..db import db
+from app.models.task import Task
+from app.db import db
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 @tasks_bp.post("")
 def create_task():
-    request_body = request.get_json()
+    request_body = is_valid_task(request.get_json())
 
     title = request_body["title"]
     description = request_body["description"]
@@ -27,6 +27,7 @@ def get_all_tasks():
 @tasks_bp.get("/<task_id>")
 def get_saved_task_by_id(task_id):
     task = validate_task(task_id)
+
     return {"task": task.to_dict()}, 200
 
 @tasks_bp.put("/<task_id>")
@@ -61,4 +62,11 @@ def validate_task(task_id):
 
     if not task:
         abort(make_response({"message": f"Task {task_id} not found"}, 404))
+
     return task
+
+def is_valid_task(task_body):
+    if "title" in task_body and "description" in task_body:
+        return task_body
+    
+    abort(make_response({"details": "Invalid data"}, 400))
