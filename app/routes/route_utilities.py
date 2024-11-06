@@ -8,8 +8,6 @@ load_dotenv()
 API_KEY = os.environ.get("API_KEY")
 CHANNEL_ID = os.environ.get("CHANNEL_ID")
 
-
-
 def create_model(cls, model_data):
     try:
         model = cls.from_dict(model_data)
@@ -21,7 +19,7 @@ def create_model(cls, model_data):
     db.session.add(model)
     db.session.commit()
 
-    return {"task": model.to_dict()}, 201
+    return model.to_dict()
 
 def validate_model(cls, model_id):
     try:
