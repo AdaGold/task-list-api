@@ -1,9 +1,10 @@
 from flask import Blueprint, request
 from sqlalchemy import desc
 from datetime import datetime
-from app.routes.route_utilities import create_model, validate_model
+from app.routes.route_utilities import create_model, validate_model, send_slack_message
 from app.models.task import Task
 from app.db import db
+
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -52,7 +53,9 @@ def update_task_as_complete(task_id):
 
     db.session.commit()
 
-    # make call to Slack API, post message to workspace and channel
+    text_message = f"Someone just completed the task {task.title}"
+    send_slack_message(text_message)
+
     return {"task": task.to_dict()}, 200
 
 @tasks_bp.patch("/<task_id>/mark_incomplete")

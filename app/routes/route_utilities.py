@@ -1,5 +1,14 @@
 from flask import abort, make_response
 from app.db import db
+import os, requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.environ.get("API_KEY")
+CHANNEL_ID = os.environ.get("CHANNEL_ID")
+
+
 
 def create_model(cls, model_data):
     try:
@@ -29,5 +38,26 @@ def validate_model(cls, model_id):
     
     response = {"message": f"Invalid request: {cls.__name__} {model_id} not found"}
     abort(make_response(response, 404))
+
+def send_slack_message(message):
+    url = "https://slack.com/api/chat.postMessage"
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    request_body = {
+        "channel": CHANNEL_ID,
+        "text": message
+        }
+
+    try:
+        response = requests.post(url=url, headers=headers, json=request_body)
+
+        response.raise_for_status()
+        return response.json()
+    
+    except:
+        abort(make_response({"message": "Unknkown request"}, 400))
 
     
