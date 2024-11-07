@@ -48,6 +48,6 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    response = f"Goal {goal_id} {goal.title} successfully deleted"
+    response = f"Goal {goal_id} \"{goal.title}\" successfully deleted"
 
     return {"details": response}
