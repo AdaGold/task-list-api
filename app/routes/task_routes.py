@@ -6,37 +6,36 @@ from app.models.task import Task
 from app.db import db
 
 
-tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
-@tasks_bp.post("")
+@bp.post("")
 def create_task():
-    request_body = request.get_json()
-    response = create_model(Task, request_body)
-
+    response = create_model(Task, request.get_json())
     return {"task": response}, 201
 
-@tasks_bp.get("")
-def get_all_tasks():
+
+@bp.get("")
+def get_tasks():
     sort_param = request.args.get("sort")
     query = db.select(Task)
-    
-    if sort_param:
-        if sort_param == "desc":
-            query = query.order_by(desc(Task.title))
-        else:
-            query = query.order_by(Task.title)
+
+    if sort_param == "desc":
+        query = query.order_by(desc(Task.title))
+    else:
+        query = query.order_by(Task.title)
 
     tasks = db.session.scalars(query)
     
-    return [task.to_dict() for task in tasks], 200
+    return [task.to_dict() for task in tasks]
 
-@tasks_bp.get("/<task_id>")
-def get_saved_task_by_id(task_id):
+
+@bp.get("/<task_id>")
+def get_task_by_id(task_id):
     task = validate_model(Task, task_id)
+    return {"task": task.to_dict()}
 
-    return {"task": task.to_dict()}, 200
 
-@tasks_bp.put("/<task_id>")
+@bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
@@ -46,34 +45,36 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_dict()}
 
-@tasks_bp.patch("/<task_id>/mark_complete")
+
+@bp.patch("/<task_id>/mark_complete")
 def update_task_as_complete(task_id):
     task = validate_model(Task, task_id)
-    task.completed_at = datetime.now()
 
+    task.completed_at = datetime.now()
     db.session.commit()
 
-    text_message = f"Someone just completed the task {task.title}"
-    send_slack_message(text_message)
+    send_slack_message(task.title)
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_dict()}
 
-@tasks_bp.patch("/<task_id>/mark_incomplete")
+
+@bp.patch("/<task_id>/mark_incomplete")
 def update_task_as_incomplete(task_id):
     task = validate_model(Task, task_id)
-    task.completed_at = None
 
+    task.completed_at = None
     db.session.commit()
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_dict()}
 
-@tasks_bp.delete("/<task_id>")
+
+@bp.delete("/<task_id>")
 def delete_task(task_id):
     task = validate_model(Task, task_id)
     
     db.session.delete(task)
     db.session.commit()
 
-    return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
+    return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}

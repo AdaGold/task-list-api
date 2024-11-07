@@ -21,9 +21,11 @@ def create_model(cls, model_data):
 
     return model.to_dict()
 
+
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
+
     except ValueError:
         response = {"message": f"Invalid request: {cls.__name__} id {model_id} invalid"}
         abort(make_response(response, 400))
@@ -37,7 +39,8 @@ def validate_model(cls, model_id):
     response = {"message": f"Invalid request: {cls.__name__} {model_id} not found"}
     abort(make_response(response, 404))
 
-def send_slack_message(message):
+
+def send_slack_message(task_title):
     url = "https://slack.com/api/chat.postMessage"
 
     headers = {
@@ -46,12 +49,11 @@ def send_slack_message(message):
 
     request_body = {
         "channel": CHANNEL_ID,
-        "text": message
+        "text": f"Someone just completed the task {task_title}"
         }
 
     try:
         response = requests.post(url=url, headers=headers, json=request_body)
-
         response.raise_for_status()
         return response.json()
     

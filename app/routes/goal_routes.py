@@ -19,7 +19,6 @@ def create_task_ids_by_goal(goal_id):
 
     try:
         task_ids = request_body["task_ids"]
-
         for task_id in task_ids:
             task = validate_model(Task, task_id)
             goal.tasks.append(task)
@@ -34,7 +33,7 @@ def create_task_ids_by_goal(goal_id):
     
 
 @bp.get("")
-def get_all_goals():
+def get_goals():
     query = db.select(Goal).order_by(Goal.id)
     goals = db.session.scalars(query)
 
@@ -42,7 +41,7 @@ def get_all_goals():
 
 
 @bp.get("/<goal_id>")
-def get_goal(goal_id):
+def get_goal_by_id(goal_id):
     goal = validate_model(Goal, goal_id)
     return {"goal": goal.to_dict()}
 
@@ -50,8 +49,10 @@ def get_goal(goal_id):
 @bp.get("/<goal_id>/tasks")
 def get_tasks_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
+
     goal_dict = goal.to_dict()
     goal_dict["tasks"] = [task.to_dict() for task in goal.tasks]
+    
     return goal_dict
 
 

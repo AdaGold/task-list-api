@@ -4,13 +4,11 @@ import pytest
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_post_task_ids_to_goal(client, one_goal, three_tasks):
-    # Act
     response = client.post("/goals/1/tasks", json={
         "task_ids": [1, 2, 3]
     })
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 200
     assert "id" in response_body
     assert "task_ids" in response_body
@@ -25,13 +23,11 @@ def test_post_task_ids_to_goal(client, one_goal, three_tasks):
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_post_task_ids_to_goal_already_with_goals(client, one_task_belongs_to_one_goal, three_tasks):
-    # Act
     response = client.post("/goals/1/tasks", json={
         "task_ids": [1, 4]
     })
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 200
     assert "id" in response_body
     assert "task_ids" in response_body
@@ -44,11 +40,9 @@ def test_post_task_ids_to_goal_already_with_goals(client, one_task_belongs_to_on
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_for_specific_goal_no_goal(client):
-    # Act
     response = client.get("/goals/1/tasks")
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 404
     assert "message" in response_body 
     assert response_body == {"message": "Invalid request: Goal 1 not found"}
@@ -56,11 +50,9 @@ def test_get_tasks_for_specific_goal_no_goal(client):
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_for_specific_goal_no_tasks(client, one_goal):
-    # Act
     response = client.get("/goals/1/tasks")
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 200
     assert "tasks" in response_body
     assert len(response_body["tasks"]) == 0
@@ -73,12 +65,9 @@ def test_get_tasks_for_specific_goal_no_tasks(client, one_goal):
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_for_specific_goal(client, one_task_belongs_to_one_goal):
-    # Act
     response = client.get("/goals/1/tasks")
     response_body = response.get_json()
-    print(response_body)
 
-    # Assert
     assert response.status_code == 200
     assert "tasks" in response_body
     assert len(response_body["tasks"]) == 1
