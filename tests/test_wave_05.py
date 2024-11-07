@@ -1,5 +1,6 @@
 import pytest
 from app.models.goal import Goal
+from app.db import db
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -81,7 +82,7 @@ def test_update_goal(client, one_goal):
     assert response.status_code == 200
     assert "goal" in response_body
     assert response_body == {"goal": {"title": "Grab broccoli on the way home", "id": 1}}
-    goal = Goal.query.get(1)
+    goal = db.session.get(Goal, 1)
     assert goal.title == "Grab broccoli on the way home"
 
 

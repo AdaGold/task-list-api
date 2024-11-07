@@ -32,7 +32,6 @@ def validate_model(cls, model_id):
 
     query = db.select(cls).where(cls.id == model_id)
     model = db.session.scalar(query)
-
     if model:
         return model
     
@@ -42,11 +41,7 @@ def validate_model(cls, model_id):
 
 def send_slack_message(task_title):
     url = "https://slack.com/api/chat.postMessage"
-
-    headers = {
-        "Authorization": f"Bearer {API_KEY}"
-    }
-
+    headers = {"Authorization": f"Bearer {API_KEY}"}
     request_body = {
         "channel": CHANNEL_ID,
         "text": f"Someone just completed the task {task_title}"

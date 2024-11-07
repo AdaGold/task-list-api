@@ -13,7 +13,7 @@ def create_goal():
 
 
 @bp.post("/<goal_id>/tasks")
-def create_task_ids_by_goal(goal_id):
+def add_tasks_to_goal(goal_id):
     request_body = request.get_json()
     goal = validate_model(Goal, goal_id)
 
@@ -33,7 +33,7 @@ def create_task_ids_by_goal(goal_id):
     
 
 @bp.get("")
-def get_goals():
+def view_goals():
     query = db.select(Goal).order_by(Goal.id)
     goals = db.session.scalars(query)
 
@@ -41,13 +41,13 @@ def get_goals():
 
 
 @bp.get("/<goal_id>")
-def get_goal_by_id(goal_id):
+def view_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return {"goal": goal.to_dict()}
 
 
 @bp.get("/<goal_id>/tasks")
-def get_tasks_by_goal(goal_id):
+def view_tasks_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     goal_dict = goal.to_dict()

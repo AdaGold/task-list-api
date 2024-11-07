@@ -51,7 +51,6 @@ def update_task(task_id):
 @bp.patch("/<task_id>/mark_complete")
 def update_task_as_complete(task_id):
     task = validate_model(Task, task_id)
-
     task.completed_at = datetime.now()
     db.session.commit()
 
@@ -63,7 +62,6 @@ def update_task_as_complete(task_id):
 @bp.patch("/<task_id>/mark_incomplete")
 def update_task_as_incomplete(task_id):
     task = validate_model(Task, task_id)
-
     task.completed_at = None
     db.session.commit()
 
