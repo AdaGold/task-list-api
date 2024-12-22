@@ -19,10 +19,12 @@ def get_tasks():
     sort_param = request.args.get("sort")
     query = db.select(Task)
 
-    if sort_param == "desc":
-        query = query.order_by(desc(Task.title))
-    else:
-        query = query.order_by(Task.title)
+    sort_method = request.args.get('sort')
+
+    if sort_method and sort_method == "asc":
+        query = query.order_by(Task.id.asc())
+    if sort_method and sort_method == "desc":
+        query = query.order_by(Task.id.desc())
 
     tasks = db.session.scalars(query)
     
