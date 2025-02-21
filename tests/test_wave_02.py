@@ -1,13 +1,11 @@
 import pytest
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_sorted_asc(client, three_tasks):
-    # Act
     response = client.get("/tasks?sort=asc")
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 200
     assert len(response_body) == 3
     assert response_body == [
@@ -29,13 +27,11 @@ def test_get_tasks_sorted_asc(client, three_tasks):
     ]
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_sorted_desc(client, three_tasks):
-    # Act
     response = client.get("/tasks?sort=desc")
     response_body = response.get_json()
 
-    # Assert
     assert response.status_code == 200
     assert len(response_body) == 3
     assert response_body == [
