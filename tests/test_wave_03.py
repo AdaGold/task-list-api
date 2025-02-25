@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 from datetime import datetime
 from app.models.task import Task
+from app.db import db
 import pytest
 
 
@@ -25,41 +26,24 @@ def test_mark_complete_on_incomplete_task(client, one_task):
 
         # Act
         response = client.patch("/tasks/1/mark_complete")
-    response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 200
-    assert "task" in response_body
-    assert response_body["task"]["is_complete"] == True
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": True
-        }
-    }
-    assert Task.query.get(1).completed_at
+    assert response.status_code == 204
+    
+    query = db.select(Task).where(Task.id == 1)
+    assert db.session.scalar(query).completed_at
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_complete_task(client, completed_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
-    response_body = response.get_json()
+    
 
     # Assert
-    assert response.status_code == 200
-    assert response_body["task"]["is_complete"] == False
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": False
-        }
-    }
-    assert Task.query.get(1).completed_at == None
+    assert response.status_code == 204
+    query = db.select(Task).where(Task.id == 1)
+    assert db.session.scalar(query).completed_at == None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -78,45 +62,30 @@ def test_mark_complete_on_completed_task(client, completed_task):
     There is no action needed here, the tests should work as-is.
     """
     with patch("requests.post") as mock_get:
-        mock_get.return_value.status_code = 200
+        mock_get.return_value.status_code = 204
 
         # Act
         response = client.patch("/tasks/1/mark_complete")
-    response_body = response.get_json()
+    
 
     # Assert
-    assert response.status_code == 200
-    assert "task" in response_body
-    assert response_body["task"]["is_complete"] == True
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": True
-        }
-    }
-    assert Task.query.get(1).completed_at
+    assert response.status_code == 204
+    query = db.select(Task).where(Task.id == 1)
+    assert db.session.scalar(query).completed_at
+    
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_incomplete_task(client, one_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
-    response_body = response.get_json()
+
 
     # Assert
-    assert response.status_code == 200
-    assert response_body["task"]["is_complete"] == False
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": False
-        }
-    }
-    assert Task.query.get(1).completed_at == None
+    assert response.status_code == 204
+   
+    query = db.select(Task).where(Task.id == 1)
+    assert db.session.scalar(query).completed_at == None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -151,7 +120,7 @@ def test_create_task_with_valid_completed_at(client):
     response = client.post("/tasks", json={
         "title": "A Brand New Task",
         "description": "Test Description",
-        "completed_at": datetime.utcnow()
+        "completed_at": datetime.now()
     })
     response_body = response.get_json()
 
@@ -166,7 +135,9 @@ def test_create_task_with_valid_completed_at(client):
             "is_complete": True
         }
     }
-    new_task = Task.query.get(1)
+
+    query = db.select(Task).where(Task.id == 1)
+    new_task = db.session.scalar(query)
     assert new_task
     assert new_task.title == "A Brand New Task"
     assert new_task.description == "Test Description"
@@ -181,22 +152,14 @@ def test_update_task_with_completed_at_date(client, completed_task):
     response = client.put("/tasks/1", json={
         "title": "Updated Task Title",
         "description": "Updated Test Description",
-        "completed_at": datetime.utcnow()
+        "completed_at": datetime.now()
     })
-    response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 200
-    assert "task" in response_body
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Updated Task Title",
-            "description": "Updated Test Description",
-            "is_complete": True
-        }
-    }
-    task = Task.query.get(1)
+    assert response.status_code == 204
+
+    query = db.select(Task).where(Task.id == 1)
+    task = db.session.scalar(query)
     assert task.title == "Updated Task Title"
     assert task.description == "Updated Test Description"
     assert task.completed_at

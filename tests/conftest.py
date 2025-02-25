@@ -57,14 +57,14 @@ def one_task(app):
 def three_tasks(app):
     db.session.add_all([
         Task(title="Water the garden 🌷", 
-             description="", 
-             completed_at=None),
+            description="", 
+            completed_at=None),
         Task(title="Answer forgotten email 📧", 
-             description="", 
-             completed_at=None),
+            description="", 
+            completed_at=None),
         Task(title="Pay my outstanding tickets 😭", 
-             description="", 
-             completed_at=None)
+            description="", 
+            completed_at=None)
     ])
     db.session.commit()
 
@@ -77,7 +77,7 @@ def three_tasks(app):
 def completed_task(app):
     new_task = Task(title="Go on my daily walk 🏞", 
                     description="Notice something new every day", 
-                    completed_at=datetime.utcnow())
+                    completed_at=datetime.now())
     db.session.add(new_task)
     db.session.commit()
 
@@ -99,7 +99,9 @@ def one_goal(app):
 # goal has this task, and the task belongs to one goal
 @pytest.fixture
 def one_task_belongs_to_one_goal(app, one_goal, one_task):
-    task = Task.query.first()
-    goal = Goal.query.first()
+    task_query = db.select(Task).where(Task.id == 1)
+    goal_query = db.select(Goal).where(Goal.id == 1)
+    task = db.session.scalar(task_query)
+    goal = db.session.scalar(goal_query)
     goal.tasks.append(task)
     db.session.commit()

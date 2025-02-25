@@ -83,17 +83,9 @@ def test_update_goal(client, one_goal):
     response = client.put("/goals/1", json={
         "title": "Updated Goal Title"
     })
-    response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 200
-    assert "goal" in response_body
-    assert response_body == {
-        "goal": {
-            "id": 1,
-            "title": "Updated Goal Title"
-        }
-    }
+    assert response.status_code == 204
 
 
 def test_update_goal_not_found(client):
@@ -112,14 +104,9 @@ def test_update_goal_not_found(client):
 def test_delete_goal(client, one_goal):
     # Act
     response = client.delete("/goals/1")
-    response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 200
-    assert "details" in response_body
-    assert response_body == {
-        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
-    }
+    assert response.status_code == 204
 
     # Check that the goal was deleted
     response = client.get("/goals/1")
