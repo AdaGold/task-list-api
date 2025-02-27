@@ -6,7 +6,7 @@ from app.db import db
 import pytest
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_on_incomplete_task(client, one_task):
     # Arrange
     """
@@ -34,7 +34,7 @@ def test_mark_complete_on_incomplete_task(client, one_task):
     assert db.session.scalar(query).completed_at
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_complete_task(client, completed_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
@@ -46,7 +46,7 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
     assert db.session.scalar(query).completed_at == None
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_on_completed_task(client, completed_task):
     # Arrange
     """
@@ -74,7 +74,7 @@ def test_mark_complete_on_completed_task(client, completed_task):
     query = db.select(Task).where(Task.id == 1)
     assert db.session.scalar(query).completed_at
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_incomplete_task(client, one_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
@@ -86,7 +86,7 @@ def test_mark_incomplete_on_incomplete_task(client, one_task):
     assert db.session.scalar(query).completed_at == None
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_missing_task(client):
     # Act
     response = client.patch("/tasks/1/mark_complete")
@@ -94,14 +94,11 @@ def test_mark_complete_missing_task(client):
 
     # Assert
     assert response.status_code == 404
-
-    raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
+    assert "message" in response_body
+    assert response_body["message"] == "Task 1 not found"
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
@@ -109,8 +106,57 @@ def test_mark_incomplete_missing_task(client):
 
     # Assert
     assert response.status_code == 404
+    assert "message" in response_body
+    assert response_body["message"] == "Task 1 not found"
 
-    raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
+# Let's add this test for creating tasks, now that
+# the completion functionality has been implemented
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_create_task_with_valid_completed_at(client):
+    # Act
+    response = client.post("/tasks", json={
+        "title": "A Brand New Task",
+        "description": "Test Description",
+        "completed_at": datetime.now()
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert "task" in response_body
+    assert response_body == {
+        "task": {
+            "id": 1,
+            "title": "A Brand New Task",
+            "description": "Test Description",
+            "is_complete": True
+        }
+    }
+
+    query = db.select(Task).where(Task.id == 1)
+    new_task = db.session.scalar(query)
+    assert new_task
+    assert new_task.title == "A Brand New Task"
+    assert new_task.description == "Test Description"
+    assert new_task.completed_at
+
+
+# Let's add this test for updating tasks, now that
+# the completion functionality has been implemented
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_update_task_with_completed_at_date(client, completed_task):
+    # Act
+    response = client.put("/tasks/1", json={
+        "title": "Updated Task Title",
+        "description": "Updated Test Description",
+        "completed_at": datetime.now()
+    })
+
+    # Assert
+    assert response.status_code == 204
+
+    query = db.select(Task).where(Task.id == 1)
+    task = db.session.scalar(query)
+    assert task.title == "Updated Task Title"
+    assert task.description == "Updated Test Description"
+    assert task.completed_at
