@@ -4,7 +4,7 @@ We will need to complete part – or all – of some of the tests for this proje
 
 You may wish to review details about how to run tests [here](https://github.com/AdaGold/viewing-party#details-about-how-to-run-tests).
 
-Recall that it is always a good idea to search the file for any `@pytest.mark.skip` decorators you may have missed before moving to the next wave.
+Recall that it is always a good idea to search the file for any `# @pytest.mark.skip` decorators you may have missed before moving to the next wave.
 
 ### Code Coverage
 
