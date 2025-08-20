@@ -111,11 +111,9 @@ def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
     assert "task" in response_body
     assert "goal_id" in response_body["task"]
     assert response_body == {
-        "task": {
-            "id": 1,
-            "goal_id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": False
-        }
+        "id": 1,
+        "goal_id": 1,
+        "title": "Go on my daily walk 🏞",
+        "description": "Notice something new every day",
+        "is_complete": False
     }
