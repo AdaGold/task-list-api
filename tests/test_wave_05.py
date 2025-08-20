@@ -68,7 +68,6 @@ def test_create_goal(client):
 
     # Assert
     assert response.status_code == 201
-    assert "goal" in response_body
     assert response_body == {
         "id": 1,
         "title": "My New Goal"
