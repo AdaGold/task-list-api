@@ -6,7 +6,7 @@ Our task list API should be able to work with an entity called `Goal`.
 - `Goal`s are entities that describe a task a user wants to complete.
 - They contain a title to name the goal.
 
-For this wave, we want to be able to create, read, update, and delete different `Goal`s. We will create RESTful routes for these different operations.
+Our plan for this wave is to be able to create, read, update, and delete different `Goal`s. We will create RESTful routes for these different operations.
 
 ## Writing Tests
 
