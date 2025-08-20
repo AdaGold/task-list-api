@@ -3,22 +3,21 @@
 ## Goal
 
 Our task list API should be able to work with an entity called `Goal`.
+- `Goal`s are entities that describe a task a user wants to complete.
+- They contain a title to name the goal.
 
-Goals are entities that describe a task a user wants to complete.
-
-They contain a title to name the goal.
-
-Our goal for this wave is to be able to create, read, update, and delete different goals. We will create RESTful routes for these different operations.
+For this wave, we want to be able to create, read, update, and delete different `Goal`s. We will create RESTful routes for these different operations.
 
 ## Writing Tests
 
-This wave requires more test writing. 
+This wave requires more test writing. The tests you need to write are scaffolded in the `test_wave_05.py` file. 
 - As with incomplete tests in other waves, you should comment out the `Exception` when implementing a test.
-- The tests you need to write are scaffolded in the `test_wave_05.py` file. 
-  - These tests are currently skipped with `@pytest.mark.skip(reason="test to be completed by student")` and the function body has `pass` in it. Once you implement these tests you should remove the `skip` decorator and the `pass`.
-- For the tests you write, use the requirements in this document to guide your test writing. 
-  - Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any misspellings.
+- These tests are currently skipped with `@pytest.mark.skip(reason="test to be completed by student")` and the function body has `pass` in it. 
+  - Once you implement these tests you should remove the `skip` decorator and the `pass`.
+
+For the tests you write, use the requirements in this document to guide your test writing. 
 - You can model your tests off of the Wave 1 tests for Tasks.
+- Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any misspellings.
 - Some tests use a [fixture](https://docs.pytest.org/en/6.2.x/fixture.html) named `one_goal` that is defined in `tests/conftest.py`. This fixture saves a specific goal to the test database.
 
 
@@ -38,6 +37,12 @@ Goals should contain these attributes. **The tests require the title column to b
 - Don't forget to run:
   - `flask db migrate` every time there's a change in models, in order to generate migrations
   - `flask db upgrade` to run all generated migrations
+- Similar to the Task model, we could add a class method to the Goal model that initializes a new instance from a dictionary, and use this method in relevant routes. 
+  - If all of our models have this method, we could create a route helper method that initializes a new model instance from a dictionary, and use it in any route that creates a new model instance.
+- Also like the Task model, notice that routes that return a JSON response are sending a dictionary representation of the goal that was fetched or created. 
+  - Creating a model helper method to return this dictionary, which we can then use to help build these route responses, will improve the consistency of our endpoints.
+- Further, we should remember that retrieving a model by its ID is a common operation. We should consider creating a route helper method that can retrieve a model by its ID, and use it for relevant routes. 
+  - This method would be very similar in functionality to retrieving a Task model by its ID, so rather than making an entirely new route helper method, we could generalize any similar function to also work with a Goal (or any other model).
 
 ## CRUD for Goals
 
@@ -59,18 +64,12 @@ and get this response:
 
 ```json
 {
-  "goal": {
-    "id": 1,
-    "title": "My New Goal"
-  }
+  "id": 1,
+  "title": "My New Goal"
 }
 ```
 
 so that I know I successfully created a goal that is saved in the database.
-
-Similar to the Task model, we could add a class method to the Goal model that initializes a new instance from a dictionary, and use this method in the route. If all of our models have this method, we could create a route helper method that initializes a new model instance from a dictionary, and use it in this route and any other route that creates a new model instance.
-
-Also like the Task model, notice that the data nested under the `"goal"` key is a dictionary representation of the goal that was created. Creating a model helper method to return this dictionary, which we can then use to help build this route response, will improve the consistency of our endpoints.
 
 ### Get Goals: Getting Saved Goals
 
@@ -91,8 +90,6 @@ As a client, I want to be able to make a `GET` request to `/goals` when there is
 ]
 ```
 
-Notice that each data item in the list is a dictionary representation of a goal. Creating a model helper method to return this dictionary, which we can then use to help build this route response, will improve the consistency of our endpoints.
-
 ### Get Goals: No Saved Goals
 
 As a client, I want to be able to make a `GET` request to `/goals` when there are zero saved goals and get this response:
@@ -111,17 +108,10 @@ As a client, I want to be able to make a `GET` request to `/goals/1` when there 
 
 ```json
 {
-  "goal": {
-    "id": 1,
-    "title": "Build a habit of going outside daily"
-  }
+  "id": 1,
+  "title": "Build a habit of going outside daily"
 }
 ```
-
-Notice that the data nested under the `"goal"` key is a dictionary representation of the goal that was retrieved. Creating a model helper method to return this dictionary, which we can then use to help build this route response, will improve the consistency of our endpoints.
-
-Further, we should remember that retrieving a model by its ID is a common operation. We should consider creating a route helper method that can retrieve a model by its ID, and use it in this route. This method would be very similar in functionality to retrieving a Task model by its ID, so rather than making an entirely new route helper method, we could generalize any similar Task model method to work also work with a Goal (or any other model).
-
 
 ### Update Goal
 
@@ -139,8 +129,6 @@ and get this response:
 
 The response should have a mimetype of "application/json" to keep our API response type consistent.
 
-We should remember that retrieving a model by its ID is a common operation. We should consider creating a route helper method that can retrieve a model by its ID, and use it in this route. This method could be written to work for Goal models, Task models, or any other model.
-
 ### Delete Goal: Deleting a Goal
 
 As a client, I want to be able to make a `DELETE` request to `/goals/1` when there is at least one saved goal and get this response:
@@ -148,8 +136,6 @@ As a client, I want to be able to make a `DELETE` request to `/goals/1` when the
 `204 No Content`
 
 The response should have a mimetype of "application/json" to keep our API response type consistent.
-
-We should remember that retrieving a model by its ID is a common operation. We should consider creating a route helper method that can retrieve a model by its ID, and use it in this route. This method could be written to work for Goal models, Task models, or any other model.
 
 ### No matching Goal: Get, Update, and Delete
 
