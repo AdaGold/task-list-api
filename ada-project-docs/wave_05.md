@@ -37,11 +37,11 @@ Goals should contain these attributes. **The tests require the title column to b
 - Don't forget to run:
   - `flask db migrate` every time there's a change in models, in order to generate migrations
   - `flask db upgrade` to run all generated migrations
-- Similar to the Task model, we could add a class method to the Goal model that initializes a new instance from a dictionary, and use this method in relevant routes. 
+- Similar to the Task model, we should add a class method to the Goal model that initializes a new instance from a dictionary, and use this method in relevant routes. 
   - If all of our models have this method, we could create a route helper method that initializes a new model instance from a dictionary, and use it in any route that creates a new model instance.
 - Also like the Task model, notice that routes that return a JSON response are sending a dictionary representation of the goal that was fetched or created. 
   - Creating a model helper method to return this dictionary, which we can then use to help build these route responses, will improve the consistency of our endpoints.
-- Further, we should remember that retrieving a model by its ID is a common operation. We should consider creating a route helper method that can retrieve a model by its ID, and use it for relevant routes. 
+- Further, we should remember that retrieving a model by its ID is a common operation. If it has not been done yet, we should create a route helper method that can retrieve a model by its ID, and use it for relevant routes. 
   - This method would be very similar in functionality to retrieving a Task model by its ID, so rather than making an entirely new route helper method, we could generalize any similar function to also work with a Goal (or any other model).
 
 ## CRUD for Goals
