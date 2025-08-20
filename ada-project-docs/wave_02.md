@@ -8,14 +8,15 @@ Our task list API allows users to create tasks and get a list of all tasks. Our 
 
 The following are required routes for wave 2. Feel free to implement the routes in any order within this wave.
 
-### Tips
-
-- Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any misspellings.
-- Use the tests in `tests/test_wave_02.py` to guide your implementation.
+Use the tests in `tests/test_wave_02.py` to guide your implementation.
 - You may feel that there are missing tests and missing edge cases considered in this wave. This is intentional.
   - You have fulfilled wave 2 requirements if all of the wave 2 tests pass.
   - You are free to add additional features, as long as the wave 2 tests still pass. However, we recommend that you consider the future waves, first.
 - Some tests use a fixture named `three_tasks` that is defined in `tests/conftest.py`. This fixture saves three different tasks with three different titles to the test database.
+
+### Tips
+
+- Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any misspellings.
 
 ### Sorting Tasks: By Title, Ascending
 
