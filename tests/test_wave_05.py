@@ -76,6 +76,7 @@ def test_create_goal(client):
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
+    pass
     # raise Exception("Complete test")
     # Act
     # ---- Complete Act Here ----
@@ -90,6 +91,7 @@ def test_update_goal(client, one_goal):
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
+    pass
     # raise Exception("Complete test")
     # Act
     # ---- Complete Act Here ----
@@ -124,6 +126,7 @@ def test_delete_goal(client, one_goal):
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
+    pass
     # raise Exception("Complete test")
 
     # Act
