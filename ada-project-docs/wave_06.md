@@ -2,7 +2,7 @@
 
 ## Goal
 
-Our users want to associate tasks and goals. Specifically, our users want to designate that there are many tasks that serve one goal.
+Our users want to associate `Task`s and `Goal`s. Specifically, our users want to designate that there are many tasks that serve one goal.
 
 This wave focuses on creating a one-to-many relationship between goals and tasks, where a goal has-many tasks, and a task belongs to one goal.
 
@@ -10,17 +10,19 @@ When we have many tasks and many goals, users will want to conveniently gather a
 
 ## Requirements
 
-First, we should update our models so that the relationship is saved in our database.
+First, we should update our models so that the relationship between them is created in our database.
 
 Secondly, we should create our new route, `/goals/<goal_id>/tasks`, so that our API gives back the right information.
+
+Use the tests in `tests/test_wave_06.py` to guide your implementation.
+- Some tests use a fixture named `one_task_belongs_to_one_goal` that is defined in `tests/conftest.py`. 
+  - This fixture uses other fixtures to save a task and a goal to the test database, then associates the task with the goal, and stores that updated relationship in the test database.
 
 ### Tips
 
 - Use lesson materials and independent research to review how to set up a one-to-many relationship in Flask.
-- Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to the model.
+- Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to a model.
 - Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any misspellings.
-- Use the tests in `tests/test_wave_06.py` to guide your implementation.
-- Some tests use a fixture named `one_task_belongs_to_one_goal` that is defined in `tests/conftest.py`. This fixture saves a task and a goal to the test database, and uses SQLAlchemy to associate the goal and task together.
 
 ### Updates to the Goal Model
 
@@ -37,8 +39,6 @@ After reviewing the strategy for creating a one-to-many relationship, in the Tas
 - Setting the foreign key to `goal`'s primary key column
 - Using `Optional` syntax to make the attribute nullable
 
-Remember to run `flask db migrate` and `flask db upgrade` whenever there is a change to the model.
-
 ### Sending a List of Task IDs to a Goal
 
 Given:
@@ -54,7 +54,7 @@ When I send a `POST` request to `/goals/1/tasks` with this request body:
 }
 ```
 
-Then the three `Task`s belong to the `Goal` and it gets updated in the database, and we get back a `200 OK` with the following response body:
+Then the three `Task`s belong to the `Goal` and it gets updated in the database. We get back a `200 OK` with the following response body:
 
 ```json
 {
@@ -102,7 +102,7 @@ then I get this response:
 }
 ```
 
-Notice that if we have been using a model helper method to return a dictionary representation of a Task, we can use this method to help build this route response. However, we must notice that there is an additional key in the data for the Task models that are associated with the Goal. This doesn't necessarily mean that we should abandon the model helper method, but we may need to introduce logic to allow it to work in this context.
+Notice that if we have been using a model helper method to return a dictionary representation of a Task, we can use this method to help build this route response. 
 
 This is also true of the Goal model helper method. We may need to introduce logic to allow it to work in this context, or use the existing method to generate the basic dictionary representation of the Goal and then add the additional data for the associated Task models.
 
