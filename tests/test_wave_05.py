@@ -37,12 +37,9 @@ def test_get_goal(client, one_goal):
 
     # Assert
     assert response.status_code == 200
-    assert "goal" in response_body
     assert response_body == {
-        "goal": {
-            "id": 1,
-            "title": "Build a habit of going outside daily"
-        }
+        "id": 1,
+        "title": "Build a habit of going outside daily"
     }
 
 
@@ -73,10 +70,8 @@ def test_create_goal(client):
     assert response.status_code == 201
     assert "goal" in response_body
     assert response_body == {
-        "goal": {
-            "id": 1,
-            "title": "My New Goal"
-        }
+        "id": 1,
+        "title": "My New Goal"
     }
 
 
