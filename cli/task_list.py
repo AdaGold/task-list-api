@@ -6,7 +6,7 @@ def parse_task_from_response(response):
     if response.status_code >= 400:
         return None
     
-    return response.json()["task"]
+    return response.json()
 
 def create_task(title, description, completed_at=None):
     query_params = {
@@ -25,14 +25,10 @@ def list_tasks():
 
 def get_task(id):
     response = requests.get(url+f"/tasks/{id}")
-    if response.status_code != 200:
-        return None
-        
     return parse_task_from_response(response)
 
 
 def update_task(id,title,description):
-
     query_params = {
         "title": title,
         "description": description
