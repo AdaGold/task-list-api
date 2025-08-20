@@ -4,24 +4,28 @@
 
 Our task list API allows users to meaningfully use the task resource. Users want to be able to mark a task as "complete" or "incomplete."
 
-We want to design our API so that it stores a task's `completed_at` date as a datetime value in our database. In this scenario, our API does _not_ give users the `completed_at` date... it only gives the information if `is_complete` is `true` or `false`.
+We want to design our API so that it stores a task's `completed_at` date as a datetime value in our database. In this scenario, our API does _not_ give users the `completed_at` date – it only gives the information if `is_complete` is `true` or `false`.
 
-A task's `is_complete` is `true` when there is a datetime for the task's `completed_at` value. A task's `is_complete` is `false` when there is a `null`/`None` value for the tasks's `completed_at` value.
+A task's `is_complete` is:
+- `true` when there is a datetime for the task's `completed_at` value.
+- `false` when there is a `null`/`None` value for the tasks's `completed_at` value.
 
 ## Requirements
 
 The following are required routes for wave 3. Feel free to implement the routes in any order within this wave.
 
-### Tips
-
-- Use the tests in `tests/test_wave_3.py` to guide your implementation.
+Use the tests in `tests/test_wave_3.py` to guide your implementation.
 - You may feel that there are missing tests and missing edge cases considered in this wave. This is intentional.
   - You have fulfilled wave 3 requirements if all of the wave 3 tests pass.
   - You are free to add additional features, as long as the wave 3 tests still pass. However, we recommend that you consider the future waves, first.
 - A test uses a fixture named `completed_task` that is defined in `tests/conftest.py`. This fixture saves a task with a datetime value in `completed_at` to the test database.
+
+### Tips
+
 - JSON's value of `true` is similar to Python's value of `True`, and `false` is similar to Python's `False`.
 - SQL's value of `null` is similar to Python's value of `None`.
 - Python has a [datetime library](https://docs.python.org/3/library/datetime.html#module-datetime) which we recommend using to represent dates in model attributes.
+- Notice that these routes require that we look up a model by its ID, and then update that model. We should be able to reuse the same route helper methods that we have been using in other Task routes to help build these routes.
 
 ### Mark Complete on an Incomplete Task
 
@@ -44,12 +48,10 @@ After I have made the `PATCH` request, I can submit a `GET` request to `/tasks/1
 
 ```json
 {
-  "task": {
-    "id": 1,
-    "title": "Go on my daily walk 🏞",
-    "description": "Notice something new every day",
-    "is_complete": true
-  }
+  "id": 1,
+  "title": "Go on my daily walk 🏞",
+  "description": "Notice something new every day",
+  "is_complete": true
 }
 ```
 
@@ -74,12 +76,10 @@ After I have made the `PATCH` request, I can submit a `GET` request to `/tasks/1
 
 ```json
 {
-  "task": {
-    "id": 1,
-    "title": "Go on my daily walk 🏞",
-    "description": "Notice something new every day",
-    "is_complete": false
-  }
+  "id": 1,
+  "title": "Go on my daily walk 🏞",
+  "description": "Notice something new every day",
+  "is_complete": false
 }
 ```
 
@@ -104,18 +104,12 @@ After I have made the `PATCH` request, I can submit a `GET` request to `/tasks/1
 
 ```json
 {
-  "task": {
-    "id": 1,
-    "title": "Go on my daily walk 🏞",
-    "description": "Notice something new every day",
-    "is_complete": true
-  }
+  "id": 1,
+  "title": "Go on my daily walk 🏞",
+  "description": "Notice something new every day",
+  "is_complete": true
 }
 ```
-
-Notice the same dictionary structure for the Task data as in our wave 1 routes. We should be able to use any response model helper that we are using in other Task routes to help build this response.
-
-Also notice that fundamentally, this route requires that we look up a model by its ID, and then update that model. We should be able to reuse the same route helper methods that we have been using in other Task routes to help build this route.
 
 ### Mark Incomplete on an Incomplete Task
 
@@ -138,18 +132,12 @@ After I have made the `PATCH` request, I can submit a `GET` request to `/tasks/1
 
 ```json
 {
-  "task": {
-    "id": 1,
-    "title": "Go on my daily walk 🏞",
-    "description": "Notice something new every day",
-    "is_complete": false
-  }
+  "id": 1,
+  "title": "Go on my daily walk 🏞",
+  "description": "Notice something new every day",
+  "is_complete": false
 }
 ```
-
-Notice the same dictionary structure for the Task data as in our wave 1 routes. We should be able to use any response model helper that we are using in other Task routes to help build this response.
-
-Also notice that fundamentally, this route requires that we look up a model by its ID, and then update that model. We should be able to reuse the same route helper methods that we have been using in other Task routes to help build this route.
 
 ## Mark Complete and Mark Incomplete for Missing Tasks
 

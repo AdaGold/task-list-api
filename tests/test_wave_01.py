@@ -41,14 +41,11 @@ def test_get_task(client, one_task):
 
     # Assert
     assert response.status_code == 200
-    assert "task" in response_body
     assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "Go on my daily walk 🏞",
-            "description": "Notice something new every day",
-            "is_complete": False
-        }
+        "id": 1,
+        "title": "Go on my daily walk 🏞",
+        "description": "Notice something new every day",
+        "is_complete": False
     }
 
 
@@ -78,14 +75,11 @@ def test_create_task(client):
 
     # Assert
     assert response.status_code == 201
-    assert "task" in response_body
     assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "A Brand New Task",
-            "description": "Test Description",
-            "is_complete": False
-        }
+        "id": 1,
+        "title": "A Brand New Task",
+        "description": "Test Description",
+        "is_complete": False
     }
     
     query = db.select(Task).where(Task.id == 1)
