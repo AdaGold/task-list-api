@@ -10,9 +10,9 @@ When we have many tasks and many goals, users will want to conveniently gather a
 
 ## Requirements
 
-First, we should update our models so that the relationship between them is created in our database.
-
-Secondly, we should create our new route, `/goals/<goal_id>/tasks`, so that our API gives back the right information.
+We should:
+1. Update our models so that the relationship between them is created in our database. Secondly, we should 
+2. Create our new route, `/goals/<goal_id>/tasks`, so that our API gives back the right information.
 
 Use the tests in `tests/test_wave_06.py` to guide your implementation.
 - Some tests use a fixture named `one_task_belongs_to_one_goal` that is defined in `tests/conftest.py`. 
