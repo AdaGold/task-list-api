@@ -1,4 +1,66 @@
+from app.models.goal import Goal
 import pytest
+
+@pytest.mark.skip(reason="No way to test this feature yet")
+def test_goal_to_dict():
+    #Arrange
+    new_goal = Goal(id=1, title="Seize the Day!")
+    
+    #Act
+    goal_dict = new_goal.to_dict()
+
+    #Assert
+    assert goal_dict["id"] == 1
+    assert goal_dict["title"] == "Seize the Day!"
+
+@pytest.mark.skip(reason="No way to test this feature yet")
+def test_goal_to_dict_no_id():
+    #Arrange
+    new_goal = Goal(title="Seize the Day!")
+    
+    #Act
+    goal_dict = new_goal.to_dict()
+
+    #Assert
+    assert goal_dict["id"] is None
+    assert goal_dict["title"] == "Seize the Day!"
+
+@pytest.mark.skip(reason="No way to test this feature yet")
+def test_goal_to_dict_no_title():
+    #Arrange
+    new_goal = Goal(id=1)
+    
+    #Act
+    goal_dict = new_goal.to_dict()
+
+    #Assert
+    assert goal_dict["id"] == 1
+    assert goal_dict["title"] is None
+
+
+
+@pytest.mark.skip(reason="No way to test this feature yet")
+def test_goal_from_dict():
+    #Arrange
+    goal_dict =  {
+        "title": "Seize the Day!",
+    }
+
+    #Act
+    goal_obj =  Goal.from_dict(goal_dict)
+
+    #Assert
+    assert goal_obj.title == "Seize the Day!"
+
+@pytest.mark.skip(reason="No way to test this feature yet")
+def test_goal_from_dict_no_title():
+    #Arrange
+    goal_dict =  {
+    }
+
+    #Act & Assert
+    with pytest.raises(KeyError, match = 'title'):
+        Goal.from_dict(goal_dict)
 
 
 @pytest.mark.skip(reason="No way to test this feature yet")

@@ -1,11 +1,17 @@
-# Wave 7: Deployment
+# Wave 7: Deployment and Refactoring
 
 ## Goal
 
-Our goal is to make our project accessible online!
+Our goal for wave 7 is twofold. We want to implement refactors that will reduce redundancy between our routes and we want our API to be available online!
 
 ## Requirements
 
+### Refactoring
+Using the Wave 07 tests and the refactoring examples we went over in class with Flasky, refactor your code in a way that removes redundancies across your Task and Goal routes. 
+
+Keep in mind that you may need to rework your project file structure and adjust your imports to make the tests work.
+
+### Deployment
 Deploy this project to Render.
 
 When deploying a web service to Render, it will try to be helpful and set the `Language` field for you, but it doesn't always select the correct option.
