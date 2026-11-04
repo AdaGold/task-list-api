@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, make_response, request, Response
+from datetime import datetime
 from app.models.task import Task
 from app.db import db
 
@@ -21,7 +22,16 @@ def create_task():
 
 @task_bp.get("")
 def get_all_tasks():
-    query = db.select(Task).order_by(Task.id)
+    query = db.select(Task)
+
+    sort_param = request.args.get("sort")
+    if sort_param == "asc":
+        query = query.order_by(Task.title)
+    elif sort_param == "desc":
+        query = query.order_by(Task.title.desc())
+    else:
+        query = query.order_by(Task.id)
+
     tasks = db.session.scalars(query)
 
     tasks_response = []
@@ -49,8 +59,26 @@ def delete_task(task_id):
     task = validate_task(task_id)
     db.session.delete(task)
     db.session.commit()
+    
+    return Response(status=204, mimetype="application/json")
+
+    
+@task_bp.patch("/<task_id>/mark_complete")
+def mark_complete(task_id):
+    task = validate_task(task_id)
+    task.completed_at = datetime.now()
+    db.session.commit()
 
     return Response(status=204, mimetype="application/json")
+
+@task_bp.patch("/<task_id>/mark_incomplete")
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+    task.completed_at = None
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
 
 def validate_task(task_id):
     try:
