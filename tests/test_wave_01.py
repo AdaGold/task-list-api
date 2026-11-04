@@ -155,7 +155,7 @@ def test_get_task_not_found(client):
     # *****************************************************************
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task(client):
     # Act
     response = client.post("/tasks", json={
@@ -247,7 +247,7 @@ def test_delete_task_not_found(client):
     assert db.session.scalars(db.select(Task)).all() == []
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task_must_contain_title(client):
     # Act
     response = client.post("/tasks", json={
@@ -264,7 +264,7 @@ def test_create_task_must_contain_title(client):
     assert db.session.scalars(db.select(Task)).all() == []
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task_must_contain_description(client):
     # Act
     response = client.post("/tasks", json={
