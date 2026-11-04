@@ -1,25 +1,15 @@
-from flask import Blueprint, abort, make_response, request, Response
+from flask import Blueprint, request, Response
 from app.models.goal import Goal
 from app.models.task import Task
 from app.db import db
-from .task_routes import validate_task
+from .routes_yay import validate_model, create_model
 
 goal_bp = Blueprint("goal_bp", __name__, url_prefix="/goals")
 
 @goal_bp.post("")
 def create_goal():
     request_body = request.get_json()
-
-    try:
-        new_goal = Goal.from_dict(request_body)
-    except KeyError:
-        response = {"details": "Invalid data"}
-        abort(make_response(response, 400))
-
-    db.session.add(new_goal)
-    db.session.commit()
-
-    return new_goal.to_dict(), 201
+    return create_model(Goal, request_body)
 
 @goal_bp.get("")
 def get_all_goals():
@@ -33,12 +23,12 @@ def get_all_goals():
 
 @goal_bp.get("/<goal_id>")
 def get_one_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     return goal.to_dict()
 
 @goal_bp.put("/<goal_id>")
 def update_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
     goal.title = request_body["title"]
@@ -48,7 +38,7 @@ def update_goal(goal_id):
 
 @goal_bp.delete("/<goal_id>")
 def delete_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     db.session.delete(goal)
     db.session.commit()
 
@@ -56,12 +46,12 @@ def delete_goal(goal_id):
 
 @goal_bp.post("/<goal_id>/tasks")
 def post_task_ids_to_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
     tasks = []
     for task_id in request_body["task_ids"]:
-        task = validate_task(task_id)
+        task = validate_model(Task, task_id)
         tasks.append(task)
 
     goal.tasks = tasks
@@ -71,7 +61,7 @@ def post_task_ids_to_goal(goal_id):
 
 @goal_bp.get("/<goal_id>/tasks")
 def get_tasks_for_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     tasks_response = []
     for task in goal.tasks:
@@ -80,19 +70,3 @@ def get_tasks_for_goal(goal_id):
     response = goal.to_dict()
     response["tasks"] = tasks_response
     return response
-
-def validate_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except:
-        response = {"message": f"goal {goal_id} invalid"}
-        abort(make_response(response, 400))
-
-    query = db.select(Goal).where(Goal.id == goal_id)
-    goal = db.session.scalar(query)
-
-    if not goal:
-        response = {"message": f"goal {goal_id} not found"}
-        abort(make_response(response, 404))
-
-    return goal
