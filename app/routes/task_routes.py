@@ -1,5 +1,7 @@
 from flask import Blueprint, request, Response
 from datetime import datetime
+import requests
+import os
 from app.models.task import Task
 from app.db import db
 from .routes_yay import validate_model, create_model
@@ -59,6 +61,14 @@ def mark_complete(task_id):
     task = validate_model(Task, task_id)
     task.completed_at = datetime.now()
     db.session.commit()
+
+    slack_token = os.environ.get("SLACK_BOT_TOKEN")
+    headers = {"Authorization": f"Bearer {slack_token}"}
+    slack_data = {
+        "channel": "api-testing",
+        "text": f"Someone just completed the task {task.title}"
+    }
+    requests.post("https://slack.com/api/chat.postMessage", json=slack_data, headers=headers)
 
     return Response(status=204, mimetype="application/json")
 
