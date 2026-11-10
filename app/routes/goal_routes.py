@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from ..db import db
 from ..models.goal import Goal
 from ..models.task import Task
-from .route_utilities import validate_model, create_model
+from .route_utilities import JSONBadRequest, validate_model, create_model
 
 
 goals_bp = Blueprint("goals", __name__)
@@ -41,7 +41,7 @@ def update_goal(goal_id):
     request_body = request.get_json(silent=True)
 
     if not isinstance(request_body, dict) or not request_body.get("title"):
-        return jsonify({"details": "Invalid data"}), 400
+        raise JSONBadRequest(description="Invalid data") 
 
     goal.title = request_body["title"]
     db.session.commit()
@@ -102,7 +102,7 @@ def get_tasks_for_goal(goal_id):
     tasks_list = []
 
     for task in goal.tasks:
-        tasks_list.append(task.to_dict())
+        tasks_list.append(task.to_dict(include_goal=True))
 
     return jsonify({
         "id": goal.id,

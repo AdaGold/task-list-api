@@ -55,7 +55,7 @@ def get_task(task_id):
     if task is None:
         return jsonify({"details": "Task not found"}), 404
 
-    return jsonify(task.to_dict()), 200
+    return jsonify(task.to_dict(include_goal=task.goal_id is not None)), 200
 
 
 @tasks_bp.route("/tasks/<int:task_id>", methods=["PUT"])

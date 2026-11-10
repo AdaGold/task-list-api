@@ -1,5 +1,5 @@
 from flask import abort, jsonify
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 from app.db import db
 
 
@@ -11,16 +11,26 @@ class JSONBadRequest(BadRequest):
 
     def get_headers(self, environ=None, scope=None):
         return [("Content-Type", "application/json")]
+    
+class JSONNotFound(NotFound):
+    def get_body(self, environ=None, scope=None):
+        return jsonify({
+            "details": self.description
+        }).get_data(as_text=True)
 
+    def get_headers(self, environ=None, scope=None):
+        return [("Content-Type", "application/json")]
 
 def validate_model(model, model_id):
     if type(model_id) is not int:
-        abort(400, description="Invalid ID")
+        raise JSONBadRequest(description="Invalid ID")
 
     instance = db.session.get(model, model_id)
 
     if instance is None:
-        abort(404, description=f"{model.__name__} not found")
+        raise JSONNotFound(
+            description=f"{model.__name__} not found"
+        )
 
     return instance
 
