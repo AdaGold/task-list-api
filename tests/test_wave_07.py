@@ -1,3 +1,4 @@
+
 import pytest
 from werkzeug.exceptions import HTTPException
 from app.models.goal import Goal
@@ -36,7 +37,7 @@ def test_route_utilities_validate_model_with_task_invalid_id(client, three_tasks
     response = e.value.get_response()
 
     assert response.status_code == 400
-    assert e.value.description == "Invalid ID"
+    assert response.get_json() == {"details": "Invalid ID"}
     # *****************************************************************************
     # ** Complete test with an assertion about the response body ****************
     # *****************************************************************************
@@ -50,7 +51,7 @@ def test_route_utilities_validate_model_with_task_missing_id(client, three_tasks
     response = e.value.get_response()
 
     assert response.status_code == 404
-    assert e.value.description == "Task not found"
+    assert response.get_json() == {"details": "Task not found"}
     # *****************************************************************************
     # **Complete test with assertion about status code response body***************
     # *****************************************************************************
@@ -74,7 +75,7 @@ def test_route_utilities_validate_model_with_goal_invalid_id(client, one_goal):
     response = e.value.get_response()
 
     assert response.status_code == 400
-    assert e.value.description == "Invalid ID"
+    assert response.get_json() == {"details": "Invalid ID"}
     # *****************************************************************************
     # **Complete test with assertion about status code response body***************
     # *****************************************************************************
@@ -88,7 +89,7 @@ def test_route_utilities_validate_model_with_goal_missing_id(client, one_goal):
     response = e.value.get_response()
 
     assert response.status_code == 404
-    assert e.value.description == "Goal not found"
+    assert response.get_json() == {"details": "Goal not found"}
     # *****************************************************************************
     # **Complete test with assertion about status code response body***************
     # *****************************************************************************
